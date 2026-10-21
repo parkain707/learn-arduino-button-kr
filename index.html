@@ -729,15 +729,50 @@
   </style>
 </head>
 <body>
+  <!-- ⏰ [도전 운영 시간(08:20~21:00) & 일일 3회 제한 잠금 모달] -->
+  <div class="auth-overlay" id="time-limit-overlay" style="display: none; z-index: 10005;">
+    <div class="auth-card" style="border-color: #ef4444; max-width: 440px;">
+      <div style="font-size: 46px; margin-bottom: 8px;" id="lock-icon">⏰</div>
+      <h2 style="font-family: var(--font-round); font-size: 22px; color: #f87171; margin-bottom: 8px;" id="lock-title">도전 운영 시간이 아닙니다</h2>
+      
+      <div style="background: #111827; border: 1.5px solid #374151; border-radius: 14px; padding: 14px; margin-bottom: 14px; text-align: left; font-size: 12.5px; line-height: 1.6;">
+        <div style="color: #fde047; font-weight: 700; margin-bottom: 4px;" id="lock-desc-main">
+          ⏰ <b>미션 도전 가능 시간: 매일 아침 08:20 ~ 밤 21:00</b>
+        </div>
+        <div style="color: #cbd5e1;" id="lock-time-status">
+          현재 시각: <span id="current-clock-display" style="color:#60a5fa; font-weight:700;">--:--</span>
+        </div>
+        <div style="color: #94a3b8; font-size: 11.5px; margin-top: 6px;" id="lock-extra-info">
+          서버 점검 및 학생 휴식을 위해 운영 시간 외에는 도전이 제한됩니다. 아침 08:20에 다시 찾아와주세요!
+        </div>
+      </div>
+
+      <div style="background: #1e1b2e; border: 1px dashed #ef4444; border-radius: 12px; padding: 10px; font-size: 11.5px; color: #fca5a5; margin-bottom: 14px; text-align: left;">
+        📢 <b>상금 수령 공식 규칙:</b> 100번을 클리어하더라도 상금 지급은 <b>단 1회만</b> 가능합니다! (중복 수령 절대 불가)
+      </div>
+
+      <button id="btn-admin-bypass" style="background: transparent; border: 1px solid #4b5563; color: #9ca3af; font-size: 11px; padding: 6px 12px; border-radius: 10px; cursor: pointer;">
+        🛠️ 대표님 / 관리자 테스트 모드로 즉시 입장
+      </button>
+    </div>
+  </div>
+
   <!-- 🔑 [로그인 / 프로필 모달] -->
   <div class="auth-overlay" id="auth-overlay">
     <div class="auth-card" id="auth-register-view">
       <div style="font-size: 42px; margin-bottom: 8px;">⚡</div>
       <h2 style="font-family: var(--font-round); font-size: 22px; color: #fde047; margin-bottom: 6px;">서바이벌 아두이노 배선 챌린지</h2>
-      <p style="font-size: 12px; color: #94a3b8; line-height: 1.45; margin-bottom: 16px;">
-        잘못 꽂으면 <b>합선 폭발!</b> 성공하면 <b>1,000 ~ 3,000 미소 상금!</b><br>
-        도전자 이름과 비밀번호를 등록하세요!
-      </p>
+      
+      <!-- 📌 [필독 운영 규칙 안내 배너] -->
+      <div style="background: rgba(15, 23, 42, 0.88); border: 1.5px solid #3b82f6; border-radius: 12px; padding: 10px 12px; margin-bottom: 14px; text-align: left; font-size: 11.5px; line-height: 1.5;">
+        <div style="font-family: var(--font-round); color: #93c5fd; font-size: 13px; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between;">
+          <span>📜 [도전자 필수 이용 규칙]</span>
+          <span style="font-size: 10.5px; color: #fbbf24;" id="auth-attempt-badge">오늘 기회: 3/3회</span>
+        </div>
+        <div style="color: #cbd5e1;">⏰ <b>도전 시간:</b> 매일 <b>아침 08:20 ~ 밤 21:00</b> (이외 시간 마감)</div>
+        <div style="color: #cbd5e1;">🎫 <b>접속 제한:</b> 하루 <b>최대 3회</b> 도전 가능</div>
+        <div style="color: #fca5a5; font-weight: 700; margin-top: 2px;">💰 <b>상금 규칙: 100번을 성공해도 상금은 1회만 지급!</b></div>
+      </div>
       
       <div style="text-align: left; margin-bottom: 10px;">
         <label style="font-size: 11.5px; color: #cbd5e1; font-weight: 700;">도전자 닉네임</label>
@@ -755,6 +790,14 @@
     <div class="auth-card" id="auth-login-view" style="display: none;">
       <div style="font-size: 42px; margin-bottom: 6px;">👋</div>
       <h2 style="font-family: var(--font-round); font-size: 21px; color: #fde047; margin-bottom: 6px;">도전자 복귀 확인</h2>
+
+      <!-- 📌 [필독 운영 규칙 안내 배너] -->
+      <div style="background: rgba(15, 23, 42, 0.88); border: 1.5px solid #3b82f6; border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; text-align: left; font-size: 11.5px; line-height: 1.5;">
+        <div style="color: #cbd5e1;">⏰ <b>도전 시간:</b> 매일 <b>아침 08:20 ~ 밤 21:00</b></div>
+        <div style="color: #cbd5e1;">🎫 <b>접속 제한:</b> 하루 <b>최대 3회</b> 도전 가능</div>
+        <div style="color: #fca5a5; font-weight: 700; margin-top: 2px;">💰 <b>상금: 100번을 성공해도 단 1회만 지급!</b></div>
+      </div>
+
       <div style="background: #111622; padding: 12px; border-radius: 12px; margin-bottom: 12px; border: 1px dashed #374151;">
         <div style="font-size: 14px; font-weight: 700; color: #60a5fa;" id="existing-name-display">지우 대원</div>
         <div style="font-size: 11.5px; color: #94a3b8; margin-top: 3px;" id="existing-stage-display">이전 기록 로딩 중...</div>
@@ -772,6 +815,8 @@
       <!-- 상단 HUD: 타이머 & 목숨 -->
       <div class="hud-bar">
         <span class="hud-title">⚡ SURVIVAL</span>
+        <div style="font-size: 11px; color: #93c5fd; background: rgba(30,58,138,0.7); border: 1px solid #3b82f6; padding: 2px 7px; border-radius: 12px; font-weight: 700;" id="hud-hours-pill">⏰ 08:20~21:00</div>
+        <div style="font-size: 11px; color: #fbbf24; background: rgba(120,53,15,0.7); border: 1px solid #f59e0b; padding: 2px 7px; border-radius: 12px; font-weight: 700;" id="hud-attempts-pill">🎫 오늘 1/3회</div>
         <button class="btn-mobile-toggle" id="btn-mobile-toggle">🔍 3D 확대</button>
         <div class="timer-pill" id="timer-pill">⏱️ <span id="timer-text">45.0s</span></div>
         <div class="lives-pill" id="lives-pill">❤️❤️❤️</div>
@@ -933,8 +978,11 @@
       </div>
 
       <div class="capture-notice-box">
-        📸 <b>상금 수령 안내:</b><br>
-        이 화면을 <b>캡처(스크린샷)하여 댓글로 업로드</b>하시면 <b>1회에 한하여 해당 상금을 지급</b>합니다!
+        📸 <b>상금 수령 공식 안내 (필독):</b><br>
+        이 화면을 <b>캡처(스크린샷)하여 댓글로 업로드</b>하시면 해당 상금을 지급합니다!<br>
+        <div style="margin-top: 4px; color: #fde047; font-weight: 800;">
+          ⚠️ 중요: 미션을 100번을 하더라도 상금 수령은 도전자 1인당 '단 1회'만 지급 가능! (중복 수령 절대 불가)
+        </div>
       </div>
 
       <div class="dilemma-actions" id="dilemma-actions">
@@ -946,6 +994,102 @@
   <canvas id="confetti-canvas"></canvas>
 
   <script>
+    /* =====================================================================
+       0. 운영 시간(08:20~21:00) & 일일 3회 접속 제한 엔진
+       ===================================================================== */
+    let adminBypassActive = false;
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('admin') === 'true' || urlParams.get('test') === 'true' || urlParams.get('preview') === 'true') {
+      adminBypassActive = true;
+    }
+
+    function getTodayKey() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function getDailyAttempts() {
+      const today = getTodayKey();
+      let record = {};
+      try {
+        record = JSON.parse(localStorage.getItem('MISO_DAILY_ATTEMPTS') || '{}');
+      } catch (e) {
+        record = {};
+      }
+      if (record.date !== today) {
+        record = { date: today, count: 0 };
+        localStorage.setItem('MISO_DAILY_ATTEMPTS', JSON.stringify(record));
+      }
+      return record;
+    }
+
+    function checkOperatingHours() {
+      if (adminBypassActive) return { isOpen: true, timeStr: '관리자 테스트' };
+
+      const now = new Date();
+      const h = now.getHours();
+      const m = now.getMinutes();
+      const curMins = h * 60 + m;
+      const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+
+      const openMins = 8 * 60 + 20; // 08:20
+      const closeMins = 21 * 60;     // 21:00
+
+      const isOpen = (curMins >= openMins && curMins < closeMins);
+      return { isOpen, timeStr };
+    }
+
+    function updateAttemptsHUD() {
+      const data = getDailyAttempts();
+      const badge = document.getElementById('auth-attempt-badge');
+      if (badge) badge.textContent = `오늘 도전: ${Math.min(3, data.count + 1)}/3회`;
+      const pill = document.getElementById('hud-attempts-pill');
+      if (pill) pill.textContent = `🎫 오늘 ${Math.min(3, data.count)}/3회`;
+    }
+
+    function verifyAccessOrBlock() {
+      const op = checkOperatingHours();
+      const timeOverlay = document.getElementById('time-limit-overlay');
+      const lockTitle = document.getElementById('lock-title');
+      const lockDesc = document.getElementById('lock-desc-main');
+      const clockDisplay = document.getElementById('current-clock-display');
+      const lockExtra = document.getElementById('lock-extra-info');
+
+      if (clockDisplay) clockDisplay.textContent = op.timeStr;
+
+      // 1. 운영 시간 체크 (08:20 ~ 21:00)
+      if (!op.isOpen) {
+        timeOverlay.style.display = 'flex';
+        lockTitle.textContent = '⏰ 미션 운영 시간이 아닙니다';
+        lockDesc.innerHTML = '⏰ <b>도전 가능 시간: 매일 아침 08:20 ~ 밤 21:00 (오후 9시)</b>';
+        lockExtra.textContent = '현재는 서버 점검 및 미션 휴식 시간입니다. 매일 아침 08:20에 문이 열립니다!';
+        return false;
+      }
+
+      // 2. 일일 3회 접속 횟수 체크
+      const attempts = getDailyAttempts();
+      if (!adminBypassActive && attempts.count >= 3) {
+        timeOverlay.style.display = 'flex';
+        lockTitle.textContent = '🚫 오늘 도전 횟수(3회)를 모두 소진했습니다!';
+        lockDesc.innerHTML = '🎫 <b>하루 최대 3회까지만 도전이 가능합니다.</b>';
+        lockExtra.textContent = '오늘의 모든 기회를 사용하셨습니다. 내일 아침 08:20에 3회의 기회가 다시 충전됩니다!';
+        return false;
+      }
+
+      timeOverlay.style.display = 'none';
+      return true;
+    }
+
+    // 초기 로딩 시 접근 검증 실행
+    verifyAccessOrBlock();
+    updateAttemptsHUD();
+
+    document.getElementById('btn-admin-bypass').addEventListener('click', () => {
+      adminBypassActive = true;
+      document.getElementById('time-limit-overlay').style.display = 'none';
+      alert('🛠️ 대표님 / 관리자 테스트 모드로 입장되었습니다. 운영 시간 및 횟수 제한 없이 자유롭게 테스트하실 수 있습니다.');
+    });
+
     /* =====================================================================
        1. 사용자 인증 & 이력 저장소
        ===================================================================== */
@@ -981,9 +1125,16 @@
     }
 
     document.getElementById('btn-start-adventure').addEventListener('click', () => {
+      if (!verifyAccessOrBlock()) return;
       const name = document.getElementById('user-name-input').value.trim();
       const pass = document.getElementById('user-pass-input').value.trim();
       if (!name || !pass) { alert('이름과 비밀번호를 모두 입력해주세요!'); return; }
+
+      const attempts = getDailyAttempts();
+      attempts.count += 1;
+      localStorage.setItem('MISO_DAILY_ATTEMPTS', JSON.stringify(attempts));
+      updateAttemptsHUD();
+
       user = { name, pass, currentStage: 1, lives: 3, certCode: 'MISO-' + Math.random().toString(36).substring(2,8).toUpperCase() };
       saveUser();
       authOverlay.style.display = 'none';
@@ -991,11 +1142,18 @@
     });
 
     document.getElementById('btn-continue-adventure').addEventListener('click', () => {
+      if (!verifyAccessOrBlock()) return;
       const pass = document.getElementById('login-pass-input').value.trim();
       if (existing && existing.pass && pass !== existing.pass) {
         alert('비밀번호가 일치하지 않습니다!');
         return;
       }
+
+      const attempts = getDailyAttempts();
+      attempts.count += 1;
+      localStorage.setItem('MISO_DAILY_ATTEMPTS', JSON.stringify(attempts));
+      updateAttemptsHUD();
+
       user = existing;
       authOverlay.style.display = 'none';
       startStage(user.currentStage || 1);
