@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>아두이노 놀이터 — 버튼을 꾹! 불이 반짝! (어린이 눈높이 3D 교실)</title>
   
-  <!-- 예쁜 둥근 폰트 & 한글 웹폰트 -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Round&display=swap" rel="stylesheet">
 
-  <!-- Three.js & OrbitControls (로컬 오프라인 지원) -->
   <script src="lib/three.min.js"></script>
   <script>
     if (typeof THREE === 'undefined') {
@@ -55,13 +53,12 @@
 
     #kids-app {
       display: grid;
-      grid-template-columns: 1fr 450px;
+      grid-template-columns: 1fr 470px;
       width: 100vw;
       height: 100vh;
       position: relative;
     }
 
-    /* 3D 스테이지 캔버스 */
     #canvas-container {
       position: relative;
       width: 100%;
@@ -80,7 +77,6 @@
       cursor: grabbing;
     }
 
-    /* 귀여운 상단 배너 */
     .top-banner {
       position: absolute;
       top: 20px;
@@ -115,7 +111,6 @@
       font-weight: 600;
     }
 
-    /* 조작 버튼 및 카메라 리셋 */
     .view-control {
       position: absolute;
       bottom: 24px;
@@ -143,7 +138,6 @@
       border-bottom: 2px solid #ccd2e0;
     }
 
-    /* 화면 중앙 직관적인 인터랙션 팝업 말풍선 */
     .action-bubble {
       position: absolute;
       bottom: 30px;
@@ -170,7 +164,6 @@
       transform: translateX(-50%) scale(1.08);
     }
 
-    /* 3D 앵커 말풍선 */
     .bubble-tag {
       position: absolute;
       background: rgba(255, 255, 255, 0.95);
@@ -208,28 +201,27 @@
       z-index: 20;
     }
 
-    /* 로봇 캐릭터 이야기 구역 */
     .story-hero {
-      padding: 24px 24px 16px;
+      padding: 20px 22px 14px;
       background: linear-gradient(135deg, #fff7dc 0%, #fffbf0 100%);
       border-bottom: 2px dashed #ffde59;
     }
     .robot-card {
       display: flex;
-      gap: 14px;
+      gap: 12px;
       align-items: center;
       background: #ffffff;
-      padding: 14px 16px;
-      border-radius: 18px;
+      padding: 12px 14px;
+      border-radius: 16px;
       border: 2px solid #ffd43f;
-      box-shadow: 0 6px 12px rgba(255, 212, 63, 0.15);
+      box-shadow: 0 4px 10px rgba(255, 212, 63, 0.15);
     }
     .robot-face {
-      font-size: 38px;
+      font-size: 34px;
     }
     .robot-speech {
-      font-size: 13.5px;
-      line-height: 1.5;
+      font-size: 13px;
+      line-height: 1.45;
       color: #3b4256;
     }
     .robot-speech b {
@@ -237,54 +229,146 @@
       font-family: var(--font-round);
     }
 
-    /* 재미있는 탐구 카드 */
+    /* 🎯 3단계 난이도별 미션 퀘스트 컨테이너 */
+    .quest-section {
+      padding: 16px 20px;
+      background: #f7faff;
+      border-bottom: 2px solid #e4edfc;
+    }
+    .quest-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .quest-main-title {
+      font-family: var(--font-round);
+      font-size: 17px;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .quest-badge-count {
+      font-family: var(--font-round);
+      font-size: 13px;
+      background: #ffde59;
+      color: #78350f;
+      padding: 3px 9px;
+      border-radius: 20px;
+    }
+
+    .mission-card {
+      background: #ffffff;
+      border: 2px solid #dbeafe;
+      border-radius: 14px;
+      padding: 11px 13px;
+      margin-bottom: 9px;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .mission-card.completed {
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+    .mission-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .mission-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+    .tag-easy { background: #dcfce7; color: #166534; }
+    .tag-mid { background: #fef3c7; color: #92400e; }
+    .tag-hard { background: #fee2e2; color: #991b1b; }
+
+    .mission-status-icon {
+      font-size: 16px;
+    }
+    .mission-title {
+      font-family: var(--font-round);
+      font-size: 14px;
+      color: #1f2937;
+      margin-bottom: 2px;
+    }
+    .mission-card.completed .mission-title {
+      color: #166534;
+      text-decoration: line-through;
+    }
+    .mission-desc {
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.35;
+    }
+
+    .mission-progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    .mission-progress-fill {
+      height: 100%;
+      background: #3b82f6;
+      width: 0%;
+      transition: width 0.15s ease;
+    }
+    .mission-card.completed .mission-progress-fill {
+      background: #22c55e;
+      width: 100% !important;
+    }
+
     .cards-container {
-      padding: 18px 24px;
+      padding: 14px 20px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
       flex: 1;
     }
 
     .fun-card {
       background: #fbfbfd;
       border: 2px solid #e8ecf4;
-      border-radius: 18px;
-      padding: 16px;
-      position: relative;
+      border-radius: 16px;
+      padding: 14px;
     }
     .fun-card-title {
       font-family: var(--font-round);
-      font-size: 16px;
+      font-size: 15px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 6px;
+      margin-bottom: 6px;
     }
     .card-coral { border-color: #ffb8b8; background: #fff8f8; }
     .card-blue { border-color: #bcd0ff; background: #f6f9ff; }
-    .card-green { border-color: #c3f2b1; background: #f7fdf5; }
 
-    /* 모드 선택 스위치 */
     .mode-select-box {
       display: flex;
       gap: 8px;
-      margin: 10px 0 4px;
+      margin-top: 6px;
     }
     .kid-mode-btn {
       flex: 1;
       border: 2px solid #d3dbe8;
       border-bottom: 4px solid #b6c2d6;
       background: #fff;
-      padding: 10px 8px;
-      border-radius: 14px;
+      padding: 9px 6px;
+      border-radius: 12px;
       font-family: var(--font-round);
-      font-size: 14px;
+      font-size: 13.5px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
       transition: all 0.15s;
     }
     .kid-mode-btn.active {
@@ -298,71 +382,81 @@
       border-bottom-width: 2px;
     }
 
-    /* 한눈에 쏙 들어오는 블록 설명 */
-    .block-explain {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 10px;
-    }
-    .block-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #ffffff;
-      padding: 8px 12px;
-      border-radius: 10px;
-      border-left: 5px solid #5271ff;
-      font-size: 13px;
-    }
-    .block-name {
-      font-family: var(--font-round);
-      font-size: 13px;
-      color: #5271ff;
-      white-space: nowrap;
-    }
-
-    /* 하단 시작 버튼 */
-    .play-section {
-      padding: 16px 24px 24px;
-      background: #fffbf0;
-      border-top: 2px dashed #ffde59;
-    }
-    .btn-big-play {
-      width: 100%;
-      background: #ff5757;
-      border: none;
-      border-bottom: 5px solid #d43b3b;
-      padding: 14px;
-      border-radius: 18px;
-      font-family: var(--font-round);
-      font-size: 18px;
-      color: #ffffff;
-      cursor: pointer;
-      display: flex;
+    /* 축하 모달 팝업 */
+    .celebrate-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(5px);
+      display: none;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      box-shadow: 0 6px 15px rgba(255, 87, 87, 0.3);
-      transition: all 0.15s;
+      z-index: 999;
+      animation: modalFadeIn 0.3s ease;
     }
-    .btn-big-play:hover {
-      background: #ff4747;
+    .celebrate-card {
+      background: #fff;
+      border: 4px solid #ffde59;
+      border-radius: 28px;
+      padding: 30px;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .btn-big-play:active {
-      transform: translateY(3px);
-      border-bottom-width: 2px;
+    @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes popIn { from { transform: scale(0.7); } to { transform: scale(1); } }
+    .badge-medal {
+      font-size: 64px;
+      margin-bottom: 12px;
+      animation: medalWiggle 1.5s infinite;
     }
-    .btn-big-play.is-playing {
-      background: #7ed957;
-      border-bottom-color: #5cb834;
-      color: #1a4208;
+    @keyframes medalWiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-8deg); }
+      75% { transform: rotate(8deg); }
+    }
+    .celebrate-title {
+      font-family: var(--font-round);
+      font-size: 24px;
+      color: #ff5757;
+      margin-bottom: 8px;
+    }
+    .celebrate-sub {
+      font-size: 14px;
+      color: #4b5563;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    .btn-close-modal {
+      background: #5271ff;
+      color: #fff;
+      border: none;
+      border-bottom: 4px solid #324fc7;
+      padding: 10px 24px;
+      border-radius: 20px;
+      font-family: var(--font-round);
+      font-size: 16px;
+      cursor: pointer;
     }
 
-    @media (max-width: 900px) {
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    @media (max-width: 960px) {
       #kids-app {
         grid-template-columns: 1fr;
-        grid-template-rows: 55vh 45vh;
+        grid-template-rows: 50vh 50vh;
       }
       #sidebar {
         border-left: none;
@@ -373,7 +467,6 @@
 </head>
 <body>
   <div id="kids-app">
-    <!-- 3D 인터랙티브 놀이터 -->
     <main id="canvas-container">
       <div class="top-banner">
         <span class="mascot-icon">🤖</span>
@@ -388,98 +481,116 @@
 
       <canvas id="three-canvas"></canvas>
 
-      <!-- 부품 위치 말풍선 -->
       <div class="bubble-tag" id="tag-button">빨간 단추 버튼 🔴</div>
       <div class="bubble-tag" id="tag-led">반짝 꼬마전구 (LED) 💡</div>
       <div class="bubble-tag" id="tag-resistor">안전 지킴이 저항 🛡️</div>
 
-      <!-- 카메라 제어 버튼 -->
       <div class="view-control">
         <button class="btn-fun" id="btn-reset">🔄 처음 시점으로 보기</button>
         <button class="btn-fun" id="btn-sound-toggle">🔊 소리 켜짐</button>
       </div>
 
-      <!-- 화면 하단 큰 안내 말풍선 -->
       <div class="action-bubble" id="action-bubble">
         <span id="bubble-emoji">👆</span>
         <span id="bubble-text">화면 속 빨간색 동그란 버튼을 마우스로 꾹 눌러보세요!</span>
       </div>
     </main>
 
-    <!-- 오른쪽 쉬운 학습 패널 -->
     <aside id="sidebar">
       <div class="story-hero">
         <div class="robot-card">
           <div class="robot-face">🤖</div>
           <div class="robot-speech">
             안녕! 나는 꼬마 로봇 <b>팅커봇</b>이야!<br>
-            오늘 우리는 버튼을 눌러서 예쁜 꼬마전구에 <b>반짝반짝 불</b>을 켜볼 거야! 준비됐니?
+            아래 <b>3가지 탐험 미션</b>을 모두 깨고 <b>아두이노 마스터 메달</b>을 따볼까?
           </div>
         </div>
       </div>
+
+      <!-- 🎯 난이도별 3단계 미션 섹션 -->
+      <section class="quest-section">
+        <div class="quest-header">
+          <div class="quest-main-title">🎯 오늘의 탐험 미션</div>
+          <div class="quest-badge-count" id="quest-count">달성: 0 / 3 ⭐</div>
+        </div>
+
+        <!-- 미션 1: 초급 -->
+        <div class="mission-card" id="mission-1">
+          <div class="mission-top">
+            <span class="mission-tag tag-easy">🌱 1단계 (쉬움)</span>
+            <span class="mission-status-icon" id="m1-icon">⏳</span>
+          </div>
+          <div class="mission-title">1. 전등 켜기 마법사</div>
+          <div class="mission-desc">버튼을 <b>3초 동안 꾹 누르고</b> 불을 환하게 밝혀보세요!</div>
+          <div class="mission-progress-bar"><div class="mission-progress-fill" id="m1-fill"></div></div>
+        </div>
+
+        <!-- 미션 2: 중급 -->
+        <div class="mission-card" id="mission-2">
+          <div class="mission-top">
+            <span class="mission-tag tag-mid">⚡ 2단계 (보통)</span>
+            <span class="mission-status-icon" id="m2-icon">🔒</span>
+          </div>
+          <div class="mission-title">2. 방 전등 스위치 만들기</div>
+          <div class="mission-desc">[전등 스위치 모드]로 바꾸고, <b>손을 떼도 불이 켜져 있게</b> 해보세요!</div>
+          <div class="mission-progress-bar"><div class="mission-progress-fill" id="m2-fill"></div></div>
+        </div>
+
+        <!-- 미션 3: 고급 -->
+        <div class="mission-card" id="mission-3">
+          <div class="mission-top">
+            <span class="mission-tag tag-hard">👑 3단계 (도전)</span>
+            <span class="mission-status-icon" id="m3-icon">🔒</span>
+          </div>
+          <div class="mission-title">3. 비밀 모스 부호 전송</div>
+          <div class="mission-desc">3초 안에 버튼을 <b>3번 톡-톡-톡 빠르게</b> 연타해보세요!</div>
+          <div class="mission-progress-bar"><div class="mission-progress-fill" id="m3-fill"></div></div>
+        </div>
+      </section>
 
       <div class="cards-container">
-        <!-- 카드 1: 어떤 원리일까요? -->
-        <div class="fun-card card-coral">
-          <div class="fun-card-title">🔍 전기는 어떻게 흐를까요?</div>
-          <p style="font-size: 13.5px; line-height: 1.5; color: #4b5266;">
-            1. <b>버튼(스위치):</b> 평소에는 다리가 끊겨 있다가, 손으로 꾹 누르면 <b>징검다리</b>가 쿵 연결되면서 전기가 슝 통과해요!<br>
-            2. <b>꼬마전구(LED):</b> 13번 핀에서 전기가 도착하면 예쁜 빨간 빛을 뿜어요.<br>
-            3. <b>풀다운 저항:</b> 손을 뗐을 때 전선에 남아있는 정전기 때문에 깜빡이지 않도록, 전기를 0번으로 얌전히 내려주는 <b>안전 미끄럼틀</b>이에요!
-          </p>
-        </div>
-
-        <!-- 카드 2: 모드 고르기 -->
         <div class="fun-card card-blue">
-          <div class="fun-card-title">🎮 버튼 작동 모드를 골라보세요!</div>
+          <div class="fun-card-title">🎮 버튼 작동 모드 선택</div>
           <div class="mode-select-box">
             <button class="kid-mode-btn active" data-mode="hold">
-              <span style="font-size: 20px;">🛎️</span>
+              <span style="font-size: 19px;">🛎️</span>
               <span>누를 때만 켜기</span>
-              <small style="font-size: 11px; color:#8590a6;">초인종처럼 작동해요</small>
+              <small style="font-size: 11px; color:#8590a6;">초인종 모드</small>
             </button>
             <button class="kid-mode-btn" data-mode="toggle">
-              <span style="font-size: 20px;">💡</span>
+              <span style="font-size: 19px;">💡</span>
               <span>딸깍! 껐다 켜기</span>
-              <small style="font-size: 11px; color:#8590a6;">방 전등 스위치 같아요</small>
+              <small style="font-size: 11px; color:#8590a6;">전등 스위치 모드</small>
             </button>
           </div>
         </div>
 
-        <!-- 카드 3: 로봇에게 내리는 명령어 (코드) -->
-        <div class="fun-card card-green">
-          <div class="fun-card-title">📜 로봇 두뇌에게 내리는 명령어</div>
-          <div class="block-explain">
-            <div class="block-item">
-              <span class="block-name">pinMode(버튼, 입력)</span>
-              <span>"2번 귀를 열고 버튼 신호를 들을 준비를 해!"</span>
-            </div>
-            <div class="block-item">
-              <span class="block-name">digitalRead(버튼)</span>
-              <span>"지금 사람이 버튼을 누르고 있니? 물어보기"</span>
-            </div>
-            <div class="block-item">
-              <span class="block-name">digitalWrite(LED, 켜기)</span>
-              <span>"버튼이 눌렸으니 꼬마전구에 불을 켜줘!"</span>
-            </div>
-          </div>
+        <div class="fun-card card-coral">
+          <div class="fun-card-title">🔍 전기는 어떻게 흐를까요?</div>
+          <p style="font-size: 13px; line-height: 1.5; color: #4b5266;">
+            • <b>스위치 다리:</b> 버튼을 누르면 전선 다리가 쿵 연결되어 전기가 통과해요!<br>
+            • <b>안전 미끄럼틀(풀다운):</b> 손을 뗐을 때 헷갈리지 않게 전기를 0번으로 얌전히 내려보내 줘요!
+          </p>
         </div>
-      </div>
-
-      <!-- 하단 실행 버튼 -->
-      <div class="play-section">
-        <button class="btn-big-play is-playing" id="btn-master-play">
-          <span id="play-icon">✨</span>
-          <span id="play-text">체험 시작 중! (버튼을 눌러보세요)</span>
-        </button>
       </div>
     </aside>
   </div>
 
+  <div class="celebrate-modal" id="celebrate-modal">
+    <div class="celebrate-card">
+      <div class="badge-medal">🏆</div>
+      <h2 class="celebrate-title">대단해요! 올클리어!</h2>
+      <p class="celebrate-sub">
+        3가지 탐험 미션을 모두 완수한 당신은<br>
+        <b>'아두이노 탐험 대장'</b>입니다! 훌륭해요!
+      </p>
+      <button class="btn-close-modal" id="btn-close-modal">계속 자유롭게 놀기 🚀</button>
+    </div>
+  </div>
+
+  <canvas id="confetti-canvas"></canvas>
+
   <script>
-    /* =====================================================================
-       1. 효과음 오디오 엔진 (Web Audio API)
-       ===================================================================== */
     let audioCtx = null;
     let soundEnabled = true;
 
@@ -492,28 +603,34 @@
       }
     }
 
-    // 경쾌한 딸깍/퐁 사운드
-    function playClickSound(isDown) {
+    function playTone(freq, duration = 0.08, type = 'sine', gainVal = 0.18) {
       if (!soundEnabled) return;
       initAudio();
       if (!audioCtx) return;
-
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       const now = audioCtx.currentTime;
-
-      osc.type = isDown ? 'sine' : 'triangle';
-      const freq = isDown ? 650 : 880;
+      osc.type = type;
       osc.frequency.setValueAtTime(freq, now);
-      osc.frequency.exponentialRampToValueAtTime(isDown ? 300 : 500, now + 0.08);
-
-      gain.gain.setValueAtTime(0.18, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-
+      gain.gain.setValueAtTime(gainVal, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       osc.start(now);
-      osc.stop(now + 0.09);
+      osc.stop(now + duration + 0.01);
+    }
+
+    function playClickSound(isDown) {
+      playTone(isDown ? 650 : 880, 0.08, isDown ? 'sine' : 'triangle', 0.18);
+    }
+
+    function playFanfareSound() {
+      if (!soundEnabled) return;
+      initAudio();
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((f, idx) => {
+        setTimeout(() => playTone(f, 0.18, 'triangle', 0.22), idx * 110);
+      });
     }
 
     document.getElementById('btn-sound-toggle').addEventListener('click', () => {
@@ -521,9 +638,43 @@
       document.getElementById('btn-sound-toggle').textContent = soundEnabled ? '🔊 소리 켜짐' : '🔇 소리 꺼짐';
     });
 
-    /* =====================================================================
-       2. 상태 관리 및 말풍선 피드백
-       ===================================================================== */
+    const missions = {
+      m1: { completed: false, holdTimer: null, holdSeconds: 0 },
+      m2: { completed: false },
+      m3: { completed: false, clickTimestamps: [] }
+    };
+
+    let completedCount = 0;
+
+    function completeMission(mKey, title) {
+      if (missions[mKey].completed) return;
+      missions[mKey].completed = true;
+      completedCount++;
+
+      playFanfareSound();
+      triggerConfetti(60);
+
+      const card = document.getElementById(`mission-${mKey.slice(1)}`);
+      card.classList.add('completed');
+      document.getElementById(`${mKey}-icon`).textContent = '✅';
+      document.getElementById('quest-count').textContent = `달성: ${completedCount} / 3 ⭐`;
+
+      actionBubble.classList.add('active-state');
+      bubbleEmoji.textContent = '🎉';
+      bubbleText.textContent = `축하해요! [${title}] 미션 달성! ⭐`;
+
+      if (completedCount === 3) {
+        setTimeout(() => {
+          document.getElementById('celebrate-modal').style.display = 'flex';
+          triggerConfetti(150);
+        }, 600);
+      }
+    }
+
+    document.getElementById('btn-close-modal').addEventListener('click', () => {
+      document.getElementById('celebrate-modal').style.display = 'none';
+    });
+
     const state = {
       mode: 'hold',
       isDown: false,
@@ -541,17 +692,16 @@
         bubbleEmoji.textContent = '💡';
         bubbleText.textContent = state.mode === 'hold' 
           ? '우와! 버튼을 누르고 있어서 전구가 반짝반짝 켜졌어요!' 
-          : '딸깍! 전등 스위치가 작동했어요!';
+          : '딸깍! 전등 스위치가 켜졌어요!';
       } else {
         actionBubble.classList.remove('active-state');
         bubbleEmoji.textContent = '👆';
         bubbleText.textContent = state.mode === 'hold'
           ? '손을 떼니까 전구가 꺼졌어요! 다시 꾹 눌러보세요.'
-          : '버튼을 한 번 더 누르면 전등이 어떻게 될까요?';
+          : (state.toggleState ? '불이 켜진 채로 유지되고 있어요! 멋져요!' : '버튼을 눌러 다시 전등을 켜보세요!');
       }
     }
 
-    // 모드 스위처
     document.querySelectorAll('.kid-mode-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.kid-mode-btn').forEach(b => b.classList.remove('active'));
@@ -563,9 +713,6 @@
       });
     });
 
-    /* =====================================================================
-       3. Three.js 3D 씬 (아두이노 + 버튼 + LED + 저항)
-       ===================================================================== */
     const container = document.getElementById('canvas-container');
     const canvas = document.getElementById('three-canvas');
 
@@ -597,7 +744,6 @@
       controls.update();
     });
 
-    // 조명
     scene.add(new THREE.AmbientLight(0xfff8ee, 0.8));
     const sunLight = new THREE.DirectionalLight(0xffffff, 0.85);
     sunLight.position.set(40, 80, 40);
@@ -606,7 +752,6 @@
     sunLight.shadow.mapSize.height = 1024;
     scene.add(sunLight);
 
-    // 바닥 그림자 평면
     const ground = new THREE.Mesh(
       new THREE.PlaneGeometry(300, 300),
       new THREE.ShadowMaterial({ opacity: 0.12 })
@@ -618,17 +763,14 @@
     const mainGroup = new THREE.Group();
     scene.add(mainGroup);
 
-    // 1) 귀여운 Uno 아두이노 보드
     const unoGroup = new THREE.Group();
     unoGroup.position.set(-18, 0, 0);
-    const unoMat = new THREE.MeshStandardMaterial({ color: 0x147387, roughness: 0.4 });
-    const unoPcb = new THREE.Mesh(new THREE.BoxGeometry(42, 1.8, 58), unoMat);
+    const unoPcb = new THREE.Mesh(new THREE.BoxGeometry(42, 1.8, 58), new THREE.MeshStandardMaterial({ color: 0x147387, roughness: 0.4 }));
     unoPcb.position.y = 0.9;
     unoPcb.castShadow = true;
     unoPcb.receiveShadow = true;
     unoGroup.add(unoPcb);
 
-    // 은색 USB 포트 & 검정 전원잭
     const silverMat = new THREE.MeshStandardMaterial({ color: 0xdde2ea, roughness: 0.3, metalness: 0.8 });
     const darkMat = new THREE.MeshStandardMaterial({ color: 0x222530, roughness: 0.7 });
     const usb = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 12), silverMat);
@@ -640,30 +782,25 @@
     jack.position.set(14, 5, -22);
     unoGroup.add(jack);
 
-    // 내장 L LED
     const lLedMat = new THREE.MeshStandardMaterial({ color: 0x553311, emissive: 0x000000 });
     const lLed = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.8, 1.6), lLedMat);
     lLed.position.set(-12, 1.8, 5);
     unoGroup.add(lLed);
     mainGroup.add(unoGroup);
 
-    // 2) 브레드보드
     const bbGroup = new THREE.Group();
     bbGroup.position.set(22, 0, 0);
-    const bbMat = new THREE.MeshStandardMaterial({ color: 0xf5f0e6, roughness: 0.5 });
-    const bb = new THREE.Mesh(new THREE.BoxGeometry(38, 5.5, 58), bbMat);
+    const bb = new THREE.Mesh(new THREE.BoxGeometry(38, 5.5, 58), new THREE.MeshStandardMaterial({ color: 0xf5f0e6, roughness: 0.5 }));
     bb.position.y = 2.75;
     bb.castShadow = true;
     bb.receiveShadow = true;
     bbGroup.add(bb);
 
-    // 중앙 분리 홈
     const divider = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.2, 56), darkMat);
     divider.position.set(0, 5.2, 0);
     bbGroup.add(divider);
     mainGroup.add(bbGroup);
 
-    // 3) 빨간색 큼직하고 귀여운 버튼
     const buttonGroup = new THREE.Group();
     buttonGroup.position.set(22, 5.5, -10);
 
@@ -677,7 +814,6 @@
     btnPlate.castShadow = true;
     buttonGroup.add(btnPlate);
 
-    // 누르면 쏙 들어가는 캡
     const capGroup = new THREE.Group();
     capGroup.position.y = 3.8;
     const capMat = new THREE.MeshStandardMaterial({ color: 0xff4747, roughness: 0.3 });
@@ -686,7 +822,6 @@
     capMesh.castShadow = true;
     capGroup.add(capMesh);
 
-    // 터치 감지용 히트박스
     const hitBox = new THREE.Mesh(new THREE.BoxGeometry(16, 12, 16), new THREE.MeshBasicMaterial({ visible: false }));
     hitBox.position.y = 4;
     capGroup.add(hitBox);
@@ -694,7 +829,6 @@
     buttonGroup.add(capGroup);
     mainGroup.add(buttonGroup);
 
-    // 4) 꼬마전구 (LED)
     const ledGroup = new THREE.Group();
     ledGroup.position.set(30, 5.5, 18);
     const ledMat = new THREE.MeshStandardMaterial({
@@ -717,7 +851,6 @@
     ledGroup.add(ledLight);
     mainGroup.add(ledGroup);
 
-    // 5) 저항들
     function makeResistor(pos, colors) {
       const g = new THREE.Group();
       g.position.copy(pos);
@@ -734,10 +867,9 @@
       mainGroup.add(g);
       return g;
     }
-    const pullDownRes = makeResistor(new THREE.Vector3(22, 8.2, -1), [0x603813, 0x000000, 0xe67e22, 0xd4af37]); // 10k
-    const ledRes = makeResistor(new THREE.Vector3(22, 8.2, 10), [0xd93829, 0xd93829, 0x603813, 0xd4af37]);      // 220
+    const pullDownRes = makeResistor(new THREE.Vector3(22, 8.2, -1), [0x603813, 0x000000, 0xe67e22, 0xd4af37]);
+    const ledRes = makeResistor(new THREE.Vector3(22, 8.2, 10), [0xd93829, 0xd93829, 0x603813, 0xd4af37]);
 
-    // 6) 알록달록 무지개 점퍼 전선
     function makeWire(pts, color) {
       const curve = new THREE.CatmullRomCurve3(pts);
       const tube = new THREE.Mesh(
@@ -747,14 +879,11 @@
       tube.castShadow = true;
       mainGroup.add(tube);
     }
-    makeWire([new THREE.Vector3(-0.5, 3.5, 4), new THREE.Vector3(6, 15, -2), new THREE.Vector3(14, 13, -12), new THREE.Vector3(17, 6, -12)], 0xff5757); // 5V 빨강
-    makeWire([new THREE.Vector3(-36, 3.5, 9), new THREE.Vector3(-20, 17, 2), new THREE.Vector3(12, 15, -8), new THREE.Vector3(26, 6, -8)], 0x5271ff);   // D2 파랑
-    makeWire([new THREE.Vector3(-36, 3.5, 17), new THREE.Vector3(-15, 18, 12), new THREE.Vector3(15, 15, 3), new THREE.Vector3(26, 6, 3)], 0x222a3d);  // GND 네이비
-    makeWire([new THREE.Vector3(-36, 3.5, -9), new THREE.Vector3(-18, 16, -4), new THREE.Vector3(10, 15, 8), new THREE.Vector3(18, 6, 8)], 0xffa040); // D13 주황
+    makeWire([new THREE.Vector3(-0.5, 3.5, 4), new THREE.Vector3(6, 15, -2), new THREE.Vector3(14, 13, -12), new THREE.Vector3(17, 6, -12)], 0xff5757);
+    makeWire([new THREE.Vector3(-36, 3.5, 9), new THREE.Vector3(-20, 17, 2), new THREE.Vector3(12, 15, -8), new THREE.Vector3(26, 6, -8)], 0x5271ff);
+    makeWire([new THREE.Vector3(-36, 3.5, 17), new THREE.Vector3(-15, 18, 12), new THREE.Vector3(15, 15, 3), new THREE.Vector3(26, 6, 3)], 0x222a3d);
+    makeWire([new THREE.Vector3(-36, 3.5, -9), new THREE.Vector3(-18, 16, -4), new THREE.Vector3(10, 15, 8), new THREE.Vector3(18, 6, 8)], 0xffa040);
 
-    /* =====================================================================
-       4. 버튼 클릭 & 쫀득한 물리 트윈 애니메이션
-       ===================================================================== */
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let isPressedOnScreen = false;
@@ -778,20 +907,58 @@
       }
     }
 
+    let holdInterval = null;
+
     function triggerButton(isDown) {
       if (state.isDown === isDown) return;
       state.isDown = isDown;
-      capTargetY = isDown ? 2.4 : 3.8; // 1.4mm 하향
+      capTargetY = isDown ? 2.4 : 3.8;
       playClickSound(isDown);
 
       if (state.mode === 'hold') {
         setLedGlow(isDown);
         updateActionBubble(isDown);
+
+        // 🎯 [미션 1 감지]: 3초 꾹 누르기
+        if (isDown && !missions.m1.completed) {
+          missions.m1.holdSeconds = 0;
+          const fillBar = document.getElementById('m1-fill');
+          clearInterval(holdInterval);
+          holdInterval = setInterval(() => {
+            missions.m1.holdSeconds += 0.1;
+            fillBar.style.width = `${Math.min(100, (missions.m1.holdSeconds / 3.0) * 100)}%`;
+            if (missions.m1.holdSeconds >= 3.0) {
+              clearInterval(holdInterval);
+              completeMission('m1', '전등 켜기 마법사');
+            }
+          }, 100);
+        } else if (!isDown && !missions.m1.completed) {
+          clearInterval(holdInterval);
+          document.getElementById('m1-fill').style.width = '0%';
+        }
+
       } else if (state.mode === 'toggle') {
         if (isDown) {
           state.toggleState = !state.toggleState;
           setLedGlow(state.toggleState);
           updateActionBubble(state.toggleState);
+        } else {
+          // 🎯 [미션 2 감지]: 손을 뗐는데도 LED가 켜져 있는 상태 달성!
+          if (state.toggleState && !missions.m2.completed) {
+            completeMission('m2', '방 전등 스위치 만들기');
+          }
+        }
+      }
+
+      // 🎯 [미션 3 감지]: 3초 안에 3회 연타
+      if (isDown && !missions.m3.completed) {
+        const nowTime = performance.now();
+        missions.m3.clickTimestamps.push(nowTime);
+        missions.m3.clickTimestamps = missions.m3.clickTimestamps.filter(t => nowTime - t <= 3000);
+        const cnt = missions.m3.clickTimestamps.length;
+        document.getElementById('m3-fill').style.width = `${Math.min(100, (cnt / 3) * 100)}%`;
+        if (cnt >= 3) {
+          completeMission('m3', '비밀 모스 부호 전송');
         }
       }
     }
@@ -822,7 +989,6 @@
     window.addEventListener('pointerup', handlePointerUp);
     window.addEventListener('pointercancel', handlePointerUp);
 
-    // 말풍선 위치 투영
     const tagButton = document.getElementById('tag-button');
     const tagLed = document.getElementById('tag-led');
     const tagResistor = document.getElementById('tag-resistor');
@@ -848,13 +1014,10 @@
       placeTag(tagResistor, new THREE.Vector3(22, 11, -1));
     }
 
-    // 렌더링 루프
     function renderLoop() {
       requestAnimationFrame(renderLoop);
-      // 부드러운 버튼 캡 보간 (Lerp)
       capCurrentY += (capTargetY - capCurrentY) * 0.35;
       capGroup.position.y = capCurrentY;
-
       controls.update();
       renderer.render(scene, camera);
       updateTags();
@@ -866,6 +1029,59 @@
       camera.updateProjectionMatrix();
       renderer.setSize(container.clientWidth, container.clientHeight);
     });
+
+    const confCanvas = document.getElementById('confetti-canvas');
+    const confCtx = confCanvas.getContext('2d');
+    let confettiParticles = [];
+
+    function resizeConfetti() {
+      confCanvas.width = window.innerWidth;
+      confCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeConfetti);
+    resizeConfetti();
+
+    function triggerConfetti(count = 80) {
+      const colors = ['#ff5757', '#ffde59', '#5271ff', '#7ed957', '#ff914d'];
+      for (let i = 0; i < count; i++) {
+        confettiParticles.push({
+          x: window.innerWidth * 0.5 + (Math.random() - 0.5) * 200,
+          y: window.innerHeight * 0.4 + (Math.random() - 0.5) * 100,
+          vx: (Math.random() - 0.5) * 12,
+          vy: -Math.random() * 10 - 4,
+          size: Math.random() * 8 + 6,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * 360,
+          vr: (Math.random() - 0.5) * 10,
+          alpha: 1
+        });
+      }
+    }
+
+    function renderConfetti() {
+      requestAnimationFrame(renderConfetti);
+      confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+      if (confettiParticles.length === 0) return;
+
+      confettiParticles.forEach((p, idx) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.25;
+        p.rotation += p.vr;
+        p.alpha -= 0.008;
+
+        confCtx.save();
+        confCtx.globalAlpha = Math.max(0, p.alpha);
+        confCtx.fillStyle = p.color;
+        confCtx.translate(p.x, p.y);
+        confCtx.rotate((p.rotation * Math.PI) / 180);
+        confCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        confCtx.restore();
+      });
+
+      confettiParticles = confettiParticles.filter(p => p.alpha > 0 && p.y < window.innerHeight + 50);
+    }
+    requestAnimationFrame(renderConfetti);
   </script>
 </body>
 </html>
