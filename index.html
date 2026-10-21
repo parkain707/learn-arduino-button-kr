@@ -12,17 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Jua&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <script src="lib/three.min.js"></script>
-  <script>
-    if (typeof THREE === 'undefined') {
-      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
-    }
-  </script>
   <script src="lib/OrbitControls.js"></script>
-  <script>
-    if (typeof THREE !== 'undefined' && typeof THREE.OrbitControls === 'undefined') {
-      document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"><\/script>');
-    }
-  </script>
 
   <style>
     :root {
@@ -781,6 +771,17 @@
   </style>
 </head>
 <body>
+  <!-- 💬 카카오톡/네이버 인앱브라우저 보안 알림 바 -->
+  <div id="inapp-browser-bar" style="display:none; position:fixed; top:0; left:0; right:0; background:linear-gradient(90deg, #b45309, #d97706); color:#fff; z-index:99999; font-size:11px; padding:6px 12px; align-items:center; justify-content:space-between; box-shadow:0 2px 10px rgba(0,0,0,0.5);">
+    <span style="display:flex; align-items:center; gap:5px;">
+      <span>⚠️</span>
+      <span>인앱 브라우저 보안 설정으로 화면이 안 열릴 때</span>
+    </span>
+    <button id="btn-inapp-open" style="background:#fff; color:#92400e; border:none; padding:3px 8px; border-radius:6px; font-weight:800; font-size:10.5px; cursor:pointer;">
+      🚀 크롬/사파리로 열기
+    </button>
+  </div>
+
   <!-- ⏰ [도전 운영 시간(08:20~21:00) & 일일 3회 제한 잠금 모달] -->
   <div class="auth-overlay" id="time-limit-overlay" style="display: none; z-index: 10005;">
     <div class="auth-card" style="border-color: #ef4444; max-width: 440px;">
@@ -837,6 +838,9 @@
       </div>
 
       <button class="btn-auth-primary" id="btn-start-adventure">🔥 긴장감 넘치는 서바이벌 시작!</button>
+      <div class="storage-mode-notice" style="display: none; margin-top: 10px; padding: 6px 10px; background: rgba(234, 179, 8, 0.15); border: 1px solid #ca8a04; border-radius: 8px; font-size: 11px; color: #fef08a; text-align: left;">
+        ⚠️ <b>브라우저 보안 모드 감지:</b> 시크릿 모드 또는 브라우저 보안 정책으로 인해 임시 메모리 저장소로 실행됩니다. 브라우저를 닫으면 진행 내역이 초기화될 수 있습니다.
+      </div>
     </div>
 
     <div class="auth-card" id="auth-login-view" style="display: none;">
@@ -859,11 +863,34 @@
         <button class="btn-auth-primary" style="flex: 1.5; margin-top: 0;" id="btn-continue-adventure">▶ 이어서 도전</button>
         <button style="flex: 1; background: #334155; color: #fff; border: none; border-radius: 12px; font-family: var(--font-round); font-size: 12px; cursor: pointer;" id="btn-reset-history">🔄 초기화</button>
       </div>
+      <div class="storage-mode-notice" style="display: none; margin-top: 10px; padding: 6px 10px; background: rgba(234, 179, 8, 0.15); border: 1px solid #ca8a04; border-radius: 8px; font-size: 11px; color: #fef08a; text-align: left;">
+        ⚠️ <b>브라우저 보안 모드 감지:</b> 시크릿 모드 또는 브라우저 보안 정책으로 인해 임시 메모리 저장소로 실행됩니다. 브라우저를 닫으면 진행 내역이 초기화될 수 있습니다.
+      </div>
     </div>
   </div>
 
   <div id="app">
     <main id="stage-container">
+      <!-- 🛡️ 3D WebGL 비활성화 / 보안 차단 폴백 오버레이 -->
+      <div id="webgl-guard-overlay" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.95); z-index:9000; flex-direction:column; align-items:center; justify-content:center; padding:24px; text-align:center;">
+        <div style="font-size:48px; margin-bottom:12px;">🛡️</div>
+        <h3 style="font-family:var(--font-round); color:#fde047; font-size:18px; margin-bottom:8px;">3D 그래픽 엔진(WebGL)을 켤 수 없습니다</h3>
+        <p style="color:#cbd5e1; font-size:12.5px; max-width:400px; line-height:1.6; margin-bottom:14px;">
+          학교 컴퓨터/태블릿 보안 설정이나 브라우저에서 '3D 하드웨어 가속'이 꺼져 있을 때 발생합니다.<br>
+          <span id="webgl-error-msg" style="color:#f87171; font-size:11px; display:block; margin-top:4px;"></span>
+        </p>
+        <div style="background:#1e293b; border:1px solid #475569; border-radius:10px; padding:10px 14px; font-size:12px; color:#93c5fd; text-align:left; max-width:380px; margin-bottom:16px;">
+          💡 <b>해결 방법 안내:</b><br>
+          1. 브라우저 설정 → <b>'가능한 경우 하드웨어 가속 사용'</b> 켜기<br>
+          2. 카카오톡/네이버 인앱 브라우저인 경우 <b>'다른 브라우저로 열기'</b><br>
+          3. 크롬(Chrome) 또는 사파리(Safari) 최신 브라우저 이용
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button onclick="location.reload()" style="background:#2563eb; color:#fff; border:none; padding:8px 16px; border-radius:10px; font-weight:700; font-size:12px; cursor:pointer;">🔄 새로고침</button>
+          <button id="btn-webgl-external" style="background:#f59e0b; color:#1e1b4b; border:none; padding:8px 16px; border-radius:10px; font-weight:700; font-size:12px; cursor:pointer;">🚀 외부 브라우저로 열기</button>
+        </div>
+      </div>
+
       <!-- 상단 HUD: 타이머 & 목숨 -->
       <div class="hud-bar">
         <span class="hud-title">⚡ SURVIVAL</span>
@@ -1048,6 +1075,96 @@
 
   <script>
     /* =====================================================================
+       -1. 보안 설정 / 시크릿 모드 대응 SafeStorage 폴리필 & 인앱 브라우저 탈출
+       ===================================================================== */
+    const SafeStorage = {
+      _mem: {},
+      _isAvailable: null,
+      checkAvailable() {
+        if (this._isAvailable !== null) return this._isAvailable;
+        try {
+          const testKey = '__miso_storage_probe__';
+          window.localStorage.setItem(testKey, '1');
+          window.localStorage.removeItem(testKey);
+          this._isAvailable = true;
+        } catch (e) {
+          this._isAvailable = false;
+          console.warn('⚠️ [SafeStorage] localStorage 접근 불가 (보안 설정/시크릿 모드), 임시 메모리 저장소로 자동 전환:', e);
+          setTimeout(() => {
+            document.querySelectorAll('.storage-mode-notice').forEach(el => el.style.display = 'block');
+          }, 0);
+        }
+        return this._isAvailable;
+      },
+      getItem(key) {
+        if (this.checkAvailable()) {
+          try {
+            return window.localStorage.getItem(key);
+          } catch (e) {
+            return this._mem[key] !== undefined ? this._mem[key] : null;
+          }
+        }
+        return this._mem[key] !== undefined ? this._mem[key] : null;
+      },
+      setItem(key, value) {
+        const strVal = String(value);
+        this._mem[key] = strVal;
+        if (this.checkAvailable()) {
+          try {
+            window.localStorage.setItem(key, strVal);
+          } catch (e) {
+            console.warn('⚠️ [SafeStorage] setItem 실패, 메모리에만 유지:', e);
+          }
+        }
+      },
+      removeItem(key) {
+        delete this._mem[key];
+        if (this.checkAvailable()) {
+          try {
+            window.localStorage.removeItem(key);
+          } catch (e) {}
+        }
+      }
+    };
+
+    function openExternalBrowser() {
+      const currentUrl = window.location.href;
+      const ua = navigator.userAgent || '';
+      const isAndroid = /Android/i.test(ua);
+      const isIOS = /iPhone|iPad|iPod/i.test(ua);
+
+      if (isAndroid) {
+        const cleanUrl = currentUrl.replace(/^https?:\/\//, '');
+        location.href = `intent://${cleanUrl}#Intent;scheme=https;package=com.android.chrome;end`;
+      } else if (isIOS && /KAKAOTALK/i.test(ua)) {
+        location.href = `kakaotalk://web/openExternal?url=${encodeURIComponent(currentUrl)}`;
+      } else {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(currentUrl).then(() => {
+            alert('🔗 게임 주소가 복사되었습니다!\n크롬(Chrome)이나 사파리(Safari) 브라우저를 열고 주소창에 붙여넣어 주세요.\n\n' + currentUrl);
+          }).catch(() => {
+            prompt('아래 주소를 복사하여 크롬이나 사파리 주소창에 붙여넣어 주세요:', currentUrl);
+          });
+        } else {
+          prompt('아래 주소를 복사하여 크롬이나 사파리 주소창에 붙여넣어 주세요:', currentUrl);
+        }
+      }
+    }
+
+    function detectInAppBrowser() {
+      const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+      const isInApp = /KAKAOTALK|NAVER\(inapp|Line\/|Instagram|FBAN|FBAV/i.test(ua);
+      if (isInApp) {
+        const bar = document.getElementById('inapp-browser-bar');
+        if (bar) bar.style.display = 'flex';
+      }
+    }
+    detectInAppBrowser();
+
+    document.getElementById('btn-inapp-open')?.addEventListener('click', openExternalBrowser);
+    document.getElementById('btn-webgl-external')?.addEventListener('click', openExternalBrowser);
+
+    /* =====================================================================
        0. 운영 시간(08:20~21:00) & 일일 3회 접속 제한 엔진
        ===================================================================== */
     let adminBypassActive = false;
@@ -1065,13 +1182,13 @@
       const today = getTodayKey();
       let record = {};
       try {
-        record = JSON.parse(localStorage.getItem('MISO_DAILY_ATTEMPTS') || '{}');
+        record = JSON.parse(SafeStorage.getItem('MISO_DAILY_ATTEMPTS') || '{}');
       } catch (e) {
         record = {};
       }
       if (record.date !== today) {
         record = { date: today, count: 0 };
-        localStorage.setItem('MISO_DAILY_ATTEMPTS', JSON.stringify(record));
+        SafeStorage.setItem('MISO_DAILY_ATTEMPTS', JSON.stringify(record));
       }
       return record;
     }
@@ -1158,14 +1275,14 @@
 
     function loadUser() {
       try {
-        const s = localStorage.getItem(STORAGE_KEY);
+        const s = SafeStorage.getItem(STORAGE_KEY);
         if (s) return JSON.parse(s);
       } catch (e) {}
       return null;
     }
 
     function saveUser() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+      SafeStorage.setItem(STORAGE_KEY, JSON.stringify(user));
     }
 
     const authOverlay = document.getElementById('auth-overlay');
@@ -1185,7 +1302,7 @@
 
       const attempts = getDailyAttempts();
       attempts.count += 1;
-      localStorage.setItem('MISO_DAILY_ATTEMPTS', JSON.stringify(attempts));
+      SafeStorage.setItem('MISO_DAILY_ATTEMPTS', JSON.stringify(attempts));
       updateAttemptsHUD();
 
       user = { name, pass, currentStage: 1, lives: 3, certCode: 'MISO-' + Math.random().toString(36).substring(2,8).toUpperCase() };
@@ -1204,7 +1321,7 @@
 
       const attempts = getDailyAttempts();
       attempts.count += 1;
-      localStorage.setItem('MISO_DAILY_ATTEMPTS', JSON.stringify(attempts));
+      SafeStorage.setItem('MISO_DAILY_ATTEMPTS', JSON.stringify(attempts));
       updateAttemptsHUD();
 
       user = existing;
@@ -1214,7 +1331,7 @@
 
     document.getElementById('btn-reset-history').addEventListener('click', () => {
       if (confirm('모든 기록을 초기화하시겠습니까?')) {
-        localStorage.removeItem(STORAGE_KEY);
+        SafeStorage.removeItem(STORAGE_KEY);
         location.reload();
       }
     });
@@ -1272,18 +1389,34 @@
     const defaultCameraTarget = new THREE.Vector3(5, 0, -2);
     camera.position.copy(defaultCameraPos);
 
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
+    let renderer = null;
+    let controls = null;
+    let webglSupported = true;
 
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.08;
-    controls.target.copy(defaultCameraTarget);
-    controls.maxPolarAngle = Math.PI / 2.05;
-    controls.minDistance = 25;
-    controls.maxDistance = 180;
+    try {
+      if (typeof THREE === 'undefined') {
+        throw new Error('Three.js 3D 라이브러리를 불러오지 못했습니다.');
+      }
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setSize(container.clientWidth || 800, container.clientHeight || 600);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.08;
+      controls.target.copy(defaultCameraTarget);
+      controls.maxPolarAngle = Math.PI / 2.05;
+      controls.minDistance = 25;
+      controls.maxDistance = 180;
+    } catch (e) {
+      console.error('⚠️ [WebGL Guard] WebGL 초기화 실패:', e);
+      webglSupported = false;
+      const overlay = document.getElementById('webgl-guard-overlay');
+      if (overlay) overlay.style.display = 'flex';
+      const errMsg = document.getElementById('webgl-error-msg');
+      if (errMsg) errMsg.textContent = `오류 내용: ${e.message || 'WebGL Context 생성 불가'}`;
+    }
 
     scene.add(new THREE.AmbientLight(0xfff6ea, 0.8));
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
@@ -2046,7 +2179,8 @@
        ===================================================================== */
     function animate() {
       requestAnimationFrame(animate);
-      controls.update();
+      if (!webglSupported || !renderer) return;
+      if (controls) controls.update();
 
       // 🌟 초등학생 비콘 링 & 화살표 3D 애니메이션
       if (activeBeacons.length > 0) {
@@ -2070,9 +2204,11 @@
       } else {
         camera.fov = 40;
       }
-      camera.aspect = container.clientWidth / container.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
+      if (container && container.clientHeight > 0) {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        if (renderer) renderer.setSize(container.clientWidth, container.clientHeight);
+      }
     }
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', () => setTimeout(handleResize, 250));
