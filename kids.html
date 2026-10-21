@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>아두이노 놀이터 — 버튼을 꾹! 불이 반짝! (어린이 눈높이 3D 교실)</title>
+  
+  <!-- 예쁜 둥근 폰트 & 한글 웹폰트 -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Round&display=swap" rel="stylesheet">
+
+  <!-- Three.js & OrbitControls (로컬 오프라인 지원) -->
+  <script src="lib/three.min.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+    }
+  </script>
+  <script src="lib/OrbitControls.js"></script>
+  <script>
+    if (typeof THREE !== 'undefined' && typeof THREE.OrbitControls === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"><\/script>');
+    }
+  </script>
+
+  <style>
+    :root {
+      --kids-bg: #fffbf0;
+      --kids-card: #ffffff;
+      --kids-yellow: #ffde59;
+      --kids-coral: #ff5757;
+      --kids-blue: #5271ff;
+      --kids-green: #7ed957;
+      --kids-dark: #2d3142;
+      --font-round: "Jua", "Pretendard", sans-serif;
+      --font-body: "Pretendard", -apple-system, sans-serif;
+      --shadow-pop: 0 8px 0 rgba(0,0,0,0.08), 0 15px 25px rgba(0,0,0,0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--kids-bg);
+      color: var(--kids-dark);
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #kids-app {
+      display: grid;
+      grid-template-columns: 1fr 450px;
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    /* 3D 스테이지 캔버스 */
+    #canvas-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 50%, #fffef7 0%, #faebd7 100%);
+      overflow: hidden;
+    }
+
+    #three-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+    #three-canvas:active {
+      cursor: grabbing;
+    }
+
+    /* 귀여운 상단 배너 */
+    .top-banner {
+      position: absolute;
+      top: 20px;
+      left: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 10px 20px;
+      border-radius: 40px;
+      box-shadow: var(--shadow-pop);
+      border: 3px solid #ffde59;
+      z-index: 10;
+    }
+    .mascot-icon {
+      font-size: 26px;
+      animation: bounceMascot 2s infinite ease-in-out;
+    }
+    @keyframes bounceMascot {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    .banner-title {
+      font-family: var(--font-round);
+      font-size: 19px;
+      color: #ff5757;
+    }
+    .banner-sub {
+      font-size: 12px;
+      color: #7a8299;
+      font-weight: 600;
+    }
+
+    /* 조작 버튼 및 카메라 리셋 */
+    .view-control {
+      position: absolute;
+      bottom: 24px;
+      left: 24px;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+    .btn-fun {
+      background: #fff;
+      border: 2px solid #e5e9f2;
+      border-bottom: 4px solid #ccd2e0;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-family: var(--font-round);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.1s, border-bottom 0.1s;
+    }
+    .btn-fun:active {
+      transform: translateY(2px);
+      border-bottom: 2px solid #ccd2e0;
+    }
+
+    /* 화면 중앙 직관적인 인터랙션 팝업 말풍선 */
+    .action-bubble {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffffff;
+      border: 3px solid #5271ff;
+      border-radius: 30px;
+      padding: 10px 22px;
+      font-family: var(--font-round);
+      font-size: 16px;
+      color: #2d3142;
+      box-shadow: var(--shadow-pop);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 10;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .action-bubble.active-state {
+      background: #fff4d1;
+      border-color: #ff5757;
+      transform: translateX(-50%) scale(1.08);
+    }
+
+    /* 3D 앵커 말풍선 */
+    .bubble-tag {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #5271ff;
+      border-radius: 16px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      pointer-events: none;
+      transform: translate(-50%, -100%);
+      white-space: nowrap;
+      z-index: 5;
+    }
+    .bubble-tag::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 6px 6px 0;
+      border-style: solid;
+      border-color: #5271ff transparent;
+    }
+
+    /* 우측 사이드 패널 */
+    #sidebar {
+      background: #ffffff;
+      border-left: 3px solid #ffde59;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow-y: auto;
+      box-shadow: -5px 0 25px rgba(0,0,0,0.04);
+      z-index: 20;
+    }
+
+    /* 로봇 캐릭터 이야기 구역 */
+    .story-hero {
+      padding: 24px 24px 16px;
+      background: linear-gradient(135deg, #fff7dc 0%, #fffbf0 100%);
+      border-bottom: 2px dashed #ffde59;
+    }
+    .robot-card {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      background: #ffffff;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 2px solid #ffd43f;
+      box-shadow: 0 6px 12px rgba(255, 212, 63, 0.15);
+    }
+    .robot-face {
+      font-size: 38px;
+    }
+    .robot-speech {
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: #3b4256;
+    }
+    .robot-speech b {
+      color: #ff5757;
+      font-family: var(--font-round);
+    }
+
+    /* 재미있는 탐구 카드 */
+    .cards-container {
+      padding: 18px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex: 1;
+    }
+
+    .fun-card {
+      background: #fbfbfd;
+      border: 2px solid #e8ecf4;
+      border-radius: 18px;
+      padding: 16px;
+      position: relative;
+    }
+    .fun-card-title {
+      font-family: var(--font-round);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .card-coral { border-color: #ffb8b8; background: #fff8f8; }
+    .card-blue { border-color: #bcd0ff; background: #f6f9ff; }
+    .card-green { border-color: #c3f2b1; background: #f7fdf5; }
+
+    /* 모드 선택 스위치 */
+    .mode-select-box {
+      display: flex;
+      gap: 8px;
+      margin: 10px 0 4px;
+    }
+    .kid-mode-btn {
+      flex: 1;
+      border: 2px solid #d3dbe8;
+      border-bottom: 4px solid #b6c2d6;
+      background: #fff;
+      padding: 10px 8px;
+      border-radius: 14px;
+      font-family: var(--font-round);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .kid-mode-btn.active {
+      border-color: #ff5757;
+      border-bottom: 4px solid #d43b3b;
+      background: #fff1f1;
+      color: #ff5757;
+    }
+    .kid-mode-btn:active {
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+    }
+
+    /* 한눈에 쏙 들어오는 블록 설명 */
+    .block-explain {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .block-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border-left: 5px solid #5271ff;
+      font-size: 13px;
+    }
+    .block-name {
+      font-family: var(--font-round);
+      font-size: 13px;
+      color: #5271ff;
+      white-space: nowrap;
+    }
+
+    /* 하단 시작 버튼 */
+    .play-section {
+      padding: 16px 24px 24px;
+      background: #fffbf0;
+      border-top: 2px dashed #ffde59;
+    }
+    .btn-big-play {
+      width: 100%;
+      background: #ff5757;
+      border: none;
+      border-bottom: 5px solid #d43b3b;
+      padding: 14px;
+      border-radius: 18px;
+      font-family: var(--font-round);
+      font-size: 18px;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 6px 15px rgba(255, 87, 87, 0.3);
+      transition: all 0.15s;
+    }
+    .btn-big-play:hover {
+      background: #ff4747;
+    }
+    .btn-big-play:active {
+      transform: translateY(3px);
+      border-bottom-width: 2px;
+    }
+    .btn-big-play.is-playing {
+      background: #7ed957;
+      border-bottom-color: #5cb834;
+      color: #1a4208;
+    }
+
+    @media (max-width: 900px) {
+      #kids-app {
+        grid-template-columns: 1fr;
+        grid-template-rows: 55vh 45vh;
+      }
+      #sidebar {
+        border-left: none;
+        border-top: 3px solid #ffde59;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="kids-app">
+    <!-- 3D 인터랙티브 놀이터 -->
+    <main id="canvas-container">
+      <div class="top-banner">
+        <span class="mascot-icon">🤖</span>
+        <div>
+          <div class="banner-title">3D 아두이노 과학 놀이터</div>
+          <div class="banner-sub">빨간 버튼을 꾹 누르면 무슨 일이 일어날까요?</div>
+        </div>
+        <a href="index.html" style="margin-left: 14px; font-size: 12px; font-weight: 700; text-decoration: none; background: #eef2f9; color: #3b5998; padding: 5px 12px; border-radius: 20px; border: 1px solid #d0d9e8; white-space: nowrap;">
+          🎓 표준 엔지니어 모드
+        </a>
+      </div>
+
+      <canvas id="three-canvas"></canvas>
+
+      <!-- 부품 위치 말풍선 -->
+      <div class="bubble-tag" id="tag-button">빨간 단추 버튼 🔴</div>
+      <div class="bubble-tag" id="tag-led">반짝 꼬마전구 (LED) 💡</div>
+      <div class="bubble-tag" id="tag-resistor">안전 지킴이 저항 🛡️</div>
+
+      <!-- 카메라 제어 버튼 -->
+      <div class="view-control">
+        <button class="btn-fun" id="btn-reset">🔄 처음 시점으로 보기</button>
+        <button class="btn-fun" id="btn-sound-toggle">🔊 소리 켜짐</button>
+      </div>
+
+      <!-- 화면 하단 큰 안내 말풍선 -->
+      <div class="action-bubble" id="action-bubble">
+        <span id="bubble-emoji">👆</span>
+        <span id="bubble-text">화면 속 빨간색 동그란 버튼을 마우스로 꾹 눌러보세요!</span>
+      </div>
+    </main>
+
+    <!-- 오른쪽 쉬운 학습 패널 -->
+    <aside id="sidebar">
+      <div class="story-hero">
+        <div class="robot-card">
+          <div class="robot-face">🤖</div>
+          <div class="robot-speech">
+            안녕! 나는 꼬마 로봇 <b>팅커봇</b>이야!<br>
+            오늘 우리는 버튼을 눌러서 예쁜 꼬마전구에 <b>반짝반짝 불</b>을 켜볼 거야! 준비됐니?
+          </div>
+        </div>
+      </div>
+
+      <div class="cards-container">
+        <!-- 카드 1: 어떤 원리일까요? -->
+        <div class="fun-card card-coral">
+          <div class="fun-card-title">🔍 전기는 어떻게 흐를까요?</div>
+          <p style="font-size: 13.5px; line-height: 1.5; color: #4b5266;">
+            1. <b>버튼(스위치):</b> 평소에는 다리가 끊겨 있다가, 손으로 꾹 누르면 <b>징검다리</b>가 쿵 연결되면서 전기가 슝 통과해요!<br>
+            2. <b>꼬마전구(LED):</b> 13번 핀에서 전기가 도착하면 예쁜 빨간 빛을 뿜어요.<br>
+            3. <b>풀다운 저항:</b> 손을 뗐을 때 전선에 남아있는 정전기 때문에 깜빡이지 않도록, 전기를 0번으로 얌전히 내려주는 <b>안전 미끄럼틀</b>이에요!
+          </p>
+        </div>
+
+        <!-- 카드 2: 모드 고르기 -->
+        <div class="fun-card card-blue">
+          <div class="fun-card-title">🎮 버튼 작동 모드를 골라보세요!</div>
+          <div class="mode-select-box">
+            <button class="kid-mode-btn active" data-mode="hold">
+              <span style="font-size: 20px;">🛎️</span>
+              <span>누를 때만 켜기</span>
+              <small style="font-size: 11px; color:#8590a6;">초인종처럼 작동해요</small>
+            </button>
+            <button class="kid-mode-btn" data-mode="toggle">
+              <span style="font-size: 20px;">💡</span>
+              <span>딸깍! 껐다 켜기</span>
+              <small style="font-size: 11px; color:#8590a6;">방 전등 스위치 같아요</small>
+            </button>
+          </div>
+        </div>
+
+        <!-- 카드 3: 로봇에게 내리는 명령어 (코드) -->
+        <div class="fun-card card-green">
+          <div class="fun-card-title">📜 로봇 두뇌에게 내리는 명령어</div>
+          <div class="block-explain">
+            <div class="block-item">
+              <span class="block-name">pinMode(버튼, 입력)</span>
+              <span>"2번 귀를 열고 버튼 신호를 들을 준비를 해!"</span>
+            </div>
+            <div class="block-item">
+              <span class="block-name">digitalRead(버튼)</span>
+              <span>"지금 사람이 버튼을 누르고 있니? 물어보기"</span>
+            </div>
+            <div class="block-item">
+              <span class="block-name">digitalWrite(LED, 켜기)</span>
+              <span>"버튼이 눌렸으니 꼬마전구에 불을 켜줘!"</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 하단 실행 버튼 -->
+      <div class="play-section">
+        <button class="btn-big-play is-playing" id="btn-master-play">
+          <span id="play-icon">✨</span>
+          <span id="play-text">체험 시작 중! (버튼을 눌러보세요)</span>
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    /* =====================================================================
+       1. 효과음 오디오 엔진 (Web Audio API)
+       ===================================================================== */
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // 경쾌한 딸깍/퐁 사운드
+    function playClickSound(isDown) {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const now = audioCtx.currentTime;
+
+      osc.type = isDown ? 'sine' : 'triangle';
+      const freq = isDown ? 650 : 880;
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.exponentialRampToValueAtTime(isDown ? 300 : 500, now + 0.08);
+
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.09);
+    }
+
+    document.getElementById('btn-sound-toggle').addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      document.getElementById('btn-sound-toggle').textContent = soundEnabled ? '🔊 소리 켜짐' : '🔇 소리 꺼짐';
+    });
+
+    /* =====================================================================
+       2. 상태 관리 및 말풍선 피드백
+       ===================================================================== */
+    const state = {
+      mode: 'hold',
+      isDown: false,
+      ledLit: false,
+      toggleState: false
+    };
+
+    const actionBubble = document.getElementById('action-bubble');
+    const bubbleEmoji = document.getElementById('bubble-emoji');
+    const bubbleText = document.getElementById('bubble-text');
+
+    function updateActionBubble(isPressed) {
+      if (isPressed) {
+        actionBubble.classList.add('active-state');
+        bubbleEmoji.textContent = '💡';
+        bubbleText.textContent = state.mode === 'hold' 
+          ? '우와! 버튼을 누르고 있어서 전구가 반짝반짝 켜졌어요!' 
+          : '딸깍! 전등 스위치가 작동했어요!';
+      } else {
+        actionBubble.classList.remove('active-state');
+        bubbleEmoji.textContent = '👆';
+        bubbleText.textContent = state.mode === 'hold'
+          ? '손을 떼니까 전구가 꺼졌어요! 다시 꾹 눌러보세요.'
+          : '버튼을 한 번 더 누르면 전등이 어떻게 될까요?';
+      }
+    }
+
+    // 모드 스위처
+    document.querySelectorAll('.kid-mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.kid-mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.mode = btn.dataset.mode;
+        state.toggleState = false;
+        setLedGlow(false);
+        updateActionBubble(false);
+      });
+    });
+
+    /* =====================================================================
+       3. Three.js 3D 씬 (아두이노 + 버튼 + LED + 저항)
+       ===================================================================== */
+    const container = document.getElementById('canvas-container');
+    const canvas = document.getElementById('three-canvas');
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xfffbf0);
+
+    const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
+    const homePos = new THREE.Vector3(22, 60, 60);
+    const homeTarget = new THREE.Vector3(6, 0, -2);
+    camera.position.copy(homePos);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.target.copy(homeTarget);
+    controls.maxPolarAngle = Math.PI / 2.05;
+    controls.minDistance = 25;
+    controls.maxDistance = 160;
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      camera.position.copy(homePos);
+      controls.target.copy(homeTarget);
+      controls.update();
+    });
+
+    // 조명
+    scene.add(new THREE.AmbientLight(0xfff8ee, 0.8));
+    const sunLight = new THREE.DirectionalLight(0xffffff, 0.85);
+    sunLight.position.set(40, 80, 40);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 1024;
+    sunLight.shadow.mapSize.height = 1024;
+    scene.add(sunLight);
+
+    // 바닥 그림자 평면
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(300, 300),
+      new THREE.ShadowMaterial({ opacity: 0.12 })
+    );
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    const mainGroup = new THREE.Group();
+    scene.add(mainGroup);
+
+    // 1) 귀여운 Uno 아두이노 보드
+    const unoGroup = new THREE.Group();
+    unoGroup.position.set(-18, 0, 0);
+    const unoMat = new THREE.MeshStandardMaterial({ color: 0x147387, roughness: 0.4 });
+    const unoPcb = new THREE.Mesh(new THREE.BoxGeometry(42, 1.8, 58), unoMat);
+    unoPcb.position.y = 0.9;
+    unoPcb.castShadow = true;
+    unoPcb.receiveShadow = true;
+    unoGroup.add(unoPcb);
+
+    // 은색 USB 포트 & 검정 전원잭
+    const silverMat = new THREE.MeshStandardMaterial({ color: 0xdde2ea, roughness: 0.3, metalness: 0.8 });
+    const darkMat = new THREE.MeshStandardMaterial({ color: 0x222530, roughness: 0.7 });
+    const usb = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 12), silverMat);
+    usb.position.set(-15, 5, -23);
+    usb.castShadow = true;
+    unoGroup.add(usb);
+
+    const jack = new THREE.Mesh(new THREE.BoxGeometry(9, 8, 13), darkMat);
+    jack.position.set(14, 5, -22);
+    unoGroup.add(jack);
+
+    // 내장 L LED
+    const lLedMat = new THREE.MeshStandardMaterial({ color: 0x553311, emissive: 0x000000 });
+    const lLed = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.8, 1.6), lLedMat);
+    lLed.position.set(-12, 1.8, 5);
+    unoGroup.add(lLed);
+    mainGroup.add(unoGroup);
+
+    // 2) 브레드보드
+    const bbGroup = new THREE.Group();
+    bbGroup.position.set(22, 0, 0);
+    const bbMat = new THREE.MeshStandardMaterial({ color: 0xf5f0e6, roughness: 0.5 });
+    const bb = new THREE.Mesh(new THREE.BoxGeometry(38, 5.5, 58), bbMat);
+    bb.position.y = 2.75;
+    bb.castShadow = true;
+    bb.receiveShadow = true;
+    bbGroup.add(bb);
+
+    // 중앙 분리 홈
+    const divider = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.2, 56), darkMat);
+    divider.position.set(0, 5.2, 0);
+    bbGroup.add(divider);
+    mainGroup.add(bbGroup);
+
+    // 3) 빨간색 큼직하고 귀여운 버튼
+    const buttonGroup = new THREE.Group();
+    buttonGroup.position.set(22, 5.5, -10);
+
+    const btnBase = new THREE.Mesh(new THREE.BoxGeometry(12, 3.5, 12), darkMat);
+    btnBase.position.y = 1.75;
+    btnBase.castShadow = true;
+    buttonGroup.add(btnBase);
+
+    const btnPlate = new THREE.Mesh(new THREE.BoxGeometry(12.2, 0.4, 12.2), silverMat);
+    btnPlate.position.y = 3.65;
+    btnPlate.castShadow = true;
+    buttonGroup.add(btnPlate);
+
+    // 누르면 쏙 들어가는 캡
+    const capGroup = new THREE.Group();
+    capGroup.position.y = 3.8;
+    const capMat = new THREE.MeshStandardMaterial({ color: 0xff4747, roughness: 0.3 });
+    const capMesh = new THREE.Mesh(new THREE.CylinderGeometry(3.6, 4.0, 3.4, 32), capMat);
+    capMesh.position.y = 1.7;
+    capMesh.castShadow = true;
+    capGroup.add(capMesh);
+
+    // 터치 감지용 히트박스
+    const hitBox = new THREE.Mesh(new THREE.BoxGeometry(16, 12, 16), new THREE.MeshBasicMaterial({ visible: false }));
+    hitBox.position.y = 4;
+    capGroup.add(hitBox);
+
+    buttonGroup.add(capGroup);
+    mainGroup.add(buttonGroup);
+
+    // 4) 꼬마전구 (LED)
+    const ledGroup = new THREE.Group();
+    ledGroup.position.set(30, 5.5, 18);
+    const ledMat = new THREE.MeshStandardMaterial({
+      color: 0x881111,
+      roughness: 0.2,
+      transparent: true,
+      opacity: 0.9,
+      emissive: 0x000000
+    });
+    const ledDome = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.5, 5, 24), ledMat);
+    ledDome.position.y = 3.5;
+    ledDome.castShadow = true;
+    const ledTop = new THREE.Mesh(new THREE.SphereGeometry(2.5, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), ledMat);
+    ledTop.position.y = 6;
+    ledTop.castShadow = true;
+    ledGroup.add(ledDome, ledTop);
+
+    const ledLight = new THREE.PointLight(0xff3322, 0, 30);
+    ledLight.position.set(0, 7, 0);
+    ledGroup.add(ledLight);
+    mainGroup.add(ledGroup);
+
+    // 5) 저항들
+    function makeResistor(pos, colors) {
+      const g = new THREE.Group();
+      g.position.copy(pos);
+      const b = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.3, 6.5, 16), new THREE.MeshStandardMaterial({ color: 0xedd6b4 }));
+      b.rotation.z = Math.PI / 2;
+      b.castShadow = true;
+      g.add(b);
+      colors.forEach((c, idx) => {
+        const ring = new THREE.Mesh(new THREE.CylinderGeometry(1.33, 1.33, 0.6, 16), new THREE.MeshBasicMaterial({ color: c }));
+        ring.rotation.z = Math.PI / 2;
+        ring.position.x = -1.8 + idx * 1.1;
+        g.add(ring);
+      });
+      mainGroup.add(g);
+      return g;
+    }
+    const pullDownRes = makeResistor(new THREE.Vector3(22, 8.2, -1), [0x603813, 0x000000, 0xe67e22, 0xd4af37]); // 10k
+    const ledRes = makeResistor(new THREE.Vector3(22, 8.2, 10), [0xd93829, 0xd93829, 0x603813, 0xd4af37]);      // 220
+
+    // 6) 알록달록 무지개 점퍼 전선
+    function makeWire(pts, color) {
+      const curve = new THREE.CatmullRomCurve3(pts);
+      const tube = new THREE.Mesh(
+        new THREE.TubeGeometry(curve, 32, 0.6, 8, false),
+        new THREE.MeshStandardMaterial({ color, roughness: 0.4 })
+      );
+      tube.castShadow = true;
+      mainGroup.add(tube);
+    }
+    makeWire([new THREE.Vector3(-0.5, 3.5, 4), new THREE.Vector3(6, 15, -2), new THREE.Vector3(14, 13, -12), new THREE.Vector3(17, 6, -12)], 0xff5757); // 5V 빨강
+    makeWire([new THREE.Vector3(-36, 3.5, 9), new THREE.Vector3(-20, 17, 2), new THREE.Vector3(12, 15, -8), new THREE.Vector3(26, 6, -8)], 0x5271ff);   // D2 파랑
+    makeWire([new THREE.Vector3(-36, 3.5, 17), new THREE.Vector3(-15, 18, 12), new THREE.Vector3(15, 15, 3), new THREE.Vector3(26, 6, 3)], 0x222a3d);  // GND 네이비
+    makeWire([new THREE.Vector3(-36, 3.5, -9), new THREE.Vector3(-18, 16, -4), new THREE.Vector3(10, 15, 8), new THREE.Vector3(18, 6, 8)], 0xffa040); // D13 주황
+
+    /* =====================================================================
+       4. 버튼 클릭 & 쫀득한 물리 트윈 애니메이션
+       ===================================================================== */
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let isPressedOnScreen = false;
+    let capCurrentY = 3.8;
+    let capTargetY = 3.8;
+
+    function setLedGlow(on) {
+      state.ledLit = on;
+      if (on) {
+        ledMat.emissive.setHex(0xff3311);
+        ledMat.emissiveIntensity = 1.3;
+        ledLight.intensity = 2.0;
+        lLedMat.emissive.setHex(0xffa040);
+        lLedMat.emissiveIntensity = 1.2;
+      } else {
+        ledMat.emissive.setHex(0x000000);
+        ledMat.emissiveIntensity = 0;
+        ledLight.intensity = 0;
+        lLedMat.emissive.setHex(0x000000);
+        lLedMat.emissiveIntensity = 0;
+      }
+    }
+
+    function triggerButton(isDown) {
+      if (state.isDown === isDown) return;
+      state.isDown = isDown;
+      capTargetY = isDown ? 2.4 : 3.8; // 1.4mm 하향
+      playClickSound(isDown);
+
+      if (state.mode === 'hold') {
+        setLedGlow(isDown);
+        updateActionBubble(isDown);
+      } else if (state.mode === 'toggle') {
+        if (isDown) {
+          state.toggleState = !state.toggleState;
+          setLedGlow(state.toggleState);
+          updateActionBubble(state.toggleState);
+        }
+      }
+    }
+
+    function handlePointerDown(e) {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects([hitBox, capMesh, btnPlate], true);
+      if (hits.length > 0) {
+        isPressedOnScreen = true;
+        controls.enabled = false;
+        triggerButton(true);
+      }
+    }
+
+    function handlePointerUp() {
+      if (isPressedOnScreen) {
+        isPressedOnScreen = false;
+        controls.enabled = true;
+        triggerButton(false);
+      }
+    }
+
+    canvas.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
+
+    // 말풍선 위치 투영
+    const tagButton = document.getElementById('tag-button');
+    const tagLed = document.getElementById('tag-led');
+    const tagResistor = document.getElementById('tag-resistor');
+    const tempVec = new THREE.Vector3();
+
+    function updateTags() {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+
+      function placeTag(el, pos) {
+        tempVec.copy(pos).project(camera);
+        if (tempVec.z > 1) {
+          el.style.display = 'none';
+          return;
+        }
+        el.style.display = 'block';
+        el.style.left = `${(tempVec.x * 0.5 + 0.5) * w}px`;
+        el.style.top = `${(-(tempVec.y * 0.5) + 0.5) * h - 14}px`;
+      }
+
+      placeTag(tagButton, new THREE.Vector3(22, 11, -10));
+      placeTag(tagLed, new THREE.Vector3(30, 13, 18));
+      placeTag(tagResistor, new THREE.Vector3(22, 11, -1));
+    }
+
+    // 렌더링 루프
+    function renderLoop() {
+      requestAnimationFrame(renderLoop);
+      // 부드러운 버튼 캡 보간 (Lerp)
+      capCurrentY += (capTargetY - capCurrentY) * 0.35;
+      capGroup.position.y = capCurrentY;
+
+      controls.update();
+      renderer.render(scene, camera);
+      updateTags();
+    }
+    requestAnimationFrame(renderLoop);
+
+    window.addEventListener('resize', () => {
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+  </script>
+</body>
+</html>

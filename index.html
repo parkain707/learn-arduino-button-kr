@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>아두이노 배우기 — 3. 버튼 누르기 (대화형 3D 레슨)</title>
+  <meta name="description" content="3D 가상 아두이노 Uno 보드에서 택트 스위치와 10kΩ 풀다운 저항 회로를 구성하고, 버튼을 눌러 LED를 제어해 보세요." />
+  
+  <!-- Pretendard & JetBrains Mono 웹 폰트 -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Three.js & OrbitControls (오프라인 로컬 라이브러리 및 CDN 폴백) -->
+  <script src="lib/three.min.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+    }
+  </script>
+  <script src="lib/OrbitControls.js"></script>
+  <script>
+    if (typeof THREE !== 'undefined' && typeof THREE.OrbitControls === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"><\/script>');
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg: #f6eddd;
+      --bg-card: #fdfaf5;
+      --bg-card-subtle: #f0e6d2;
+      --text: #2c2f38;
+      --text-muted: #6e7382;
+      --border: #e2d7c3;
+      --accent-coral: #e3604b;
+      --accent-blue: #3b74db;
+      --accent-green: #2fa866;
+      --accent-amber: #e89528;
+      --accent-dark: #1f232e;
+      --code-bg: #1c202a;
+      --code-text: #e6edf3;
+      --code-highlight: rgba(227, 96, 75, 0.25);
+      --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      --font-mono: "JetBrains Mono", Consolas, monospace;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 2px 8px rgba(35, 30, 20, 0.06);
+      --shadow-md: 0 8px 24px rgba(35, 30, 20, 0.08);
+      --shadow-lg: 0 16px 40px rgba(35, 30, 20, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      user-select: none;
+    }
+
+    /* 전체 앱 레이아웃 */
+    #app {
+      display: grid;
+      grid-template-columns: 1fr 440px;
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    /* 3D 뷰포트 영역 */
+    #stage-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 45%, #faf4eb 0%, #ece0ce 100%);
+      overflow: hidden;
+    }
+
+    #board-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+    #board-canvas:active {
+      cursor: grabbing;
+    }
+
+    /* 상단 네비게이션 & 브랜드 */
+    .brand-header {
+      position: absolute;
+      top: 24px;
+      left: 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(253, 250, 245, 0.88);
+      backdrop-filter: blur(12px);
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      z-index: 10;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 18px;
+    }
+    .brand-logo path.loop {
+      fill: none;
+      stroke: var(--accent-blue);
+      stroke-width: 3.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .brand-logo path.sign {
+      fill: none;
+      stroke: var(--accent-coral);
+      stroke-width: 2.2;
+      stroke-linecap: round;
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lesson-badge {
+      font-size: 11px;
+      font-weight: 600;
+      background: #e9e0cf;
+      color: #615745;
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    /* 좌측 하단 뷰 컨트롤 바 */
+    .viewbar {
+      position: absolute;
+      bottom: 28px;
+      left: 28px;
+      display: flex;
+      align-items: center;
+      background: rgba(253, 250, 245, 0.92);
+      backdrop-filter: blur(12px);
+      padding: 6px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      z-index: 10;
+      gap: 4px;
+    }
+    .btn-icon {
+      background: transparent;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text);
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-icon:hover {
+      background: var(--bg-card-subtle);
+    }
+    .btn-icon:active {
+      transform: scale(0.95);
+    }
+    .viewbar-sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      margin: 0 4px;
+    }
+
+    /* 버튼 클릭 유도 힌트 */
+    .click-hint {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(31, 35, 46, 0.85);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-md);
+      pointer-events: none;
+      animation: pulseHint 2.4s infinite ease-in-out;
+      z-index: 10;
+    }
+    .click-hint-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-coral);
+    }
+    @keyframes pulseHint {
+      0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.95; }
+      50% { transform: translateX(-50%) translateY(-4px); opacity: 1; }
+    }
+
+    /* 3D 앵커 콜아웃 오버레이 */
+    .callout-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .callout-card {
+      position: absolute;
+      background: rgba(253, 250, 245, 0.94);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 10px;
+      box-shadow: var(--shadow-sm);
+      max-width: 200px;
+      pointer-events: auto;
+      transform: translate(-50%, -100%);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .callout-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-coral);
+      margin-bottom: 2px;
+    }
+    .callout-desc {
+      font-size: 11px;
+      line-height: 1.4;
+      color: var(--text-muted);
+    }
+
+    /* 우측 사이드 패널 */
+    #sidebar {
+      background: var(--bg-card);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow-y: auto;
+      box-shadow: -4px 0 20px rgba(0,0,0,0.03);
+      z-index: 20;
+    }
+
+    /* 상단 레슨 헤더 */
+    .lesson-hero {
+      padding: 24px 28px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .lesson-num {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-coral);
+      margin-bottom: 6px;
+    }
+    .lesson-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+      line-height: 1.25;
+    }
+    .lesson-lede {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--text-muted);
+    }
+
+    /* 탭 메뉴 */
+    .tabs-nav {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card-subtle);
+      padding: 0 16px;
+      gap: 4px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      position: relative;
+      transition: color 0.15s;
+    }
+    .tab-btn:hover {
+      color: var(--text);
+    }
+    .tab-btn.active {
+      color: var(--accent-coral);
+    }
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent-coral);
+    }
+
+    /* 탭 본문 영역 */
+    .tab-panel {
+      padding: 20px 24px;
+      font-size: 13.5px;
+      line-height: 1.6;
+      display: none;
+    }
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* 핀아웃 테이블 */
+    .pin-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 12.5px;
+    }
+    .pin-table tr {
+      border-bottom: 1px solid var(--border);
+    }
+    .pin-table td {
+      padding: 9px 6px;
+      vertical-align: top;
+    }
+    .pin-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 11px;
+      color: #fff;
+    }
+    .badge-5v { background: #d64a3a; }
+    .badge-d2 { background: #3b74db; }
+    .badge-gnd { background: #2f3547; }
+    .badge-d13 { background: #e89528; }
+
+    /* 규격 그리드 */
+    .specs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .spec-item {
+      background: var(--bg-card-subtle);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+    }
+    .spec-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+    .spec-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* 코드 섹션 */
+    .code-section {
+      padding: 20px 24px;
+      background: #faf6ef;
+      border-top: 1px solid var(--border);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .code-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    /* 모드 토글 스위처 */
+    .mode-switcher {
+      display: flex;
+      background: var(--bg-card-subtle);
+      padding: 3px;
+      border-radius: 8px;
+      gap: 2px;
+    }
+    .mode-btn {
+      border: none;
+      background: transparent;
+      padding: 5px 11px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.15s;
+    }
+    .mode-btn.active {
+      background: #fff;
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    /* 코드 에디터 블록 */
+    .code-box {
+      background: var(--code-bg);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+    .code-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      background: #14171f;
+      border-bottom: 1px solid #282e3d;
+    }
+    .code-lang {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: #7b849b;
+    }
+    .code-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-run {
+      background: var(--accent-coral);
+      color: #fff;
+      border: none;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-run:hover {
+      background: #d44d37;
+    }
+    .btn-run:active {
+      transform: scale(0.97);
+    }
+    .btn-run.running {
+      background: #e65239;
+    }
+
+    .btn-copy {
+      background: #252a37;
+      color: #c0c7d6;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-copy:hover {
+      background: #313747;
+      color: #fff;
+    }
+
+    pre.code-view {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.65;
+      padding: 14px;
+      color: var(--code-text);
+      overflow-x: auto;
+      max-height: 220px;
+    }
+    .code-line {
+      display: block;
+      transition: background 0.15s;
+      border-radius: 3px;
+      padding: 0 4px;
+    }
+    .code-line.active {
+      background: var(--code-highlight);
+      color: #ffb4a6;
+      font-weight: 600;
+    }
+
+    /* 시리얼 모니터 콘솔 */
+    .console-box {
+      margin-top: 12px;
+      background: #14171f;
+      border: 1px solid #282e3d;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      font-family: var(--font-mono);
+    }
+    .console-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 12px;
+      background: #0f1218;
+      border-bottom: 1px solid #212634;
+      font-size: 11px;
+    }
+    .console-status-group {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .console-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #555e70;
+    }
+    .console-dot.online {
+      background: #2fa866;
+      box-shadow: 0 0 8px rgba(47, 168, 102, 0.6);
+    }
+    .console-label {
+      color: #8b95aa;
+      font-weight: 600;
+    }
+    .console-body {
+      padding: 10px 12px;
+      font-size: 11.5px;
+      color: #9da7bb;
+      max-height: 100px;
+      overflow-y: auto;
+      min-height: 54px;
+    }
+    .console-row {
+      margin-bottom: 3px;
+    }
+    .console-row.high {
+      color: #4ade80;
+    }
+    .console-row.low {
+      color: #94a3b8;
+    }
+
+    /* 반응형 레이아웃 */
+    @media (max-width: 960px) {
+      #app {
+        grid-template-columns: 1fr;
+        grid-template-rows: 55vh 45vh;
+      }
+      #sidebar {
+        border-left: none;
+        border-top: 1px solid var(--border);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- 3D 뷰포트 영역 -->
+    <main id="stage-container">
+      <div class="brand-header">
+        <svg class="brand-logo" viewBox="0 0 92 50" aria-hidden="true">
+          <path class="loop" d="M24 6.5a18.5 18.5 0 1 0 0 37c8.7 0 13.4-6.6 22-18.5S59.3 6.5 68 6.5a18.5 18.5 0 1 1 0 37c-8.7 0-13.4-6.6-22-18.5S32.7 6.5 24 6.5z" />
+          <path class="sign" d="M15.5 25h12M62 25h12M68 19v12" />
+        </svg>
+        <span class="brand-title">
+          아두이노 배우기
+          <span class="lesson-badge">레슨 3 / 11</span>
+        </span>
+        <a href="kids.html" style="margin-left: 10px; font-size: 12px; font-weight: 700; text-decoration: none; background: #ffde59; color: #664d03; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #ffd026; transition: transform 0.1s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+          🧒 초등학생 눈높이 모드
+        </a>
+      </div>
+
+      <canvas id="board-canvas"></canvas>
+
+      <!-- 2D 앵커 콜아웃 오버레이 -->
+      <div class="callout-overlay" id="callout-overlay"></div>
+
+      <!-- 뷰 컨트롤 바 -->
+      <div class="viewbar">
+        <button class="btn-icon" id="btn-zoom-in" title="확대 (+)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M11 8v6M8 11h6"/></svg>
+        </button>
+        <button class="btn-icon" id="btn-zoom-out" title="축소 (-)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M8 11h6"/></svg>
+        </button>
+        <span class="viewbar-sep"></span>
+        <button class="btn-icon" id="btn-reset-view" title="시점 초기화 (R)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg>
+        </button>
+      </div>
+
+      <div class="click-hint">
+        <span class="click-hint-dot"></span>
+        3D 화면 속 붉은색 버튼을 마우스로 꾹 눌러보세요!
+      </div>
+    </main>
+
+    <!-- 우측 설명 & 제어 사이드바 -->
+    <aside id="sidebar">
+      <div class="lesson-hero">
+        <div class="lesson-num">3. 디지털 입력</div>
+        <h1 class="lesson-title">버튼 누르기 (Push a button)</h1>
+        <p class="lesson-lede">
+          디지털 입력(Input)을 통해 아두이노가 현실 세계의 신호를 감지합니다. 택트 버튼을 누르면 D2 핀에 5V(HIGH)가 인가되고, 버튼을 떼면 10kΩ 풀다운 저항이 핀을 0V(LOW)로 안정적으로 유지합니다.
+        </p>
+      </div>
+
+      <!-- 정보 탭 메뉴 -->
+      <nav class="tabs-nav">
+        <button class="tab-btn active" data-tab="overview">개요</button>
+        <button class="tab-btn" data-tab="pinout">핀 연결 (Pinout)</button>
+        <button class="tab-btn" data-tab="example">코드 설명</button>
+        <button class="tab-btn" data-tab="specs">상세 규격</button>
+      </nav>
+
+      <!-- 탭 1: 개요 -->
+      <div class="tab-panel active" id="tab-overview">
+        <p><b>버튼과 풀다운 저항의 동작 원리:</b></p>
+        <p style="margin-top: 6px; color: var(--text-muted);">
+          스위치가 열려 있을 때 핀이 전원이나 접지 어디에도 연결되지 않으면 공기 중의 정전기나 노이즈로 인해 값이 불안정하게 튀는 <b>플로팅(Floating)</b> 상태가 발생합니다.
+        </p>
+        <div style="background: var(--bg-card-subtle); padding: 12px; border-radius: 8px; margin-top: 10px; border-left: 3px solid var(--accent-coral);">
+          <b>핵심 포인트:</b> 10kΩ 풀다운 저항은 평상시 미세한 전류로 D2 핀을 0V(GND)로 잡아두며, 버튼이 눌리는 순간 5V 전원이 직결되어 명확한 HIGH 신호로 전환됩니다.
+        </div>
+      </div>
+
+      <!-- 탭 2: 핀아웃 -->
+      <div class="tab-panel" id="tab-pinout">
+        <table class="pin-table">
+          <tr>
+            <td><span class="pin-badge badge-5v">5V</span></td>
+            <td><b>버튼 좌측 단자</b></td>
+            <td>스위치 한쪽 전원 공급 (적색 전선)</td>
+          </tr>
+          <tr>
+            <td><span class="pin-badge badge-d2">D2</span></td>
+            <td><b>버튼 우측 + 10kΩ</b></td>
+            <td>버튼을 누르면 HIGH를 읽는 디지털 입력선 (청색 전선)</td>
+          </tr>
+          <tr>
+            <td><span class="pin-badge badge-gnd">GND</span></td>
+            <td><b>10kΩ 저항 반대편</b></td>
+            <td>버튼을 뗐을 때 D2를 0V(LOW)로 유지 (네이비 전선)</td>
+          </tr>
+          <tr>
+            <td><span class="pin-badge badge-d13">D13</span></td>
+            <td><b>220Ω → LED</b></td>
+            <td>스케치 코드에 의해 제어되는 출력 핀 (주황 전선)</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- 탭 3: 코드 설명 -->
+      <div class="tab-panel" id="tab-example">
+        <ul style="padding-left: 18px; color: var(--text-muted); display: flex; flex-direction: column; gap: 8px;">
+          <li><code>pinMode(BUTTON, INPUT)</code>: 2번 핀을 전압을 내보내는 출력이 아닌, 외부 전압을 감지하는 <b>입력 모드</b>로 전환합니다.</li>
+          <li><code>digitalRead(BUTTON)</code>: 버튼을 누르고 있으면 <code>HIGH</code>(1), 떼면 <code>LOW</code>(0)을 반환합니다.</li>
+          <li><b>누르고 있기(Hold) 모드</b>: 버튼을 누르고 있는 동안에만 실시간으로 LED가 켜집니다.</li>
+          <li><b>토글(Toggle) 모드</b>: 버튼이 눌려지는 순간(Rising Edge)을 포착하여 누를 때마다 LED를 켜고 끕니다. 접점 노이즈 방지를 위해 30ms 디바운스(Debounce) 딜레이를 줍니다.</li>
+        </ul>
+      </div>
+
+      <!-- 탭 4: 상세 규격 -->
+      <div class="tab-panel" id="tab-specs">
+        <div class="specs-grid">
+          <div class="spec-item">
+            <div class="spec-label">스위치 규격</div>
+            <div class="spec-val">12mm 택트 스위치</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">풀다운 저항</div>
+            <div class="spec-val">10 kΩ (to GND)</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">논리 전압 레벨</div>
+            <div class="spec-val">LOW &lt; 1.5V, HIGH &gt; 3.0V</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">채터링(바운스) 시간</div>
+            <div class="spec-val">접점 떨림 약 5ms 발생</div>
+          </div>
+        </div>
+        <p style="margin-top: 12px; font-size: 12px; color: var(--text-muted);">
+          💡 <b>전문가 팁:</b> <code>pinMode(BUTTON, INPUT_PULLUP)</code>을 사용하면 아두이노 내부 20kΩ 풀업 저항이 활성화되므로 외부 10kΩ 저항 없이도 회로를 구성할 수 있습니다.
+        </p>
+      </div>
+
+      <!-- 인터랙티브 코드 실행 섹션 -->
+      <div class="code-section">
+        <div class="code-header">
+          <div class="code-title">직접 해보기 (스케치 코드)</div>
+          <div class="mode-switcher">
+            <button class="mode-btn active" data-mode="hold">누르고 있기 (Hold)</button>
+            <button class="mode-btn" data-mode="toggle">토글 전환 (Toggle)</button>
+          </div>
+        </div>
+
+        <div class="code-box">
+          <div class="code-toolbar">
+            <span class="code-lang">Arduino C++ (.ino)</span>
+            <div class="code-actions">
+              <button class="btn-copy" id="btn-copy-code">코드 복사</button>
+              <button class="btn-run" id="btn-toggle-sim">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <span id="run-btn-text">실행하기 (Space)</span>
+              </button>
+            </div>
+          </div>
+          <pre class="code-view"><code id="code-display"></code></pre>
+        </div>
+
+        <!-- 시리얼 모니터 콘솔 -->
+        <div class="console-box">
+          <div class="console-bar">
+            <div class="console-status-group">
+              <span class="console-dot" id="console-dot"></span>
+              <span class="console-label">시리얼 모니터 (Serial Monitor)</span>
+            </div>
+            <span style="font-size: 10px; color: #647087;" id="console-status-text">대기 중 (Stopped)</span>
+          </div>
+          <div class="console-body" id="console-logs">
+            <div class="console-row" style="color: #647087;">// [실행하기] 버튼을 누르면 스케치가 가상 보드에 업로드됩니다.</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    /* =====================================================================
+       1. 아두이노 스케치 템플릿 및 상태 관리
+       ===================================================================== */
+    const SKETCH_TEMPLATES = {
+      hold: {
+        globals: "",
+        logic: `  int pressed = digitalRead(BUTTON);
+  digitalWrite(LED, pressed);`,
+        traceLines: ["digitalRead(BUTTON)", "digitalWrite(LED, pressed)"]
+      },
+      toggle: {
+        globals: `int last = LOW;
+bool lit = false;
+`,
+        logic: `  int now = digitalRead(BUTTON);
+  if (now == HIGH && last == LOW) {
+    lit = !lit;
+    digitalWrite(LED, lit);
+    delay(30);  // 채터링 방지(디바운스)
+  }
+  last = now;`,
+        traceLines: ["digitalRead(BUTTON)", "if (now == HIGH", "lit = !lit", "digitalWrite(LED, lit)", "last = now"]
+      }
+    };
+
+    function generateCode(mode) {
+      const tmpl = SKETCH_TEMPLATES[mode];
+      return `const int BUTTON = 2;
+const int LED = 13;
+${tmpl.globals}
+void setup() {
+  pinMode(BUTTON, INPUT);
+  pinMode(LED, OUTPUT);
+}
+
+void loop() {
+${tmpl.logic}
+}`;
+    }
+
+    const state = {
+      mode: 'hold',
+      running: false,
+      buttonPressed: false,
+      ledLit: false,
+      toggleLit: false,
+      toggleLast: false,
+      traceIndex: 0
+    };
+
+    /* =====================================================================
+       2. UI 탭, 모드 스위처, 시리얼 모니터 로직
+       ===================================================================== */
+    const codeDisplay = document.getElementById('code-display');
+    const consoleLogs = document.getElementById('console-logs');
+    const consoleDot = document.getElementById('console-dot');
+    const consoleStatusText = document.getElementById('console-status-text');
+    const btnToggleSim = document.getElementById('btn-toggle-sim');
+    const runBtnText = document.getElementById('run-btn-text');
+
+    function renderCode() {
+      const raw = generateCode(state.mode);
+      const lines = raw.split('\n');
+      codeDisplay.innerHTML = lines.map((l, i) => `<span class="code-line" data-line="${i}">${escapeHtml(l)}</span>`).join('');
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function logConsole(msg, type = '') {
+      const row = document.createElement('div');
+      row.className = `console-row ${type}`;
+      row.textContent = `> ${msg}`;
+      consoleLogs.appendChild(row);
+      consoleLogs.scrollTop = consoleLogs.scrollHeight;
+      // 최대 30줄 유지
+      if (consoleLogs.children.length > 30) {
+        consoleLogs.removeChild(consoleLogs.firstChild);
+      }
+    }
+
+    // 탭 전환
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+      });
+    });
+
+    // 모드 전환
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.mode = btn.dataset.mode;
+        state.toggleLit = false;
+        state.toggleLast = false;
+        updateLed(false);
+        renderCode();
+        if (state.running) {
+          logConsole(`동작 모드 변경: ${state.mode === 'hold' ? '누르고 있기(Hold)' : '토글 전환(Toggle)'}`);
+        }
+      });
+    });
+
+    // 코드 복사
+    document.getElementById('btn-copy-code').addEventListener('click', () => {
+      navigator.clipboard.writeText(generateCode(state.mode)).then(() => {
+        const originalText = document.getElementById('btn-copy-code').textContent;
+        document.getElementById('btn-copy-code').textContent = '복사 완료!';
+        setTimeout(() => document.getElementById('btn-copy-code').textContent = originalText, 1500);
+      });
+    });
+
+    // 시뮬레이션 시작/정지 토글
+    function toggleSimulation() {
+      state.running = !state.running;
+      if (state.running) {
+        btnToggleSim.classList.add('running');
+        runBtnText.textContent = '스케치 정지 (Space)';
+        consoleDot.classList.add('online');
+        consoleStatusText.textContent = '실행 중 (Running)';
+        consoleLogs.innerHTML = '';
+        logConsole('스케치 컴파일 완료...');
+        logConsole('Arduino Uno 보드로 업로드 중...');
+        setTimeout(() => {
+          if (!state.running) return;
+          logConsole('업로드 완료! 스케치 실행 시작.');
+          logConsole(`초기 상태: D2 = LOW, LED = OFF`);
+        }, 300);
+      } else {
+        btnToggleSim.classList.remove('running');
+        runBtnText.textContent = '실행하기 (Space)';
+        consoleDot.classList.remove('online');
+        consoleStatusText.textContent = '대기 중 (Stopped)';
+        logConsole('스케치 실행이 정지되었습니다.');
+        updateLed(false);
+        clearCodeHighlights();
+      }
+    }
+    btnToggleSim.addEventListener('click', toggleSimulation);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        toggleSimulation();
+      } else if (e.key === 'r' || e.key === 'R') {
+        resetCameraView();
+      }
+    });
+
+    renderCode();
+
+    /* =====================================================================
+       3. Three.js 3D 씬 및 프로시저럴 모델링 (아두이노, 브레드보드, 부품들)
+       ===================================================================== */
+    const container = document.getElementById('stage-container');
+    const canvas = document.getElementById('board-canvas');
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf6eddd);
+
+    const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
+    const defaultCameraPos = new THREE.Vector3(25, 68, 65);
+    const defaultCameraTarget = new THREE.Vector3(5, 0, -2);
+    camera.position.copy(defaultCameraPos);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.target.copy(defaultCameraTarget);
+    controls.maxPolarAngle = Math.PI / 2.05; // 바닥 아래로 카메라 통과 방지
+    controls.minDistance = 25;
+    controls.maxDistance = 180;
+
+    function resetCameraView() {
+      camera.position.copy(defaultCameraPos);
+      controls.target.copy(defaultCameraTarget);
+      controls.update();
+    }
+    document.getElementById('btn-reset-view').addEventListener('click', resetCameraView);
+    document.getElementById('btn-zoom-in').addEventListener('click', () => {
+      camera.position.sub(controls.target).multiplyScalar(0.85).add(controls.target);
+    });
+    document.getElementById('btn-zoom-out').addEventListener('click', () => {
+      camera.position.sub(controls.target).multiplyScalar(1.15).add(controls.target);
+    });
+
+    // 조명 구성 (부드러운 스튜디오 조명 느낌)
+    const ambientLight = new THREE.AmbientLight(0xfff6ea, 0.75);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
+    dirLight.position.set(45, 90, 40);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 2048;
+    dirLight.shadow.mapSize.height = 2048;
+    dirLight.shadow.camera.near = 10;
+    dirLight.shadow.camera.far = 250;
+    const d = 50;
+    dirLight.shadow.camera.left = -d;
+    dirLight.shadow.camera.right = d;
+    dirLight.shadow.camera.top = d;
+    dirLight.shadow.camera.bottom = -d;
+    dirLight.shadow.bias = -0.0005;
+    scene.add(dirLight);
+
+    const fillLight = new THREE.DirectionalLight(0xb0d5ff, 0.4);
+    fillLight.position.set(-50, 40, -40);
+    scene.add(fillLight);
+
+    // 바닥 그림자 수신용 평면
+    const groundGeo = new THREE.PlaneGeometry(300, 300);
+    const groundMat = new THREE.ShadowMaterial({ opacity: 0.12 });
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -0.1;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    /* --- 부품 3D 빌더 --- */
+    const rootGroup = new THREE.Group();
+    scene.add(rootGroup);
+
+    // 1) Arduino Uno R3 PCB 보드
+    const unoGroup = new THREE.Group();
+    unoGroup.position.set(-18, 0, 0);
+
+    // Uno PCB 본체 (치수 68.6 x 53.4 mm)
+    const unoPcbGeo = new THREE.BoxGeometry(42, 1.6, 58);
+    const unoPcbMat = new THREE.MeshStandardMaterial({ color: 0x0e5d6e, roughness: 0.45, metalness: 0.1 });
+    const unoPcb = new THREE.Mesh(unoPcbGeo, unoPcbMat);
+    unoPcb.position.y = 0.8;
+    unoPcb.receiveShadow = true;
+    unoPcb.castShadow = true;
+    unoGroup.add(unoPcb);
+
+    // USB 포트 (실버 메탈)
+    const usbGeo = new THREE.BoxGeometry(10, 8, 12);
+    const metalMat = new THREE.MeshStandardMaterial({ color: 0xd4d8df, roughness: 0.25, metalness: 0.85 });
+    const usb = new THREE.Mesh(usbGeo, metalMat);
+    usb.position.set(-15, 5, -23);
+    usb.castShadow = true;
+    unoGroup.add(usb);
+
+    // DC 전원 잭 (블랙 플라스틱)
+    const jackGeo = new THREE.BoxGeometry(9, 8, 13);
+    const darkMat = new THREE.MeshStandardMaterial({ color: 0x22242a, roughness: 0.7 });
+    const jack = new THREE.Mesh(jackGeo, darkMat);
+    jack.position.set(14, 5, -22);
+    jack.castShadow = true;
+    unoGroup.add(jack);
+
+    // ATmega328P DIP-28 칩
+    const mcuGeo = new THREE.BoxGeometry(22, 3, 7);
+    const mcu = new THREE.Mesh(mcuGeo, darkMat);
+    mcu.position.set(4, 2.5, 6);
+    mcu.castShadow = true;
+    unoGroup.add(mcu);
+
+    // 핀 헤더 소켓들 (디지털 상단, 아날로그/파워 하단)
+    function createHeader(x, z, length) {
+      const headerGeo = new THREE.BoxGeometry(2.54, 4.5, length);
+      const header = new THREE.Mesh(headerGeo, darkMat);
+      header.position.set(x, 3.2, z);
+      header.castShadow = true;
+      unoGroup.add(header);
+    }
+    createHeader(-18, 5, 36);  // 디지털 핀 헤더 (D0~D13, GND, AREF)
+    createHeader(18, -4, 20);  // 파워 헤더 (5V, GND, 3.3V 등)
+    createHeader(18, 16, 16);  // 아날로그 헤더 (A0~A5)
+
+    // Uno 기판 내장 'L' LED (Pin 13과 직결)
+    const lLedGeo = new THREE.BoxGeometry(1.4, 0.8, 1.4);
+    const lLedMat = new THREE.MeshStandardMaterial({
+      color: 0x443311,
+      roughness: 0.3,
+      emissive: 0x000000,
+      emissiveIntensity: 0
+    });
+    const lLed = new THREE.Mesh(lLedGeo, lLedMat);
+    lLed.position.set(-12, 1.8, 5);
+    unoGroup.add(lLed);
+
+    rootGroup.add(unoGroup);
+
+    // 2) 브레드보드 (미니 하프 사이즈)
+    const breadboardGroup = new THREE.Group();
+    breadboardGroup.position.set(22, 0, 0);
+
+    const bbGeo = new THREE.BoxGeometry(38, 5.5, 58);
+    const bbMat = new THREE.MeshStandardMaterial({ color: 0xf2eee3, roughness: 0.6 });
+    const breadboard = new THREE.Mesh(bbGeo, bbMat);
+    breadboard.position.y = 2.75;
+    breadboard.castShadow = true;
+    breadboard.receiveShadow = true;
+    breadboardGroup.add(breadboard);
+
+    // 브레드보드 중앙 분리 홈 (Divider Trench)
+    const trenchGeo = new THREE.BoxGeometry(2.2, 1.5, 56);
+    const trenchMat = new THREE.MeshStandardMaterial({ color: 0x2e2f33, roughness: 0.8 });
+    const trench = new THREE.Mesh(trenchGeo, trenchMat);
+    trench.position.set(0, 5.2, 0);
+    breadboardGroup.add(trench);
+
+    // 브레드보드 핀 구멍 그리드 (시각적 텍스처 대용 메쉬 격자)
+    const holeGeo = new THREE.PlaneGeometry(0.7, 0.7);
+    const holeMat = new THREE.MeshBasicMaterial({ color: 0x3d3f45 });
+    const holeInst = new THREE.InstancedMesh(holeGeo, holeMat, 220);
+    const dummy = new THREE.Object3D();
+    dummy.rotation.x = -Math.PI / 2;
+    let hIdx = 0;
+    for (let row = -24; row <= 24; row += 2.54) {
+      for (let col of [-14, -11.5, -9, -6.5, -4, 4, 6.5, 9, 11.5, 14]) {
+        dummy.position.set(col, 5.52, row);
+        dummy.updateMatrix();
+        holeInst.setMatrixAt(hIdx++, dummy.matrix);
+      }
+    }
+    breadboardGroup.add(holeInst);
+    rootGroup.add(breadboardGroup);
+
+    // 3) 12mm 택트 스위치 (Push Button)
+    const buttonGroup = new THREE.Group();
+    buttonGroup.position.set(22, 5.5, -10);
+
+    // 스위치 베이스 바디 (다크 그레이 플라스틱 12x3.6x12)
+    const btnBaseGeo = new THREE.BoxGeometry(11.5, 3.5, 11.5);
+    const btnBaseMat = new THREE.MeshStandardMaterial({ color: 0x222530, roughness: 0.5 });
+    const btnBase = new THREE.Mesh(btnBaseGeo, btnBaseMat);
+    btnBase.position.y = 1.75;
+    btnBase.castShadow = true;
+    buttonGroup.add(btnBase);
+
+    // 스위치 상단 금속 플레이트 커버
+    const btnPlateGeo = new THREE.BoxGeometry(11.8, 0.4, 11.8);
+    const btnPlate = new THREE.Mesh(btnPlateGeo, metalMat);
+    btnPlate.position.y = 3.65;
+    btnPlate.castShadow = true;
+    buttonGroup.add(btnPlate);
+
+    // 스위치 코너 4개 리벳
+    const rivetGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.3, 10);
+    for (let rx of [-4.5, 4.5]) {
+      for (let rz of [-4.5, 4.5]) {
+        const rivet = new THREE.Mesh(rivetGeo, darkMat);
+        rivet.position.set(rx, 3.85, rz);
+        buttonGroup.add(rivet);
+      }
+    }
+
+    // 스위치 원형 플런저 캡 (Cap) - 클릭 시 눌리는 메쉬
+    const capGroup = new THREE.Group();
+    capGroup.position.y = 3.8;
+    const capGeo = new THREE.CylinderGeometry(3.4, 3.8, 3.2, 32);
+    const capMat = new THREE.MeshStandardMaterial({ color: 0xe3604b, roughness: 0.35 });
+    const capMesh = new THREE.Mesh(capGeo, capMat);
+    capMesh.position.y = 1.6;
+    capMesh.castShadow = true;
+    capGroup.add(capMesh);
+
+    // 캡 마우스 인터랙션을 위한 보이지 않는 터치 타겟(Hitbox)
+    const hitBoxGeo = new THREE.BoxGeometry(14, 10, 14);
+    const hitBoxMat = new THREE.MeshBasicMaterial({ visible: false });
+    const hitBox = new THREE.Mesh(hitBoxGeo, hitBoxMat);
+    hitBox.position.y = 4;
+    capGroup.add(hitBox);
+
+    buttonGroup.add(capGroup);
+    rootGroup.add(buttonGroup);
+
+    // 4) 저항들 (10kΩ 풀다운 저항 & 220Ω LED 보호 저항)
+    function createResistor(colorBands) {
+      const rGroup = new THREE.Group();
+      // 몸통
+      const bodyGeo = new THREE.CylinderGeometry(1.2, 1.2, 6.2, 16);
+      const bodyMat = new THREE.MeshStandardMaterial({ color: 0xdec6a5, roughness: 0.6 });
+      const body = new THREE.Mesh(bodyGeo, bodyMat);
+      body.rotation.z = Math.PI / 2;
+      body.castShadow = true;
+      rGroup.add(body);
+
+      // 색상 띠 (Color bands)
+      colorBands.forEach((c, idx) => {
+        const bandGeo = new THREE.CylinderGeometry(1.23, 1.23, 0.6, 16);
+        const bandMat = new THREE.MeshBasicMaterial({ color: c });
+        const band = new THREE.Mesh(bandGeo, bandMat);
+        band.rotation.z = Math.PI / 2;
+        band.position.x = -1.8 + idx * 1.1;
+        rGroup.add(band);
+      });
+
+      // 리드선 양쪽
+      const leadGeo = new THREE.CylinderGeometry(0.3, 0.3, 3, 8);
+      const lead1 = new THREE.Mesh(leadGeo, metalMat);
+      lead1.position.set(-3.5, -1.2, 0);
+      lead1.rotation.z = Math.PI / 4;
+      const lead2 = new THREE.Mesh(leadGeo, metalMat);
+      lead2.position.set(3.5, -1.2, 0);
+      lead2.rotation.z = -Math.PI / 4;
+      rGroup.add(lead1, lead2);
+
+      return rGroup;
+    }
+
+    // 10kΩ 풀다운 저항 (갈-검-주-금)
+    const pulldownResistor = createResistor([0x603813, 0x000000, 0xe67e22, 0xd4af37]);
+    pulldownResistor.position.set(22, 8.2, -1);
+    rootGroup.add(pulldownResistor);
+
+    // 220Ω LED 보호 저항 (빨-빨-갈-금)
+    const ledResistor = createResistor([0xd93829, 0xd93829, 0x603813, 0xd4af37]);
+    ledResistor.position.set(22, 8.2, 10);
+    rootGroup.add(ledResistor);
+
+    // 5) 5mm 적색 LED (LED 양극 & 음극)
+    const ledGroup = new THREE.Group();
+    ledGroup.position.set(30, 5.5, 18);
+
+    const ledDomeGeo = new THREE.CylinderGeometry(2.4, 2.4, 5, 24);
+    const ledCapGeo = new THREE.SphereGeometry(2.4, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+    const ledMat = new THREE.MeshStandardMaterial({
+      color: 0x771111,
+      roughness: 0.15,
+      transparent: true,
+      opacity: 0.88,
+      emissive: 0x000000,
+      emissiveIntensity: 0
+    });
+    const ledDome = new THREE.Mesh(ledDomeGeo, ledMat);
+    ledDome.position.y = 3.5;
+    ledDome.castShadow = true;
+    const ledCap = new THREE.Mesh(ledCapGeo, ledMat);
+    ledCap.position.y = 6;
+    ledCap.castShadow = true;
+    ledGroup.add(ledDome, ledCap);
+
+    // LED 자체 동적 광원 (PointLight)
+    const ledLight = new THREE.PointLight(0xff3322, 0, 25);
+    ledLight.position.set(0, 6, 0);
+    ledGroup.add(ledLight);
+    rootGroup.add(ledGroup);
+
+    // 6) 커브 3D 점퍼 전선들 (CatmullRomCurve3 생성)
+    function createWire(points, hexColor, radius = 0.55) {
+      const curve = new THREE.CatmullRomCurve3(points);
+      const tubeGeo = new THREE.TubeGeometry(curve, 32, radius, 8, false);
+      const tubeMat = new THREE.MeshStandardMaterial({
+        color: hexColor,
+        roughness: 0.5,
+        metalness: 0.1
+      });
+      const wire = new THREE.Mesh(tubeGeo, tubeMat);
+      wire.castShadow = true;
+      rootGroup.add(wire);
+      return wire;
+    }
+
+    // 5V 전원선 (적색): Uno 파워헤더 5V -> 브레드보드 버튼 좌측
+    createWire([
+      new THREE.Vector3(-0.5, 3.5, 4),
+      new THREE.Vector3(5, 14, -2),
+      new THREE.Vector3(14, 13, -12),
+      new THREE.Vector3(17, 6, -12)
+    ], 0xd64a3a);
+
+    // D2 입력 감지선 (청색): Uno 디지털 D2 -> 브레드보드 버튼 우측 단자
+    createWire([
+      new THREE.Vector3(-36, 3.5, 9),
+      new THREE.Vector3(-20, 16, 2),
+      new THREE.Vector3(12, 14, -8),
+      new THREE.Vector3(26, 6, -8)
+    ], 0x3b74db);
+
+    // GND 풀다운 접지선 (네이비): Uno GND -> 풀다운 저항 하단
+    createWire([
+      new THREE.Vector3(-36, 3.5, 17),
+      new THREE.Vector3(-15, 17, 12),
+      new THREE.Vector3(15, 14, 3),
+      new THREE.Vector3(26, 6, 3)
+    ], 0x222a3d);
+
+    // D13 출력선 (주황색): Uno 디지털 D13 -> 220Ω 저항
+    createWire([
+      new THREE.Vector3(-36, 3.5, -9),
+      new THREE.Vector3(-18, 15, -4),
+      new THREE.Vector3(10, 14, 8),
+      new THREE.Vector3(18, 6, 8)
+    ], 0xe89528);
+
+    // LED 캐소드 접지 브릿지선 (네이비 짧은 점퍼선)
+    createWire([
+      new THREE.Vector3(30, 6, 20),
+      new THREE.Vector3(32, 9, 12),
+      new THREE.Vector3(26, 6, 5)
+    ], 0x222a3d, 0.45);
+
+
+    /* =====================================================================
+       4. 버튼 마우스 인터랙션 & 90ms 물리 하강 트윈
+       ===================================================================== */
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let isPointerDownOnBtn = false;
+    let capStartY = 3.8;
+    let capTargetY = 3.8;
+    let capAnimProgress = 1;
+    let capFromY = 3.8;
+
+    function setButtonDepressed(isDown) {
+      if (state.buttonPressed === isDown) return;
+      state.buttonPressed = isDown;
+
+      // 1.3mm 하향 트윈
+      capFromY = capGroup.position.y;
+      capTargetY = isDown ? (capStartY - 1.3) : capStartY;
+      capAnimProgress = 0;
+
+      // 시뮬레이션 엔진 상태 통보
+      onButtonStateChange(isDown);
+    }
+
+    function onButtonStateChange(isDown) {
+      if (!state.running) return;
+
+      logConsole(`D2 신호 입력: ${isDown ? 'HIGH (버튼 눌림)' : 'LOW (버튼 놓임)'}`, isDown ? 'high' : 'low');
+
+      if (state.mode === 'hold') {
+        updateLed(isDown);
+        highlightCodeLine(isDown ? 7 : 8);
+      } else if (state.mode === 'toggle') {
+        if (isDown && !state.toggleLast) {
+          // Rising Edge -> 상태 반전 & 디바운스
+          state.toggleLit = !state.toggleLit;
+          updateLed(state.toggleLit);
+          highlightCodeLine(9);
+          logConsole(`[토글 반전] LED 상태: ${state.toggleLit ? 'ON' : 'OFF'}`);
+        }
+        state.toggleLast = isDown;
+      }
+    }
+
+    function updateLed(on) {
+      state.ledLit = on;
+      if (on) {
+        ledMat.emissive.setHex(0xff2211);
+        ledMat.emissiveIntensity = 1.2;
+        ledLight.intensity = 1.6;
+        lLedMat.emissive.setHex(0xe89528);
+        lLedMat.emissiveIntensity = 1.0;
+      } else {
+        ledMat.emissive.setHex(0x000000);
+        ledMat.emissiveIntensity = 0;
+        ledLight.intensity = 0;
+        lLedMat.emissive.setHex(0x000000);
+        lLedMat.emissiveIntensity = 0;
+      }
+    }
+
+    function highlightCodeLine(lineIdx) {
+      document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+      const target = document.querySelector(`.code-line[data-line="${lineIdx}"]`);
+      if (target) {
+        target.classList.add('active');
+      }
+    }
+
+    function clearCodeHighlights() {
+      document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+    }
+
+    // 마우스/터치 레이캐스팅
+    function onPointerDown(e) {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects([hitBox, capMesh, btnPlate], true);
+      if (hits.length > 0) {
+        isPointerDownOnBtn = true;
+        controls.enabled = false; // 버튼 조작 중 카메라 회전 방지
+        setButtonDepressed(true);
+      }
+    }
+
+    function onPointerUp() {
+      if (isPointerDownOnBtn) {
+        isPointerDownOnBtn = false;
+        controls.enabled = true;
+        setButtonDepressed(false);
+      }
+    }
+
+    canvas.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+
+
+    /* =====================================================================
+       5. 3D 앵커 포인트 및 2D 콜아웃 투영 시스템
+       ===================================================================== */
+    const callouts = [
+      { id: 'btn', pos: new THREE.Vector3(22, 11, -10), title: '택트 버튼 (입력)', desc: '클릭하면 D2 핀으로 5V HIGH가 공급됩니다.' },
+      { id: 'r_pull', pos: new THREE.Vector3(22, 11, -1), title: '10kΩ 풀다운 저항', desc: '평상시 D2를 0V(LOW)로 잡아 플로팅을 방지합니다.' },
+      { id: 'led', pos: new THREE.Vector3(30, 13, 18), title: 'LED 및 220Ω 저항', desc: 'D13 핀 제어 신호에 의해 점등됩니다.' }
+    ];
+
+    const overlay = document.getElementById('callout-overlay');
+    callouts.forEach(c => {
+      const el = document.createElement('div');
+      el.className = 'callout-card';
+      el.id = `callout-${c.id}`;
+      el.innerHTML = `<div class="callout-title">${c.title}</div><div class="callout-desc">${c.desc}</div>`;
+      overlay.appendChild(el);
+    });
+
+    function updateCalloutPositions() {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      const p = new THREE.Vector3();
+
+      callouts.forEach(c => {
+        p.copy(c.pos);
+        p.project(camera);
+        const el = document.getElementById(`callout-${c.id}`);
+        // 카메라 뒤편에 있는 경우 숨김
+        if (p.z > 1) {
+          el.style.opacity = '0';
+          return;
+        }
+        el.style.opacity = '1';
+        const x = (p.x * 0.5 + 0.5) * w;
+        const y = (-(p.y * 0.5) + 0.5) * h;
+        el.style.left = `${Math.round(x)}px`;
+        el.style.top = `${Math.round(y - 12)}px`;
+      });
+    }
+
+
+    /* =====================================================================
+       6. 애니메이션 렌더링 루프
+       ===================================================================== */
+    let lastTime = performance.now();
+
+    function animate(now) {
+      requestAnimationFrame(animate);
+      const delta = (now - lastTime) / 1000;
+      lastTime = now;
+
+      // 캡 하강/상승 90ms 3차 감속 트윈 (Cubic Out Easing)
+      if (capAnimProgress < 1) {
+        capAnimProgress += delta / 0.09;
+        if (capAnimProgress >= 1) {
+          capAnimProgress = 1;
+          capGroup.position.y = capTargetY;
+        } else {
+          // outCubic easing
+          const t = 1 - Math.pow(1 - capAnimProgress, 3);
+          capGroup.position.y = capFromY + (capTargetY - capFromY) * t;
+        }
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+      updateCalloutPositions();
+    }
+    requestAnimationFrame(animate);
+
+    // 윈도우 리사이즈 대응
+    window.addEventListener('resize', () => {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    });
+  </script>
+</body>
+</html>
