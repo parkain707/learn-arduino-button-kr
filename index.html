@@ -884,7 +884,7 @@
             <span class="wire-dot" style="background: #a855f7;"></span>🟣 보라선(비상리셋)
           </button>
           <button class="wire-btn" data-wire="gold" id="btn-w-gold">
-            <span class="wire-dot" style="background: #eab308;"></span>🟡 골드선(마스터)
+            <span class="wire-dot" style="background: #eab308;"></span>🟡 골드선(도깨비퇴치)
           </button>
         </div>
       </div>
@@ -972,38 +972,41 @@
           </button>
         </div>
 
-        <!-- 5단계 (고등학생 수준: 10만 미소 초극강 마스터 챌린지) -->
+        <!-- 5단계 (고등학생 수준 과학 융합: 10만 미소 초극강 마스터 챌린지 - 어린이 눈높이 쉬운 용어) -->
         <div class="stage-card" id="card-stage-5" style="border: 2px solid #ec4899; background: #1f142b;">
           <div class="stage-top-row">
-            <span class="stage-tag" style="background: #831843; color: #fbcfe8;">🌌 5단계 (고교 물리/공학 초극강)</span>
+            <span class="stage-tag" style="background: #831843; color: #fbcfe8;">🌌 5단계 (형·누나 과학 융합 마스터)</span>
             <span class="stage-prize-tag" style="background: linear-gradient(135deg, #ec4899, #f59e0b); color: #fff; font-weight: 800;">💎 특별 상금 100,000 MISO</span>
           </div>
-          <div class="stage-name" style="color: #f472b6;">옴의 법칙 정밀 계산 & 플로팅 노이즈 필터링</div>
+          <div class="stage-name" style="color: #f472b6;">불빛 지킴이 댐 저항 & 도깨비 전기(노이즈) 퇴치 작전</div>
           <div class="stage-inst">
-            [고등학교 물리 I / 정보 융합]<br>
-            V_in = 5.0V, V_f = 2.0V, I = 20mA일 때 옴의 법칙으로 보호 저항값과 색띠를 풀고, 🟡 골드 마스터 결선 및 500ms 동기화 디바운스 필터를 해제하세요!
+            <b>[고등학교 물리 & 정보 융합을 어린이 눈높이로!]</b><br>
+            전기가 너무 세면 전구가 펑 터져요! <b>'옴의 법칙(전기 힘 나누기 퀴즈)'</b>으로 알맞은 댐 저항을 찾고, <b>'도깨비 전기를 쫓아내는 🟡 골드선'</b>을 이은 뒤, 단추를 심장박동처럼 <b>'똑... 똑... 똑... 0.5초 박자'</b>로 3번 탭하세요!
           </div>
 
           <!-- 1) 옴의 법칙 4지선다 퀴즈 영역 -->
           <div id="physics-quiz-box" style="background: #120e1a; border: 1px solid #db2777; border-radius: 10px; padding: 10px; margin-top: 8px;">
             <div style="font-size: 11.5px; font-weight: 700; color: #fbcfe8; margin-bottom: 5px;">
-              📐 Q1. 직렬 보호 저항값 R과 색띠(Color Band)는?
+              📐 Q1. 전구를 지키는 [댐 저항 크기]와 [무지개 색띠]는?
             </div>
             <div style="font-size: 10.5px; color: #cbd5e1; margin-bottom: 8px; line-height: 1.4;">
-              공식: R = (V_in - V_f) / I = (5.0V - 2.0V) / 0.02A
+              💡 <b>초등학생도 바로 푸는 계산 힌트:</b><br>
+              들어오는 전기 힘(5V) - 전구가 먹는 힘(2V) = 남는 힘 3V!<br>
+              남는 힘 3V ÷ 흐르는 전기(0.02A) = <b>몇 옴(Ω)일까요?</b><br>
+              (색띠 비밀: 갈색=1, 초록=5, 갈색=0 한 개 더 붙이기!)
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;" id="quiz-options-grid">
-              <button class="quiz-btn" data-ans="wrong">A) 100Ω (갈-검-갈)</button>
-              <button class="quiz-btn" data-ans="correct">B) 150Ω (갈-초-갈)</button>
-              <button class="quiz-btn" data-ans="wrong">C) 330Ω (주-주-갈)</button>
-              <button class="quiz-btn" data-ans="wrong">D) 1kΩ (갈-검-빨)</button>
+              <button class="quiz-btn" data-ans="wrong">A) 100Ω [갈-검-갈]<br><span style="font-size: 9.5px; opacity: 0.8;">(힘을 덜 막아 전구가 위험해요)</span></button>
+              <button class="quiz-btn" data-ans="correct">B) 150Ω [갈-초-갈]<br><span style="font-size: 9.5px; opacity: 0.8;">(정답! 전구가 딱 안전해요)</span></button>
+              <button class="quiz-btn" data-ans="wrong">C) 330Ω [주-주-갈]<br><span style="font-size: 9.5px; opacity: 0.8;">(너무 많이 막아 너무 어두워요)</span></button>
+              <button class="quiz-btn" data-ans="wrong">D) 1kΩ [갈-검-빨]<br><span style="font-size: 9.5px; opacity: 0.8;">(불이 아예 안 켜져요)</span></button>
             </div>
           </div>
 
           <div class="stage-checklist" style="margin-top: 8px;">
-            <div class="check-item" id="chk-ohm">⚪ 1. 옴의 법칙 LED 저항값 계산 풀이</div>
-            <div class="check-item" id="chk-gold">⚪ 2. [골드선] 플로팅 방지 인터럽트 단자 결선</div>
-            <div class="check-item" id="chk-debounce">⚪ 3. 하드웨어 바운싱 제거 500ms 정밀 펄스 3회 동기화</div>
+            <div class="check-item" id="chk-ohm">⚪ 1. [퀴즈] 전구 보호 댐 저항 풀기 (150Ω 갈-초-갈)</div>
+            <div class="check-item" id="chk-gold">⚪ 2. [골드선] 도깨비 전기(플로팅) 쫓아내는 D3 황금선 잇기</div>
+            <div class="check-item" id="chk-debounce">⚪ 3. [박자] 단추 떨림(채터링) 막기! 0.5초 심장박동으로 3회 탭</div>
           </div>
           <button class="btn-test-circuit" id="btn-test-5" style="display: none; background: linear-gradient(135deg, #db2777, #9333ea); border-color: #be185d; color: #fff;">
             🌌 10만 미소 초극강 마스터 검증 시작!
@@ -1532,8 +1535,8 @@
         p1: 'soc-d3',
         p2: 'soc-btn-branch',
         color: 0xfacc15,
-        label: '🟡 골드선(마스터 인터럽트)',
-        tip: '보드에서 번쩍이는 황금빛 인터럽트 구멍 2개를 차례로 콕콕 연결하세요!'
+        label: '🟡 골드선(도깨비 전기 퇴치)',
+        tip: '보드에서 번쩍이는 황금빛 도깨비 퇴치 구멍 2개를 차례로 콕콕 연결하세요!'
       }
     };
 
@@ -1789,11 +1792,11 @@
         const chkGold = document.getElementById('chk-gold');
         if (chkGold) {
           chkGold.className = 'check-item done';
-          chkGold.textContent = '✅ 2. [골드선] 플로팅 방지 인터럽트 결선 완료!';
+          chkGold.textContent = '✅ 2. [골드선] 도깨비 전기(플로팅) 쫓아내기 완료!';
         }
         playSnapSound();
-        document.getElementById('emg-text').innerHTML = '<b>로봇 삐뽀:</b> 골드 인터럽트 결선 성공! 옴의 법칙 퀴즈를 풀고 마스터 검증을 시작하세요!';
-        logMsg('골드선(D3 플로팅 인터럽트) 결선 성공!', 'succ');
+        document.getElementById('emg-text').innerHTML = '<b>로봇 삐뽀:</b> 와! 도깨비 전기가 도망쳤어요! 1번 퀴즈를 풀고 검증을 시작하세요!';
+        logMsg('골드선(도깨비 전기 퇴치 D3선) 연결 성공!', 'succ');
         clearBeacons();
         checkStage5Ready();
         return;
@@ -1887,11 +1890,11 @@
         document.getElementById('emergency-banner').className = 'emergency-banner alert-explosion';
         document.getElementById('emg-text').innerHTML = '<b>🚨 삐뽀 비상경보:</b> 25초 카운트다운! [보라선]을 집어 번쩍이는 리셋 구멍 2개를 신속히 탭하세요!';
       } else if (stage === 5) {
-        document.getElementById('current-stage-title').textContent = '🌌 5단계: 고교 물리 옴의 법칙 & 노이즈 필터링 (초극강 100,000 MISO)';
-        document.getElementById('current-stage-desc').textContent = 'V_in=5.0V, V_f=2.0V, I=20mA 옴의 법칙 계산 후 🟡 골드선 결선, 스위치 채터링 방지 500ms 펄스 3회 동기화를 완수하세요!';
+        document.getElementById('current-stage-title').textContent = '🌌 5단계: 불빛 지킴이 댐 저항 & 도깨비 전기 퇴치 (특별 상금 100,000 MISO)';
+        document.getElementById('current-stage-desc').textContent = '💡 [어린이 과학 마스터] 전구가 안 터지게 150옴 댐 저항을 찾고, 🟡 골드선으로 도깨비 전기를 쫓아낸 뒤, 심장박동 0.5초 박자로 침착하게 3회 탭하세요!';
         document.getElementById('target-prize-text').textContent = '💎 100,000 MISO';
         document.getElementById('emergency-banner').className = 'emergency-banner';
-        document.getElementById('emg-text').innerHTML = '<b>🌌 초극강 마스터 도전:</b> 옴의 법칙 저항 퀴즈를 풀고, [골드선]을 골라 인터럽트 구멍 2개를 연결하세요!';
+        document.getElementById('emg-text').innerHTML = '<b>🌌 로봇 삐뽀:</b> 10만 미소 최종 관문! 1번 퀴즈를 풀고, [골드선]을 골라 번쩍이는 구멍 2개를 이어봐요!';
       }
 
       for (let s = 1; s <= 5; s++) {
@@ -2001,17 +2004,17 @@
           const chkOhm = document.getElementById('chk-ohm');
           if (chkOhm) {
             chkOhm.className = 'check-item done';
-            chkOhm.textContent = '✅ 1. 옴의 법칙 계산 성공! (150Ω 갈-초-갈)';
+            chkOhm.textContent = '✅ 1. [퀴즈] 전구 보호 댐 저항 풀기 성공! (150Ω 갈-초-갈)';
           }
           playSnapSound();
-          logMsg('옴의 법칙 계산 정답! R = (5.0 - 2.0) / 0.02 = 150Ω (갈-초-갈)', 'succ');
-          document.getElementById('emg-text').innerHTML = '<b>로봇 삐뽀:</b> 옴의 법칙 정답! 이제 [골드선]을 결선하거나 아래 검증 시작을 누르세요!';
+          logMsg('옴의 법칙 퀴즈 정답! 3V ÷ 0.02A = 150Ω (갈-초-갈)! 전구가 안전합니다!', 'succ');
+          document.getElementById('emg-text').innerHTML = '<b>로봇 삐뽀:</b> 150옴 정답! 전구가 안 터져요! 이제 [골드선]을 연결하거나 아래 검증 시작을 누르세요!';
           checkStage5Ready();
         } else {
           btn.classList.add('selected-wrong');
           ohmQuizSolved = false;
           playTone(180, 0.25, 'sawtooth', 0.2);
-          logMsg('오답: 옴의 법칙 R = (Vin - Vf) / I 공식을 다시 계산해보세요!', 'warn');
+          logMsg('오답: 💡 힌트: 전기 힘 5에서 전구 힘 2를 뺀 3에서 0.02를 나눠보세요!', 'warn');
         }
       });
     });
@@ -2025,15 +2028,15 @@
       btnTest5.addEventListener('click', () => {
         if (!ohmQuizSolved || !connectedCircuits.gold) {
           playTone(180, 0.3, 'sawtooth', 0.25);
-          alert('1번 옴의 법칙 퀴즈와 2번 골드선 결선이 모두 완료되어야 합니다!');
+          alert('1번 댐 저항 퀴즈와 2번 골드선 도깨비 퇴치가 모두 완료되어야 합니다!');
           return;
         }
         stage5Active = true;
         debounceCadenceCount = 0;
         lastDebouncePressTime = 0;
         playTone(700, 0.2, 'triangle', 0.3);
-        document.getElementById('emg-text').innerHTML = '<b>🌌 10만 미소 마스터 동기화 가동!</b><br>스위치 접점 바운싱을 피해 <b>약 500ms(0.4~0.8초) 간격으로 정밀하게 3회 탭</b>하세요!';
-        logMsg('STAGE 5 초극강 동기화 가동: 500ms 간격으로 침착하게 3회 탭하세요 (너무 빠르면 채터링 에러)!');
+        document.getElementById('emg-text').innerHTML = '<b>🌌 10만 미소 마스터 동기화 가동!</b><br>단추 스프링이 바들바들 떠는 떨림(채터링)을 막기 위해 <b>\'똑... 똑... 똑...\' 심장박동(0.5초 간격)</b>으로 침착하게 3회 탭하세요!';
+        logMsg('STAGE 5 초극강 동기화 가동: 심장박동 0.5초 간격으로 침착하게 3회 탭하세요 (파바박 연타하면 떨림 에러 발생)!');
       });
     }
 
@@ -2084,38 +2087,38 @@
           lastDebouncePressTime = now;
           debounceCadenceCount = 1;
           playTone(520, 0.1, 'triangle', 0.25);
-          document.getElementById('chk-debounce').textContent = '⚪ 3. 동기화 펄스: 1 / 3회 (다음 탭은 0.5초 뒤)';
-          logMsg('첫 번째 펄스 입력 감지! 다음 탭은 약 0.5초(500ms) 뒤에 누르세요.');
+          document.getElementById('chk-debounce').textContent = '⚪ 3. 심장박동 박자: 1 / 3회 (다음 탭은 0.5초 뒤 똑!)';
+          logMsg('첫 번째 탭 감지! 다음 탭은 약 0.5초 뒤에 \'똑\' 누르세요.');
         } else {
           const delta = now - lastDebouncePressTime;
           lastDebouncePressTime = now;
           if (delta < 320) {
-            // 하드웨어 접점 바운싱 (채터링 노이즈)
+            // 하드웨어 접점 바운싱 (단추 떨림 채터링 노이즈)
             debounceCadenceCount = 0;
             lastDebouncePressTime = 0;
             playTone(180, 0.3, 'sawtooth', 0.3);
-            document.getElementById('chk-debounce').textContent = '⚠️ 채터링 노이즈 감지! (0회로 리셋: 너무 빠릅니다!)';
-            document.getElementById('emg-text').innerHTML = '<b>⚠️ 바운싱 채터링 감지!</b> 너무 빠르게 연타하면 기계식 접점 노이즈로 인식되어 리셋됩니다! <b>약 0.5초 간격으로 침착하게</b> 누르세요!';
-            logMsg(`[바운싱 에러] 간격 ${Math.round(delta)}ms: 너무 빨라 기계식 접점 노이즈가 발생했습니다. (0회로 리셋)`, 'warn');
+            document.getElementById('chk-debounce').textContent = '⚠️ 단추 떨림 감지! (파바박 연타 금지: 0회 리셋)';
+            document.getElementById('emg-text').innerHTML = '<b>⚠️ 단추 떨림(채터링) 감지!</b> 너무 빠르게 파바박 누르면 단추 스프링이 바들바들 떨어 컴퓨터가 헷갈려요! <b>\'똑... 똑... 똑...\' 0.5초 심장박동</b>으로 침착하게 누르세요!';
+            logMsg(`[단추 떨림 에러] 간격 ${Math.round(delta)}ms: 너무 빨라 단추 내부 쇠붙이가 바들바들 떨렸습니다. (0회 리셋)`, 'warn');
           } else if (delta > 1200) {
             // 시간 초과
             debounceCadenceCount = 1;
             playTone(300, 0.1, 'triangle', 0.2);
-            document.getElementById('chk-debounce').textContent = '⚪ 3. 동기화 펄스: 1 / 3회 (간격 초과로 1회차부터 재시작)';
-            logMsg(`[타임아웃] 간격 ${Math.round(delta)}ms: 너무 느려 1회차부터 다시 시작합니다.`);
+            document.getElementById('chk-debounce').textContent = '⚪ 3. 심장박동 박자: 1 / 3회 (박자가 늦어 1회차부터 다시 시작)';
+            logMsg(`[박자 늦음] 간격 ${Math.round(delta)}ms: 너무 늦어 1회차부터 다시 시작합니다.`);
           } else {
             // 정상 통과 (320ms ~ 1200ms)
             debounceCadenceCount++;
             playTone(520 + debounceCadenceCount * 140, 0.1, 'triangle', 0.3);
-            document.getElementById('chk-debounce').textContent = `⚪ 3. 동기화 펄스: ${debounceCadenceCount} / 3회 (간격 ${Math.round(delta)}ms 정상)`;
-            logMsg(`동기화 펄스 ${debounceCadenceCount}/3회 정상 통과 (간격: ${Math.round(delta)}ms)`);
+            document.getElementById('chk-debounce').textContent = `⚪ 3. 심장박동 박자: ${debounceCadenceCount} / 3회 (완벽한 박자!)`;
+            logMsg(`심장박동 펄스 ${debounceCadenceCount}/3회 정상 통과 (간격: ${Math.round(delta)}ms)`);
 
             if (debounceCadenceCount >= 3) {
               clearInterval(timerInterval);
               playFanfareSound();
               document.getElementById('chk-debounce').className = 'check-item done';
-              document.getElementById('chk-debounce').textContent = '✅ 3. 하드웨어 바운싱 완벽 제거 & 500ms 동기화 성공!';
-              logMsg('🌌 [전설의 초극강 마스터 정복] 100,000 MISO 달성! 대한민국 최고 고교 공학자 등극!', 'succ');
+              document.getElementById('chk-debounce').textContent = '✅ 3. 단추 떨림 완벽 제거 & 0.5초 심장박동 통과!';
+              logMsg('🌌 [전설의 초극강 마스터 정복] 100,000 MISO 달성! 형·누나 과학 융합 미션 완벽 정복!', 'succ');
               triggerPrizeModal(5, '💎 100,000 MISO (초극강 마스터)', null, 100000);
             }
           }
