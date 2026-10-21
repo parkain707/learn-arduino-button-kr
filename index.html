@@ -804,9 +804,6 @@
         📢 <b>상금 수령 공식 규칙:</b> 100번을 클리어하더라도 상금 지급은 <b>단 1회만</b> 가능합니다! (중복 수령 절대 불가)
       </div>
 
-      <button id="btn-admin-bypass" style="background: transparent; border: 1px solid #4b5563; color: #9ca3af; font-size: 11px; padding: 6px 12px; border-radius: 10px; cursor: pointer;">
-        🛠️ 대표님 / 관리자 테스트 모드로 즉시 입장
-      </button>
     </div>
   </div>
 
@@ -1254,11 +1251,6 @@
     verifyAccessOrBlock();
     updateAttemptsHUD();
 
-    document.getElementById('btn-admin-bypass').addEventListener('click', () => {
-      adminBypassActive = true;
-      document.getElementById('time-limit-overlay').style.display = 'none';
-      alert('🛠️ 대표님 / 관리자 테스트 모드로 입장되었습니다. 운영 시간 및 횟수 제한 없이 자유롭게 테스트하실 수 있습니다.');
-    });
 
     /* =====================================================================
        1. 사용자 인증 & 이력 저장소
