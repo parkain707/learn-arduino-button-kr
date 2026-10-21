@@ -1164,11 +1164,7 @@
     /* =====================================================================
        0. 운영 시간(08:20~21:00) & 일일 3회 접속 제한 엔진
        ===================================================================== */
-    let adminBypassActive = false;
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('admin') === 'true' || urlParams.get('test') === 'true' || urlParams.get('preview') === 'true') {
-      adminBypassActive = true;
-    }
+    const adminBypassActive = false;
 
     function getTodayKey() {
       const d = new Date();
