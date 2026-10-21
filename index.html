@@ -769,32 +769,32 @@
 
       <canvas id="board-canvas"></canvas>
 
-      <!-- 좌측 하단 전선 공구함 (Wiring Toolbag) -->
+      <!-- 좌측 하단 전선 공구함 (어린이 눈높이 색상 전선함) -->
       <div class="wire-toolkit">
         <div class="toolkit-title">
           <span>🧰 점퍼선 공구함 (전선 선택)</span>
           <span style="font-size: 10px; color: #f59e0b;" id="active-wire-label">선택: 없음</span>
         </div>
         <div class="wire-selector-grid">
-          <button class="wire-btn" data-wire="5v" id="btn-w-5v">
-            <span class="wire-dot" style="background: #ef4444;"></span>5V 전원선
-          </button>
-          <button class="wire-btn" data-wire="d2" id="btn-w-d2">
-            <span class="wire-dot" style="background: #3b82f6;"></span>D2 신호선
-          </button>
           <button class="wire-btn" data-wire="d13" id="btn-w-d13">
-            <span class="wire-dot" style="background: #f97316;"></span>D13 출력선
+            <span class="wire-dot" style="background: #f97316;"></span>🟠 주황선(불켜기)
           </button>
           <button class="wire-btn" data-wire="gnd" id="btn-w-gnd">
-            <span class="wire-dot" style="background: #334155;"></span>GND 접지선
+            <span class="wire-dot" style="background: #38bdf8;"></span>⚫ 검정선(바닥접지)
+          </button>
+          <button class="wire-btn" data-wire="5v" id="btn-w-5v">
+            <span class="wire-dot" style="background: #ef4444;"></span>🔴 빨강선(에너지)
+          </button>
+          <button class="wire-btn" data-wire="d2" id="btn-w-d2">
+            <span class="wire-dot" style="background: #3b82f6;"></span>🔵 파랑선(단추신호)
           </button>
         </div>
       </div>
 
-      <!-- 화면 하단 긴급 안내 배너 -->
+      <!-- 화면 하단 로봇 삐뽀 친절 안내 배너 -->
       <div class="emergency-banner" id="emergency-banner">
-        <span id="emg-icon">⚠️</span>
-        <span id="emg-text">공구함에서 전선을 고르고, 3D 보드의 반짝이는 핀을 클릭해 올바르게 연결하세요!</span>
+        <span id="emg-icon">🤖</span>
+        <span id="emg-text"><b>로봇 삐뽀:</b> [주황선]을 고르면 보드에 <b>반짝이는 2개 구멍</b>이 보여요! 차례로 콕콕 탭해봐요!</span>
       </div>
     </main>
 
@@ -802,11 +802,11 @@
       <div class="mission-hud-hero">
         <div class="hud-stage-badge">
           <span id="current-stage-tag">STAGE 1 / 3</span>
-          <span style="color: #fbbf24;">💰 누적/도전 상금: <b id="target-prize-text">1,000 MISO</b></span>
+          <span style="color: #fbbf24;">💰 현재 상금: <b id="target-prize-text">1,000 MISO</b></span>
         </div>
-        <h1 class="hud-stage-title" id="current-stage-title">🌱 1단계: LED 출력 회로 결선</h1>
+        <h1 class="hud-stage-title" id="current-stage-title">🌱 1단계: 마법의 빨간 불(LED) 켜기</h1>
         <p class="hud-stage-desc" id="current-stage-desc">
-          아두이노 D13 핀과 접지(GND) 전선이 끊겨 있습니다! 45초 내에 올바른 핀에 전선을 연결하고 테스트 버튼을 누르세요. 잘못 꽂으면 쇼트 폭발!
+          전구에 전기가 흐르도록 [주황선]과 [검정선]을 이어봐요! 전선을 고르면 보드 구멍이 번쩍번쩍 빛나요!
         </p>
       </div>
 
@@ -818,43 +818,43 @@
             <span class="stage-tag" style="background: #14532d; color: #86efac;">1단계 (기초 결선)</span>
             <span class="stage-prize-tag">💰 1,000 MISO</span>
           </div>
-          <div class="stage-name">LED 점등 회로 완성 챌린지</div>
-          <div class="stage-inst">D13 출력선(주황)과 GND 접지선(검정)을 브레드보드 LED 회로에 연결하세요!</div>
+          <div class="stage-name">마법의 빨간 불(LED) 켜기 챌린지</div>
+          <div class="stage-inst">1) 주황선 골라 번쩍이는 구멍 2개 콕콕! ➔ 2) 검정선 골라 번쩍이는 구멍 2개 콕콕!</div>
           <div class="stage-checklist">
-            <div class="check-item" id="chk-d13">⚪ D13 핀 ➔ LED 보호저항 (주황 전선)</div>
-            <div class="check-item" id="chk-gnd1">⚪ GND 핀 ➔ LED 음극 접지 (검정 전선)</div>
+            <div class="check-item" id="chk-d13">⚪ 1. [주황선] 불켜는 선 ➔ 반짝이는 주황 구멍 2곳 콕콕!</div>
+            <div class="check-item" id="chk-gnd1">⚪ 2. [검정선] 바닥 접지선 ➔ 반짝이는 검정 구멍 2곳 콕콕!</div>
           </div>
-          <button class="btn-test-circuit" id="btn-test-1">⚡ 회로 통전 테스트 & 검증</button>
+          <button class="btn-test-circuit" id="btn-test-1">💡 마법의 불 켜보기! (1,000 미소 도전)</button>
         </div>
 
         <!-- 2단계 -->
         <div class="stage-card" id="card-stage-2">
           <div class="stage-top-row">
-            <span class="stage-tag" style="background: #713f12; color: #fde047;">2단계 (스위치 풀다운)</span>
+            <span class="stage-tag" style="background: #713f12; color: #fde047;">2단계 (스위치 연결)</span>
             <span class="stage-prize-tag">💰 2,000 MISO</span>
           </div>
-          <div class="stage-name">풀다운 스위치 회로 & 쇼트 방지</div>
-          <div class="stage-inst">5V 전원, D2 감지선, 10kΩ 저항 GND를 연결하세요. (⚠️ 5V와 GND를 저항 없이 직결하면 폭발!)</div>
+          <div class="stage-name">딸깍 누르는 빨간 단추(버튼) 연결</div>
+          <div class="stage-inst">단추를 누르면 전기가 통하게 빨강선과 파랑선을 이어주세요! (⚠️ 빨강선과 검정선을 바로 붙이면 펑! 폭발해요)</div>
           <div class="stage-checklist">
-            <div class="check-item" id="chk-5v">⚪ 5V 핀 ➔ 버튼 좌측 단자 (빨간 전선)</div>
-            <div class="check-item" id="chk-d2">⚪ D2 핀 ➔ 버튼 우측 신호선 (파란 전선)</div>
-            <div class="check-item" id="chk-pull">⚪ 10kΩ 풀다운 저항 ➔ GND 접지 (검정 전선)</div>
+            <div class="check-item" id="chk-5v">⚪ 1. [빨강선] 에너지선 ➔ 반짝이는 빨강 구멍 2곳 콕콕!</div>
+            <div class="check-item" id="chk-d2">⚪ 2. [파랑선] 단추 신호선 ➔ 반짝이는 파랑 구멍 2곳 콕콕!</div>
+            <div class="check-item" id="chk-pull">⚪ 3. 안전 방패(저항) 안착 완료</div>
           </div>
-          <button class="btn-test-circuit" id="btn-test-2" style="display: none;">⚡ 스위치 전원 가동 & 테스트</button>
+          <button class="btn-test-circuit" id="btn-test-2" style="display: none;">🔘 단추 연결 확인 & 2,000 미소 도전!</button>
         </div>
 
         <!-- 3단계 -->
         <div class="stage-card" id="card-stage-3">
           <div class="stage-top-row">
-            <span class="stage-tag" style="background: #831843; color: #fbcfe8;">3단계 (시퀀스 암호 해제)</span>
+            <span class="stage-tag" style="background: #831843; color: #fbcfe8;">3단계 (최종 챔피언)</span>
             <span class="stage-prize-tag">💰 3,000 MISO (최고상금)</span>
           </div>
-          <div class="stage-name">폭탄 해제 시퀀스 (모스 부호)</div>
-          <div class="stage-inst">아두이노가 요청하는 박자대로 30초 내에 버튼을 정확히 입력하세요!</div>
+          <div class="stage-name">비밀의 단추 3번 누르기 미션</div>
+          <div class="stage-inst">화면에 있는 🔴 빨간 단추를 손가락으로 [하나! 둘! 셋!] 3번 연속 꾹 누르면 최종 우승!</div>
           <div class="stage-checklist">
-            <div class="check-item" id="chk-morse">⚪ 박자: [톡(짧게) - 톡(짧게) - 꾹(1초간)] 입력</div>
+            <div class="check-item" id="chk-morse">⚪ 화면의 빨간 단추를 3번 연속 톡! 톡! 톡! 누르기</div>
           </div>
-          <button class="btn-test-circuit" id="btn-test-3" style="display: none;">🚨 해제 시퀀스 시작</button>
+          <button class="btn-test-circuit" id="btn-test-3" style="display: none;">🚨 3회 연속 누르기 도전 시작!</button>
         </div>
       </section>
 
@@ -1216,6 +1216,87 @@
     makePinSocket('soc-d2', new THREE.Vector3(-36, 5, 9), 'Arduino D2 입력');
     makePinSocket('soc-btn-r', new THREE.Vector3(26, 7, -8), '버튼 우측 단자');
 
+    // 🌟 초등학생을 위한 번쩍이는 3D 유도 빔 & 힌트 발자국 시스템 (Pulsing Beacons)
+    const beaconGroup = new THREE.Group();
+    rootGroup.add(beaconGroup);
+
+    const WIRE_GUIDES = {
+      d13: {
+        p1: 'soc-d13',
+        p2: 'soc-led-in',
+        color: 0xf97316,
+        label: '🟠 주황선(불켜기)',
+        tip: '보드에서 깜빡이는 주황 구멍 2개를 차례로 콕콕 탭하세요!'
+      },
+      gnd: {
+        p1: 'soc-gnd',
+        p2: 'soc-led-gnd',
+        color: 0x38bdf8,
+        label: '⚫ 검정선(바닥접지)',
+        tip: '보드에서 깜빡이는 하늘/검정 구멍 2개를 차례로 콕콕 탭하세요!'
+      },
+      '5v': {
+        p1: 'soc-5v',
+        p2: 'soc-btn-l',
+        color: 0xef4444,
+        label: '🔴 빨강선(5V에너지)',
+        tip: '보드에서 번쩍이는 빨간 구멍 2개를 차례로 콕콕 탭하세요!'
+      },
+      d2: {
+        p1: 'soc-d2',
+        p2: 'soc-btn-r',
+        color: 0x3b82f6,
+        label: '🔵 파랑선(단추신호)',
+        tip: '보드에서 번쩍이는 파란 구멍 2개를 차례로 콕콕 탭하세요!'
+      }
+    };
+
+    let activeBeacons = [];
+
+    function updateBeacons(wireKey) {
+      while (beaconGroup.children.length > 0) {
+        beaconGroup.remove(beaconGroup.children[0]);
+      }
+      activeBeacons = [];
+
+      if (!wireKey || !WIRE_GUIDES[wireKey]) return;
+      const guide = WIRE_GUIDES[wireKey];
+
+      [guide.p1, guide.p2].forEach((pinId, idx) => {
+        const pin = pinSockets.find(p => p.userData.id === pinId);
+        if (!pin) return;
+
+        const bGroup = new THREE.Group();
+        bGroup.position.copy(pin.position);
+
+        // 1. 회전 네온 링
+        const ringGeo = new THREE.TorusGeometry(2.6, 0.45, 8, 24);
+        const ringMat = new THREE.MeshBasicMaterial({ color: guide.color });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.rotation.x = Math.PI / 2;
+        ring.position.y = 1.2;
+        bGroup.add(ring);
+
+        // 2. 아래를 가리키는 3D 원뿔 화살표
+        const coneGeo = new THREE.ConeGeometry(1.6, 3.2, 12);
+        const coneMat = new THREE.MeshBasicMaterial({ color: guide.color });
+        const cone = new THREE.Mesh(coneGeo, coneMat);
+        cone.rotation.x = Math.PI; // 아래 방향
+        cone.position.y = 5.5;
+        bGroup.add(cone);
+
+        beaconGroup.add(bGroup);
+        activeBeacons.push({ group: bGroup, ring, cone, basePinId: pinId, baseY: 5.5, idx: idx + 1 });
+      });
+    }
+
+    function clearBeacons() {
+      while (beaconGroup.children.length > 0) {
+        beaconGroup.remove(beaconGroup.children[0]);
+      }
+      activeBeacons = [];
+    }
+
     /* =====================================================================
        4. 서바이벌 게임 루프 & 미션 상태 엔진
        ===================================================================== */
@@ -1252,7 +1333,11 @@
         activeWireTool = btn.dataset.wire;
         document.getElementById('active-wire-label').textContent = `선택: ${btn.textContent.trim()}`;
         document.getElementById('emergency-banner').className = 'emergency-banner';
-        document.getElementById('emg-text').textContent = `[${btn.textContent.trim()}]을(를) 집었습니다! 3D 화면의 반짝이는 핀 2곳을 차례로 탭해 연결하세요!`;
+
+        const g = WIRE_GUIDES[activeWireTool];
+        const tipText = g ? g.tip : '3D 화면의 반짝이는 핀 2곳을 차례로 탭해 연결하세요!';
+        document.getElementById('emg-text').innerHTML = `<b>로봇 삐뽀:</b> [${btn.textContent.trim()}] 집음! ${tipText}`;
+        updateBeacons(activeWireTool);
         playClickSound();
       });
     });
@@ -1290,12 +1375,14 @@
       if (!selectedSocket) {
         selectedSocket = socketId;
         targetPin.material.color.setHex(0x22c55e);
-        logMsg(`[결선 시작]: ${hitObj.userData.label} 선택됨. 연결할 반대편 핀을 탭하세요.`);
+        document.getElementById('emg-text').innerHTML = `<b>로봇 삐뽀:</b> 1번 구멍 콕! 이제 남은 <b>반대편 번쩍이는 구멍</b>을 탭하세요!`;
+        logMsg(`[결선 시작]: 1번 핀 연결됨. 남은 반대편 핀을 탭하세요.`);
       } else {
         const start = selectedSocket;
         const end = socketId;
         selectedSocket = null;
         pinSockets.forEach(s => s.material.color.setHex(0xfacc15));
+        clearBeacons();
 
         validateAndWire(start, end, activeWireTool);
       }
@@ -1337,56 +1424,65 @@
 
       // 💥 치명적 합선(쇼트) 판별: 5V와 GND를 보호저항 없이 직결하는 경우!
       if ((p1 === 'soc-5v' && p2 === 'soc-gnd') || (p1 === 'soc-gnd' && p2 === 'soc-5v')) {
-        triggerExplosion('5V 전원과 GND 접지를 저항 없이 다이렉트로 쇼트시켰습니다! 메인보드가 파괴되었습니다!');
+        triggerExplosion('빨간 5V 에너지선과 검정 바닥선을 전구 없이 바로 붙였습니다! 쾅! (쇼트 폭발)');
         return;
       }
 
-      // 1단계 올바른 배선: D13 <-> LED 입력
+      // 1단계 올바른 배선: D13 <-> LED 입력 (주황선)
       if (pair === 'soc-d13::soc-led-in' && wireType === 'd13') {
         connectedCircuits.d13 = true;
         wires['d13'].visible = true;
         document.getElementById('chk-d13').className = 'check-item done';
-        document.getElementById('chk-d13').textContent = '✅ D13 핀 ➔ LED 보호저항 (결선 완료)';
+        document.getElementById('chk-d13').textContent = '✅ 1. [주황선] 불켜는 선 연결 완료!';
         playSnapSound();
-        logMsg('D13 신호선 연결 성공!', 'succ');
+        document.getElementById('emg-text').innerHTML = '<b>로봇 삐뽀:</b> 짝짝짝! 주황선 연결 성공! 이제 [검정선]을 꽂아봐요!';
+        logMsg('주황선(D13) 연결 성공!', 'succ');
+        clearBeacons();
         return;
       }
 
-      // 1단계 올바른 배선: GND <-> LED 접지
+      // 1단계 올바른 배선: GND <-> LED 접지 (검정선)
       if (pair === 'soc-gnd::soc-led-gnd' && wireType === 'gnd') {
         connectedCircuits.gnd1 = true;
         wires['gnd1'].visible = true;
         document.getElementById('chk-gnd1').className = 'check-item done';
-        document.getElementById('chk-gnd1').textContent = '✅ GND 핀 ➔ LED 음극 접지 (결선 완료)';
+        document.getElementById('chk-gnd1').textContent = '✅ 2. [검정선] 바닥 접지선 연결 완료!';
         playSnapSound();
-        logMsg('LED 접지선 연결 성공!', 'succ');
+        document.getElementById('emg-text').innerHTML = '<b>로봇 삐뽀:</b> 우와! 회로 완성! 아래 노란 [불 켜보기!] 버튼을 탭하세요!';
+        logMsg('검정 접지선(GND) 연결 성공!', 'succ');
+        clearBeacons();
         return;
       }
 
-      // 2단계 배선: 5V <-> 버튼 좌측
+      // 2단계 배선: 5V <-> 버튼 좌측 (빨강선)
       if (pair === 'soc-5v::soc-btn-l' && wireType === '5v') {
         connectedCircuits['5v'] = true;
         wires['5v'].visible = true;
         document.getElementById('chk-5v').className = 'check-item done';
-        document.getElementById('chk-5v').textContent = '✅ 5V 핀 ➔ 버튼 좌측 (결선 완료)';
+        document.getElementById('chk-5v').textContent = '✅ 1. [빨강선] 5V 에너지선 연결 완료!';
         playSnapSound();
-        logMsg('5V 전원선 연결 성공!', 'succ');
+        document.getElementById('emg-text').innerHTML = '<b>로봇 삐뽀:</b> 에너지선 연결 성공! 이제 [파랑선]을 골라 꽂아봐요!';
+        logMsg('빨강선(5V) 연결 성공!', 'succ');
+        clearBeacons();
         return;
       }
 
-      // 2단계 배선: D2 <-> 버튼 우측
+      // 2단계 배선: D2 <-> 버튼 우측 (파랑선)
       if (pair === 'soc-btn-r::soc-d2' && wireType === 'd2') {
         connectedCircuits.d2 = true;
         wires['d2'].visible = true;
         document.getElementById('chk-d2').className = 'check-item done';
-        document.getElementById('chk-d2').textContent = '✅ D2 핀 ➔ 버튼 우측 (결선 완료)';
+        document.getElementById('chk-d2').textContent = '✅ 2. [파랑선] 단추 신호선 연결 완료!';
         playSnapSound();
-        logMsg('D2 입력선 연결 성공!', 'succ');
+        document.getElementById('emg-text').innerHTML = '<b>로봇 삐뽀:</b> 단추 연결 완성! 아래 노란 [단추 연결 확인] 버튼을 누르세요!';
+        logMsg('파랑 신호선(D2) 연결 성공!', 'succ');
+        clearBeacons();
         return;
       }
 
       // 잘못된 결선 시
       playTone(200, 0.2, 'sawtooth', 0.2);
+      document.getElementById('emg-text').innerHTML = `<b>로봇 삐뽀:</b> 앗! 해당 구멍들에는 [${wireType}] 전선이 맞지 않아요! 반짝이는 구멍을 다시 찾아봐요!`;
       logMsg(`결선 실패: 해당 핀들 사이에는 [${wireType}] 전선이 맞지 않습니다!`, 'warn');
     }
 
@@ -1447,6 +1543,23 @@
 
       // UI 갱신
       document.getElementById('current-stage-tag').textContent = `STAGE ${stage} / 3`;
+      if (stage === 1) {
+        document.getElementById('current-stage-title').textContent = '🌱 1단계: 마법의 빨간 불(LED) 켜기';
+        document.getElementById('current-stage-desc').textContent = '전구에 전기가 흐르도록 [주황선]과 [검정선]을 이어봐요! 전선을 고르면 보드 구멍이 번쩍번쩍 빛나요!';
+        document.getElementById('target-prize-text').textContent = '1,000 MISO';
+        document.getElementById('emg-text').innerHTML = '<b>로봇 삐뽀:</b> [주황선]을 고르면 보드에 <b>반짝이는 2개 구멍</b>이 보여요! 차례로 콕콕 탭해봐요!';
+      } else if (stage === 2) {
+        document.getElementById('current-stage-title').textContent = '🎮 2단계: 딸깍 누르는 빨간 단추(버튼) 연결';
+        document.getElementById('current-stage-desc').textContent = '단추를 누르면 전기가 통하게 빨강선과 파랑선을 이어주세요! (⚠️ 빨강선과 검정선을 바로 붙이면 펑! 폭발해요)';
+        document.getElementById('target-prize-text').textContent = '2,000 MISO';
+        document.getElementById('emg-text').innerHTML = '<b>로봇 삐뽀:</b> 잘했어요! 이제 [빨강선]을 골라 반짝이는 빨간 구멍 2개를 콕콕 이어봐요!';
+      } else if (stage === 3) {
+        document.getElementById('current-stage-title').textContent = '👑 3단계: 비밀 단추 3번 누르기 (최종 3,000 미소!)';
+        document.getElementById('current-stage-desc').textContent = '화면에 있는 🔴 빨간 단추를 손가락으로 [하나! 둘! 셋!] 3번 연속 꾹 누르면 최종 우승!';
+        document.getElementById('target-prize-text').textContent = '3,000 MISO';
+        document.getElementById('emg-text').innerHTML = '<b>로봇 삐뽀:</b> 마지막 미션! 3D 화면의 빨간 단추를 3번 연속 톡! 톡! 톡! 탭하세요!';
+      }
+
       for (let s = 1; s <= 3; s++) {
         const card = document.getElementById(`card-stage-${s}`);
         card.className = 'stage-card' + (s === stage ? ' current' : (s < stage ? ' completed' : ''));
@@ -1609,6 +1722,18 @@
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
+
+      // 🌟 초등학생 비콘 링 & 화살표 3D 애니메이션
+      if (activeBeacons.length > 0) {
+        const t = performance.now() * 0.005;
+        activeBeacons.forEach(b => {
+          b.ring.rotation.z += 0.05;
+          const s = 1.0 + Math.sin(t * 3) * 0.18;
+          b.ring.scale.set(s, s, s);
+          b.cone.position.y = b.baseY + Math.sin(t * 4) * 0.8;
+        });
+      }
+
       renderer.render(scene, camera);
     }
     animate();
