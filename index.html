@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>아두이노 인터랙티브 3D 실습실 — 버튼 누르기 & 미소 상금 챌린지</title>
-  <meta name="description" content="3D 가상 아두이노 보드에서 직접 스위치를 누르고, 전선도 뽑아보며 1,000~3,000 미소 상금 챌린지에 도전하세요!" />
+  <title>아두이노 서바이벌 배선 챌린지 — 1,000 ~ 3,000 미소 상금 쟁탈전</title>
+  <meta name="description" content="제한시간 내에 직접 전선을 올바르게 연결하세요! 잘못 연결하면 합선 폭발! 성공하면 진짜 상금 미소 획득!" />
   
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,40 +26,34 @@
 
   <style>
     :root {
-      --bg: #f6eddd;
-      --bg-card: #fdfaf5;
-      --bg-card-subtle: #f0e6d2;
-      --text: #2c2f38;
-      --text-muted: #6e7382;
-      --border: #e2d7c3;
-      --accent-coral: #e3604b;
-      --accent-blue: #3b74db;
-      --accent-green: #2fa866;
+      --bg: #1e222d;
+      --bg-card: #252a37;
+      --bg-card-subtle: #2f3646;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border: #3b4254;
+      --accent-coral: #ef4444;
+      --accent-blue: #3b82f6;
+      --accent-green: #10b981;
       --accent-gold: #f59e0b;
       --accent-purple: #8b5cf6;
-      --code-bg: #1c202a;
-      --code-text: #e6edf3;
-      --code-highlight: rgba(227, 96, 75, 0.35);
-      --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --code-bg: #141720;
+      --code-text: #e2e8f0;
+      --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
       --font-round: "Jua", "Pretendard", sans-serif;
-      --font-mono: "JetBrains Mono", Consolas, monospace;
-      --radius-sm: 8px;
-      --radius-md: 14px;
-      --shadow-sm: 0 2px 8px rgba(35, 30, 20, 0.06);
-      --shadow-md: 0 8px 24px rgba(35, 30, 20, 0.08);
+      --font-mono: "JetBrains Mono", monospace;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      -webkit-font-smoothing: antialiased;
       user-select: none;
     }
 
     body {
       font-family: var(--font-sans);
-      background-color: var(--bg);
+      background-color: #12141c;
       color: var(--text);
       overflow: hidden;
       width: 100vw;
@@ -68,7 +62,7 @@
 
     #app {
       display: grid;
-      grid-template-columns: 1fr 490px;
+      grid-template-columns: 1fr 500px;
       width: 100vw;
       height: 100vh;
       position: relative;
@@ -78,7 +72,7 @@
       position: relative;
       width: 100%;
       height: 100%;
-      background: radial-gradient(circle at 50% 45%, #faf4eb 0%, #ece0ce 100%);
+      background: radial-gradient(circle at 50% 50%, #2a3142 0%, #151822 100%);
       overflow: hidden;
     }
 
@@ -88,201 +82,142 @@
       display: block;
       cursor: grab;
     }
-    #board-canvas:active {
-      cursor: grabbing;
-    }
+    #board-canvas:active { cursor: grabbing; }
 
-    /* 상단 헤더 & 대원 프로필 바 */
-    .brand-header {
+    /* 상단 긴장감 HUD 바 (타이머 & 목숨) */
+    .hud-bar {
       position: absolute;
       top: 18px;
       left: 20px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      background: rgba(253, 250, 245, 0.94);
-      backdrop-filter: blur(12px);
-      padding: 8px 16px;
-      border-radius: var(--radius-md);
+      gap: 12px;
+      background: rgba(30, 35, 48, 0.92);
+      backdrop-filter: blur(10px);
+      padding: 8px 18px;
+      border-radius: 40px;
       border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
       z-index: 10;
     }
-    .brand-logo {
-      width: 28px;
-      height: 16px;
-    }
-    .brand-logo path.loop {
-      fill: none;
-      stroke: var(--accent-blue);
-      stroke-width: 3.2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-    .brand-logo path.sign {
-      fill: none;
-      stroke: var(--accent-coral);
-      stroke-width: 2.2;
-      stroke-linecap: round;
-    }
-    .brand-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
+    .hud-title {
+      font-family: var(--font-round);
+      font-size: 16px;
+      color: #ffde59;
       display: flex;
       align-items: center;
       gap: 6px;
     }
 
-    /* 대원 프로필 알약 */
-    .user-profile-pill {
-      background: #f0fdf4;
-      border: 1px solid #86efac;
-      padding: 3px 9px;
+    .timer-pill {
+      background: #7f1d1d;
+      border: 2px solid #ef4444;
+      padding: 4px 12px;
       border-radius: 20px;
-      font-size: 11px;
+      font-family: var(--font-mono);
       font-weight: 700;
-      color: #166534;
+      font-size: 14px;
+      color: #fca5a5;
       display: flex;
       align-items: center;
-      gap: 6px;
-      margin-left: 4px;
+      gap: 5px;
     }
-    .btn-user-reset {
-      background: transparent;
-      border: none;
-      color: #dc2626;
-      cursor: pointer;
-      font-size: 10.5px;
-      text-decoration: underline;
+    .timer-pill.urgent {
+      animation: timerBlink 0.6s infinite alternate;
+    }
+    @keyframes timerBlink {
+      from { background: #7f1d1d; border-color: #ef4444; }
+      to { background: #dc2626; border-color: #fef08a; }
     }
 
-    /* 좌측 하단 실험 도구 & 뷰바 */
-    .viewbar {
+    .lives-pill {
+      font-size: 14px;
+      letter-spacing: 2px;
+    }
+
+    /* 좌측 하단 전선 공구함 (Wiring Toolbag) */
+    .wire-toolkit {
       position: absolute;
       bottom: 22px;
       left: 20px;
-      display: flex;
-      align-items: center;
-      background: rgba(253, 250, 245, 0.95);
+      background: rgba(30, 35, 48, 0.95);
       backdrop-filter: blur(12px);
-      padding: 6px 10px;
-      border-radius: var(--radius-md);
       border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
+      padding: 10px 14px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
       z-index: 10;
-      gap: 6px;
     }
-    .btn-icon {
-      background: transparent;
-      border: none;
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+    .toolkit-title {
+      font-family: var(--font-round);
+      font-size: 12.5px;
+      color: #93c5fd;
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: var(--text);
-      transition: background 0.15s;
+      justify-content: space-between;
     }
-    .btn-icon:hover { background: var(--bg-card-subtle); }
-    .viewbar-sep { width: 1px; height: 18px; background: var(--border); margin: 0 2px; }
-
-    .viewbar-btn {
-      background: #ffffff;
-      border: 1px solid #dcd3c1;
-      padding: 6px 10px;
-      border-radius: 8px;
+    .wire-selector-grid {
+      display: flex;
+      gap: 8px;
+    }
+    .wire-btn {
+      background: #1e2330;
+      border: 2px solid #4b5563;
+      border-radius: 10px;
+      padding: 7px 11px;
       font-size: 11.5px;
-      font-weight: 600;
+      font-weight: 700;
+      color: #e5e7eb;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 4px;
-      color: var(--text);
+      gap: 6px;
       transition: all 0.15s;
     }
-    .viewbar-btn:hover { background: #f5ede0; }
-    .viewbar-btn.active-action {
-      background: #fee2e2;
-      border-color: #ef4444;
-      color: #991b1b;
-      font-weight: 700;
+    .wire-btn.selected {
+      border-color: #fbbf24;
+      background: #374151;
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.5);
+      transform: translateY(-2px);
+    }
+    .wire-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
     }
 
-    /* 화면 중앙 하단 실시간 안내 배너 */
-    .guide-banner {
+    /* 화면 중앙 긴급 안내 배너 */
+    .emergency-banner {
       position: absolute;
       bottom: 24px;
-      left: 50%;
+      left: 55%;
       transform: translateX(-50%);
-      background: rgba(31, 35, 46, 0.92);
-      backdrop-filter: blur(8px);
-      color: #fff;
-      padding: 9px 20px;
+      background: rgba(17, 24, 39, 0.94);
+      border: 2px solid #ef4444;
+      color: #fee2e2;
+      padding: 10px 22px;
       border-radius: 30px;
-      font-size: 13px;
-      font-weight: 500;
+      font-family: var(--font-round);
+      font-size: 14px;
       display: flex;
       align-items: center;
       gap: 8px;
-      box-shadow: var(--shadow-md);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
       pointer-events: none;
       z-index: 10;
-      transition: all 0.25s ease;
       white-space: nowrap;
+      transition: all 0.2s ease;
     }
-    .guide-banner.alert-pulse {
-      background: #991b1b;
-      animation: alertPulse 1.2s infinite ease-in-out;
+    .emergency-banner.alert-explosion {
+      background: #7f1d1d;
+      border-color: #f87171;
+      animation: explodeShake 0.4s infinite;
     }
-    .guide-banner.success-pulse {
-      background: #15803d;
-    }
-    @keyframes alertPulse {
-      0%, 100% { transform: translateX(-50%) scale(1); }
-      50% { transform: translateX(-50%) scale(1.04); }
-    }
-    .guide-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--accent-coral);
-    }
-
-    /* 3D 앵커 콜아웃 */
-    .callout-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 5;
-    }
-    .callout-card {
-      position: absolute;
-      background: rgba(253, 250, 245, 0.94);
-      border: 1px solid var(--border);
-      padding: 6px 10px;
-      border-radius: 10px;
-      box-shadow: var(--shadow-sm);
-      max-width: 180px;
-      pointer-events: auto;
-      transform: translate(-50%, -100%);
-      transition: opacity 0.2s;
-    }
-    .callout-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--accent-coral);
-      margin-bottom: 2px;
-    }
-    .callout-desc {
-      font-size: 10px;
-      line-height: 1.35;
-      color: var(--text-muted);
+    @keyframes explodeShake {
+      0%, 100% { transform: translateX(-50%) rotate(0deg); }
+      25% { transform: translateX(-53%) rotate(-3deg); }
+      75% { transform: translateX(-47%) rotate(3deg); }
     }
 
     /* 우측 사이드 패널 */
@@ -293,550 +228,317 @@
       flex-direction: column;
       height: 100vh;
       overflow-y: auto;
-      box-shadow: -4px 0 20px rgba(0,0,0,0.03);
       z-index: 20;
     }
 
-    .lesson-hero {
-      padding: 18px 22px 12px;
-      border-bottom: 1px solid var(--border);
+    .mission-hud-hero {
+      padding: 18px 22px 14px;
+      background: linear-gradient(135deg, #1f2533 0%, #151924 100%);
+      border-bottom: 2px solid #374151;
     }
-    .lesson-num {
+    .hud-stage-badge {
       font-size: 11px;
       font-weight: 700;
+      color: #ef4444;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--accent-coral);
-      margin-bottom: 3px;
-    }
-    .lesson-title {
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--text);
       margin-bottom: 4px;
-      line-height: 1.25;
-    }
-    .lesson-lede {
-      font-size: 12.5px;
-      line-height: 1.45;
-      color: var(--text-muted);
-    }
-
-    /* 🎁 상금 이벤트 규칙 특별 공지 */
-    .prize-rules-box {
-      margin: 12px 20px 4px;
-      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-      border: 2px solid #f59e0b;
-      border-radius: 12px;
-      padding: 10px 14px;
-      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.12);
-    }
-    .prize-rules-title {
-      font-family: var(--font-round);
-      font-size: 13.5px;
-      color: #92400e;
       display: flex;
       align-items: center;
-      gap: 5px;
-      margin-bottom: 3px;
+      justify-content: space-between;
     }
-    .prize-rules-desc {
-      font-size: 11px;
-      color: #78350f;
+    .hud-stage-title {
+      font-family: var(--font-round);
+      font-size: 21px;
+      color: #f9fafb;
+      margin-bottom: 4px;
+    }
+    .hud-stage-desc {
+      font-size: 12px;
+      color: #9ca3af;
       line-height: 1.45;
     }
 
-    /* 🎯 3단계 상금 미션 구역 */
-    .quest-section {
+    /* 3단계 서바이벌 미션 카드 */
+    .mission-section {
       padding: 14px 20px;
-      background: #f7faff;
-      border-bottom: 2px solid #e4edfc;
-    }
-    .quest-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .quest-main-title {
-      font-family: var(--font-round);
-      font-size: 15px;
-      color: #1e3a8a;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .quest-badge-count {
-      font-family: var(--font-round);
-      font-size: 11.5px;
-      background: #ffde59;
-      color: #78350f;
-      padding: 2px 8px;
-      border-radius: 20px;
-    }
-
-    .mission-card {
-      background: #ffffff;
-      border: 2px solid #dbeafe;
-      border-radius: 12px;
-      padding: 9px 12px;
-      margin-bottom: 8px;
-      transition: all 0.2s ease;
-      position: relative;
-    }
-    .mission-card.completed {
-      border-color: #86efac;
-      background: #f0fdf4;
-    }
-    .mission-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 3px;
-    }
-    .mission-tag {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 1px 6px;
-      border-radius: 5px;
-    }
-    .tag-easy { background: #dcfce7; color: #166534; }
-    .tag-mid { background: #fef3c7; color: #92400e; }
-    .tag-hard { background: #fee2e2; color: #991b1b; }
-
-    .mission-prize-badge {
-      font-family: var(--font-round);
-      font-size: 11px;
-      background: #fef08a;
-      color: #854d0e;
-      padding: 2px 7px;
-      border-radius: 12px;
-      border: 1px solid #facc15;
-    }
-
-    .mission-title {
-      font-family: var(--font-round);
-      font-size: 13.5px;
-      color: #1f2937;
-    }
-    .mission-card.completed .mission-title {
-      color: #166534;
-      text-decoration: line-through;
-    }
-    .mission-desc {
-      font-size: 11px;
-      color: #64748b;
-      line-height: 1.4;
-      margin-top: 2px;
-    }
-
-    /* 💡 [핵심] 2단계 미션 완벽 가이드 박스 */
-    .mission-guide-box {
-      background: #fffbeb;
-      border: 1px solid #fde68a;
-      border-left: 3px solid #f59e0b;
-      border-radius: 8px;
-      padding: 8px 10px;
-      margin-top: 6px;
-      font-size: 11px;
-      line-height: 1.45;
-      color: #92400e;
-    }
-    .mission-guide-box b {
-      color: #b45309;
-    }
-    .mission-guide-box ol {
-      margin-left: 14px;
-      margin-top: 4px;
-    }
-    .mission-guide-box li {
-      margin-bottom: 2px;
-    }
-
-    .mission-progress-bar {
-      width: 100%;
-      height: 5px;
-      background: #e2e8f0;
-      border-radius: 10px;
-      margin-top: 6px;
-      overflow: hidden;
-    }
-    .mission-progress-fill {
-      height: 100%;
-      background: #3b82f6;
-      width: 0%;
-      transition: width 0.15s ease;
-    }
-    .mission-card.completed .mission-progress-fill {
-      background: #22c55e;
-      width: 100% !important;
-    }
-
-    /* 코드 섹션 */
-    .code-section {
-      padding: 16px 20px;
-      background: #faf6ef;
-      border-top: 1px solid var(--border);
-      flex: 1;
       display: flex;
       flex-direction: column;
-    }
-    .code-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    .code-title {
-      font-size: 13px;
-      font-weight: 700;
+      gap: 10px;
     }
 
-    /* 모드 스위처 (2단계 미션 연동 하이라이트) */
-    .mode-switcher-container {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .mode-switcher {
-      display: flex;
-      background: var(--bg-card-subtle);
-      padding: 2px;
-      border-radius: 8px;
-      gap: 2px;
-      position: relative;
-    }
-    .mode-btn {
-      border: none;
-      background: transparent;
-      padding: 5px 10px;
-      font-size: 11.5px;
-      font-weight: 600;
-      border-radius: 6px;
-      cursor: pointer;
-      color: var(--text-muted);
-      transition: all 0.15s;
-    }
-    .mode-btn.active {
-      background: #fff;
-      color: var(--text);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    }
-    /* 2단계 미션 시 화살표로 번쩍이는 펄스 */
-    .mode-btn.highlight-target {
-      background: #fef08a !important;
-      color: #854d0e !important;
-      font-weight: 700 !important;
-      box-shadow: 0 0 0 3px #f59e0b !important;
-      animation: modePulse 1.2s infinite;
-    }
-    @keyframes modePulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.06); }
-    }
-
-    .code-box {
-      background: var(--code-bg);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-      position: relative;
-    }
-    .code-toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 7px 12px;
-      background: #14171f;
-      border-bottom: 1px solid #282e3d;
-    }
-    .code-lang {
-      font-size: 11px;
-      font-family: var(--font-mono);
-      font-weight: 600;
-      color: #7b849b;
-    }
-    .code-actions {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .btn-run {
-      background: var(--accent-coral);
-      color: #fff;
-      border: none;
-      padding: 5px 13px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 8px rgba(227, 96, 75, 0.4);
-    }
-    .btn-run.pulse-ready {
-      animation: runBtnPulse 1.5s infinite;
-    }
-    @keyframes runBtnPulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(227, 96, 75, 0.7); }
-      50% { box-shadow: 0 0 0 8px rgba(227, 96, 75, 0); }
-    }
-    .btn-run.running {
-      background: #2563eb;
-      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
-    }
-
-    .btn-copy {
-      background: #252a37;
-      color: #c0c7d6;
-      border: none;
-      padding: 5px 9px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    pre.code-view {
-      font-family: var(--font-mono);
-      font-size: 11.5px;
-      line-height: 1.6;
+    .stage-card {
+      background: #1e2330;
+      border: 2px solid #374151;
+      border-radius: 14px;
       padding: 12px 14px;
-      color: var(--code-text);
-      overflow-x: auto;
-      max-height: 170px;
+      position: relative;
+      transition: all 0.2s;
     }
-    .code-line {
-      display: block;
-      transition: background 0.12s;
-      border-radius: 3px;
-      padding: 0 4px;
+    .stage-card.current {
+      border-color: #f59e0b;
+      background: #232938;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.2);
     }
-    .code-line.active {
-      background: var(--code-highlight);
-      color: #ffc2b4;
+    .stage-card.completed {
+      border-color: #10b981;
+      background: #142322;
+    }
+    .stage-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .stage-tag {
+      font-size: 10.5px;
       font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+    .stage-prize-tag {
+      font-family: var(--font-round);
+      font-size: 12px;
+      color: #fde047;
+      background: #854d0e;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    .stage-name {
+      font-family: var(--font-round);
+      font-size: 14.5px;
+      color: #f3f4f6;
+      margin-bottom: 3px;
+    }
+    .stage-inst {
+      font-size: 11.5px;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+    .stage-checklist {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+    }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #cbd5e1;
+    }
+    .check-item.done {
+      color: #4ade80;
+      text-decoration: line-through;
     }
 
-    /* 시리얼 모니터 */
-    .console-box {
+    .btn-test-circuit {
+      width: 100%;
       margin-top: 10px;
-      background: #14171f;
-      border: 1px solid #282e3d;
-      border-radius: var(--radius-sm);
-      overflow: hidden;
+      background: #f59e0b;
+      color: #111827;
+      border: none;
+      border-bottom: 3px solid #b45309;
+      padding: 9px;
+      border-radius: 10px;
+      font-family: var(--font-round);
+      font-size: 13.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-test-circuit:active {
+      transform: translateY(2px);
+      border-bottom-width: 1px;
+    }
+
+    /* 코드 모니터 */
+    .code-console-sec {
+      padding: 12px 20px 20px;
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+    }
+    .console-box {
+      background: var(--code-bg);
+      border: 1px solid #333a4c;
+      border-radius: 10px;
       font-family: var(--font-mono);
+      overflow: hidden;
     }
     .console-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 5px 11px;
-      background: #0f1218;
-      border-bottom: 1px solid #212634;
+      padding: 6px 12px;
+      background: #0d0f15;
       font-size: 10.5px;
+      color: #71717a;
+      border-bottom: 1px solid #27272a;
     }
-    .console-status-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .console-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #555e70;
-    }
-    .console-dot.online {
-      background: #2fa866;
-      box-shadow: 0 0 6px rgba(47, 168, 102, 0.7);
-    }
-    .console-label {
-      color: #8b95aa;
-      font-weight: 600;
-    }
-    .console-body {
-      padding: 8px 11px;
+    .console-logs {
+      padding: 10px;
       font-size: 11px;
-      color: #9da7bb;
-      max-height: 80px;
+      max-height: 90px;
       overflow-y: auto;
-      min-height: 48px;
+      color: #a1a1aa;
     }
-    .console-row.high { color: #4ade80; }
-    .console-row.low { color: #94a3b8; }
-    .console-row.warn { color: #f87171; font-weight: 600; }
+    .log-warn { color: #f87171 !important; font-weight: 700; }
+    .log-succ { color: #4ade80 !important; font-weight: 700; }
 
     /* =====================================================================
-       🔑 로그인 & 등록 모달
+       💥 합선 폭발 & 실패 모달
        ===================================================================== */
-    .auth-overlay {
+    .gameover-modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(30, 35, 48, 0.85);
-      backdrop-filter: blur(8px);
-      display: flex;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(10px);
+      display: none;
       align-items: center;
       justify-content: center;
-      z-index: 10000;
+      z-index: 20000;
     }
-    .auth-card {
-      background: #ffffff;
-      border: 4px solid #f59e0b;
+    .gameover-card {
+      background: #1e1b2e;
+      border: 4px solid #ef4444;
       border-radius: 26px;
-      padding: 28px;
-      width: 90%;
+      padding: 30px;
       max-width: 420px;
       text-align: center;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.35);
-      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 0 50px rgba(239, 68, 68, 0.6);
+      animation: popIn 0.3s ease;
     }
-    .auth-robot { font-size: 44px; margin-bottom: 6px; }
-    .auth-title { font-family: var(--font-round); font-size: 21px; color: #1f2937; margin-bottom: 6px; }
-    .auth-desc { font-size: 12px; color: #64748b; line-height: 1.45; margin-bottom: 16px; }
-    .auth-input-group { display: flex; flex-direction: column; gap: 9px; margin-bottom: 16px; text-align: left; }
-    .auth-label { font-size: 11.5px; font-weight: 700; color: #374151; margin-left: 4px; }
-    .auth-input { width: 100%; padding: 10px 13px; border: 2px solid #e2e8f0; border-radius: 12px; font-family: inherit; font-size: 13.5px; outline: none; }
-    .auth-input:focus { border-color: #5271ff; }
-    .btn-auth-primary {
-      width: 100%;
-      background: #e3604b;
+    @keyframes popIn { from { transform: scale(0.7); } to { transform: scale(1); } }
+    .gameover-icon { font-size: 56px; margin-bottom: 10px; }
+    .gameover-title { font-family: var(--font-round); font-size: 26px; color: #f87171; margin-bottom: 8px; }
+    .gameover-desc { font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px; }
+    .btn-retry {
+      background: #ef4444;
       color: #fff;
       border: none;
-      border-bottom: 4px solid #c2412c;
-      padding: 11px;
-      border-radius: 13px;
+      border-bottom: 4px solid #b91c1c;
+      padding: 11px 26px;
+      border-radius: 16px;
       font-family: var(--font-round);
-      font-size: 15px;
+      font-size: 16px;
       cursor: pointer;
     }
-    .btn-auth-primary:active { transform: translateY(2px); border-bottom-width: 2px; }
-    .auth-existing-box { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 12px; margin-bottom: 12px; }
-    .auth-choice-btns { display: flex; gap: 8px; }
-    .btn-auth-sub { flex: 1; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 9px; border-radius: 10px; font-family: var(--font-round); font-size: 12.5px; cursor: pointer; }
 
-    /* =====================================================================
-       🏆 상금 인증 증서 및 선택의 갈림길 모달
-       ===================================================================== */
+    /* 🏆 상금 인증서 모달 (선택의 딜레마) */
     .prize-modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(17, 24, 39, 0.88);
-      backdrop-filter: blur(8px);
+      background: rgba(10, 15, 26, 0.92);
+      backdrop-filter: blur(10px);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 10001;
     }
     .prize-cert-card {
-      background: #ffffff;
+      background: #181d29;
       border: 4px solid #f59e0b;
       border-radius: 26px;
-      padding: 24px;
+      padding: 26px;
       width: 92%;
       max-width: 440px;
       text-align: center;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
-      position: relative;
-      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 0 60px rgba(245, 158, 11, 0.5);
+      animation: popIn 0.35s ease;
     }
-    @keyframes popIn { from { transform: scale(0.7); } to { transform: scale(1); } }
-
     .cert-frame {
-      background: #fffdf5;
+      background: #202738;
       border: 2px dashed #f59e0b;
-      border-radius: 16px;
-      padding: 15px;
+      border-radius: 18px;
+      padding: 16px;
       margin-bottom: 14px;
       position: relative;
     }
     .cert-stamp {
       position: absolute;
-      top: 12px;
+      top: 10px;
       right: 12px;
-      width: 64px;
-      height: 64px;
-      border: 3px solid #dc2626;
+      width: 66px;
+      height: 66px;
+      border: 3px solid #ef4444;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #dc2626;
+      color: #ef4444;
       font-family: var(--font-round);
       font-size: 12px;
       font-weight: 700;
       transform: rotate(-12deg);
-      opacity: 0.9;
     }
-    .cert-stage-tag { font-family: var(--font-round); font-size: 13.5px; color: #d97706; margin-bottom: 3px; }
-    .cert-amount { font-family: var(--font-round); font-size: 32px; color: #b45309; margin-bottom: 4px; }
-    .cert-meta-table { width: 100%; font-size: 11px; text-align: left; color: #64748b; margin-top: 6px; border-top: 1px solid #fed7aa; padding-top: 6px; }
-    .cert-meta-table td { padding: 2px 4px; }
+    .cert-amount { font-family: var(--font-round); font-size: 34px; color: #fde047; margin: 4px 0; }
+    .cert-meta-table { width: 100%; font-size: 11px; text-align: left; color: #94a3b8; margin-top: 6px; border-top: 1px solid #374151; padding-top: 6px; }
 
     .capture-notice-box {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      border-left: 4px solid #3b82f6;
+      background: #1e3a8a;
+      border: 1px solid #3b82f6;
       border-radius: 10px;
-      padding: 9px 12px;
+      padding: 10px;
       font-size: 11.5px;
       line-height: 1.45;
-      color: #1e40af;
+      color: #bfdbfe;
       text-align: left;
       margin-bottom: 12px;
     }
-    .capture-notice-box b { color: #1d4ed8; }
-
     .dilemma-actions { display: flex; flex-direction: column; gap: 8px; }
     .btn-claim-now {
       background: #10b981;
       color: #fff;
       border: none;
-      border-bottom: 4px solid #059669;
+      border-bottom: 4px solid #047857;
       padding: 11px;
       border-radius: 13px;
       font-family: var(--font-round);
       font-size: 14.5px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
     }
     .btn-gamble-next {
       background: #f59e0b;
-      color: #fff;
+      color: #111827;
       border: none;
-      border-bottom: 4px solid #d97706;
+      border-bottom: 4px solid #b45309;
       padding: 11px;
       border-radius: 13px;
       font-family: var(--font-round);
       font-size: 14.5px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+      font-weight: 700;
     }
-    .btn-claim-now:active, .btn-gamble-next:active { transform: translateY(2px); border-bottom-width: 2px; }
-    .forfeit-warning-text { font-size: 10px; color: #dc2626; font-weight: 700; margin-top: 2px; }
+    .forfeit-warning-text { font-size: 10px; color: #f87171; font-weight: 700; margin-top: 2px; }
+
+    /* 대원 로그인 모달 */
+    .auth-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(10, 15, 26, 0.95);
+      backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10000;
+    }
+    .auth-card {
+      background: #1e2433; border: 4px solid #f59e0b; border-radius: 26px; padding: 28px; width: 90%; max-width: 420px; text-align: center;
+    }
+    .auth-input { width: 100%; padding: 10px 13px; background: #0f131c; border: 2px solid #374151; color: #fff; border-radius: 12px; margin-top: 4px; outline: none; }
+    .btn-auth-primary { width: 100%; background: #ef4444; color: #fff; border: none; border-bottom: 4px solid #b91c1c; padding: 11px; border-radius: 13px; font-family: var(--font-round); font-size: 15px; cursor: pointer; margin-top: 14px; }
 
     #confetti-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 10002; }
 
     @media (max-width: 960px) {
-      #app {
-        grid-template-columns: 1fr;
-        grid-template-rows: 50vh 50vh;
-      }
+      #app { grid-template-columns: 1fr; grid-template-rows: 50vh 50vh; }
       #sidebar { border-left: none; border-top: 1px solid var(--border); }
     }
   </style>
@@ -845,195 +547,168 @@
   <!-- 🔑 [로그인 / 프로필 모달] -->
   <div class="auth-overlay" id="auth-overlay">
     <div class="auth-card" id="auth-register-view">
-      <div class="auth-robot">🤖</div>
-      <h2 class="auth-title">아두이노 탐험대 등록</h2>
-      <p class="auth-desc">이름과 비밀번호를 등록하면 <b>상금 획득 내역과 미션 진행 상태</b>가 자동으로 안전하게 저장됩니다!</p>
+      <div style="font-size: 42px; margin-bottom: 8px;">⚡</div>
+      <h2 style="font-family: var(--font-round); font-size: 22px; color: #fde047; margin-bottom: 6px;">서바이벌 아두이노 배선 챌린지</h2>
+      <p style="font-size: 12px; color: #94a3b8; line-height: 1.45; margin-bottom: 16px;">
+        잘못 꽂으면 <b>합선 폭발!</b> 성공하면 <b>1,000 ~ 3,000 미소 상금!</b><br>
+        도전자 이름과 비밀번호를 등록하세요!
+      </p>
       
-      <div class="auth-input-group">
-        <label class="auth-label" for="user-name-input">대원 이름 (닉네임)</label>
-        <input type="text" id="user-name-input" class="auth-input" placeholder="예: 번개탐험가 민우" maxlength="12" />
-        
-        <label class="auth-label" for="user-pass-input">나만의 비밀번호 (간단한 4자리 등)</label>
-        <input type="password" id="user-pass-input" class="auth-input" placeholder="다음 번에 이어서 할 때 필요해요" maxlength="16" />
+      <div style="text-align: left; margin-bottom: 10px;">
+        <label style="font-size: 11.5px; color: #cbd5e1; font-weight: 700;">도전자 닉네임</label>
+        <input type="text" id="user-name-input" class="auth-input" placeholder="예: 회로탐정 지우" maxlength="12" />
       </div>
 
-      <button class="btn-auth-primary" id="btn-start-adventure">🚀 탐험 시작하고 상금 도전하기!</button>
+      <div style="text-align: left; margin-bottom: 14px;">
+        <label style="font-size: 11.5px; color: #cbd5e1; font-weight: 700;">나만의 비밀번호</label>
+        <input type="password" id="user-pass-input" class="auth-input" placeholder="이어서 할 때 필요해요 (4자리 이상)" maxlength="16" />
+      </div>
+
+      <button class="btn-auth-primary" id="btn-start-adventure">🔥 긴장감 넘치는 서바이벌 시작!</button>
     </div>
 
-    <!-- 기존 저장된 계정 재방문 뷰 -->
     <div class="auth-card" id="auth-login-view" style="display: none;">
-      <div class="auth-robot">👋</div>
-      <h2 class="auth-title">다시 오신 것을 환영합니다!</h2>
-      <div class="auth-existing-box">
-        <div style="font-size: 14px; font-weight: 700; color: #1e3a8a;" id="existing-name-display">민우 대원</div>
-        <div style="font-size: 11.5px; color: #475569; margin-top: 3px;" id="existing-stage-display">이전 달성: 1단계 (1,000미소)</div>
+      <div style="font-size: 42px; margin-bottom: 6px;">👋</div>
+      <h2 style="font-family: var(--font-round); font-size: 21px; color: #fde047; margin-bottom: 6px;">도전자 복귀 확인</h2>
+      <div style="background: #111622; padding: 12px; border-radius: 12px; margin-bottom: 12px; border: 1px dashed #374151;">
+        <div style="font-size: 14px; font-weight: 700; color: #60a5fa;" id="existing-name-display">지우 대원</div>
+        <div style="font-size: 11.5px; color: #94a3b8; margin-top: 3px;" id="existing-stage-display">이전 기록 로딩 중...</div>
       </div>
-
-      <div class="auth-input-group">
-        <label class="auth-label" for="login-pass-input">비밀번호 확인</label>
-        <input type="password" id="login-pass-input" class="auth-input" placeholder="등록했던 비밀번호 입력" />
-      </div>
-
-      <div class="auth-choice-btns">
-        <button class="btn-auth-primary" style="flex: 1.5;" id="btn-continue-adventure">▶ 이어서 하기</button>
-        <button class="btn-auth-sub" id="btn-reset-history">🔄 초기화 후 새로하기</button>
+      <input type="password" id="login-pass-input" class="auth-input" placeholder="비밀번호 입력" />
+      <div style="display: flex; gap: 8px; margin-top: 12px;">
+        <button class="btn-auth-primary" style="flex: 1.5; margin-top: 0;" id="btn-continue-adventure">▶ 이어서 도전</button>
+        <button style="flex: 1; background: #334155; color: #fff; border: none; border-radius: 12px; font-family: var(--font-round); font-size: 12px; cursor: pointer;" id="btn-reset-history">🔄 초기화</button>
       </div>
     </div>
   </div>
 
   <div id="app">
     <main id="stage-container">
-      <div class="brand-header">
-        <svg class="brand-logo" viewBox="0 0 92 50" aria-hidden="true">
-          <path class="loop" d="M24 6.5a18.5 18.5 0 1 0 0 37c8.7 0 13.4-6.6 22-18.5S59.3 6.5 68 6.5a18.5 18.5 0 1 1 0 37c-8.7 0-13.4-6.6-22-18.5S32.7 6.5 24 6.5z" />
-          <path class="sign" d="M15.5 25h12M62 25h12M68 19v12" />
-        </svg>
-        <span class="brand-title">
-          아두이노 배우기
-          <span style="font-size: 11px; background: #fef08a; color:#854d0e; padding: 2px 7px; border-radius: 6px; font-weight: 700;">🎁 1,000~3,000 미소 챌린지</span>
-        </span>
-
-        <!-- 로그인된 대원 뱃지 -->
-        <div class="user-profile-pill" id="user-profile-pill" style="display: none;">
-          <span>👤 <b id="top-username">탐험대원</b></span>
-          <button class="btn-user-reset" id="btn-switch-account" title="기록 초기화 및 대원 변경">초기화</button>
-        </div>
+      <!-- 상단 HUD: 타이머 & 목숨 -->
+      <div class="hud-bar">
+        <span class="hud-title">⚡ SURVIVAL CIRCUIT</span>
+        <div class="timer-pill" id="timer-pill">⏱️ <span id="timer-text">45.0s</span></div>
+        <div class="lives-pill" id="lives-pill">❤️❤️❤️</div>
       </div>
 
       <canvas id="board-canvas"></canvas>
-      <div class="callout-overlay" id="callout-overlay"></div>
 
-      <!-- 좌측 하단 제어 & 실험 버튼바 -->
-      <div class="viewbar">
-        <button class="btn-icon" id="btn-zoom-in" title="확대 (+)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M11 8v6M8 11h6"/></svg></button>
-        <button class="btn-icon" id="btn-zoom-out" title="축소 (-)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M8 11h6"/></svg></button>
-        <button class="btn-icon" id="btn-reset-view" title="시점 초기화 (R)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg></button>
-        <span class="viewbar-sep"></span>
-        <button class="viewbar-btn" id="btn-toggle-wire">🔌 전선 쏙 뽑기</button>
-        <button class="viewbar-btn" id="btn-toggle-resistor">👻 풀다운 저항 뽑기 (플로팅 실험)</button>
+      <!-- 좌측 하단 전선 공구함 (Wiring Toolbag) -->
+      <div class="wire-toolkit">
+        <div class="toolkit-title">
+          <span>🧰 점퍼선 공구함 (전선 선택)</span>
+          <span style="font-size: 10px; color: #f59e0b;" id="active-wire-label">선택: 없음</span>
+        </div>
+        <div class="wire-selector-grid">
+          <button class="wire-btn" data-wire="5v" id="btn-w-5v">
+            <span class="wire-dot" style="background: #ef4444;"></span>5V 전원선
+          </button>
+          <button class="wire-btn" data-wire="d2" id="btn-w-d2">
+            <span class="wire-dot" style="background: #3b82f6;"></span>D2 신호선
+          </button>
+          <button class="wire-btn" data-wire="d13" id="btn-w-d13">
+            <span class="wire-dot" style="background: #f97316;"></span>D13 출력선
+          </button>
+          <button class="wire-btn" data-wire="gnd" id="btn-w-gnd">
+            <span class="wire-dot" style="background: #334155;"></span>GND 접지선
+          </button>
+        </div>
       </div>
 
-      <!-- 중앙 하단 가이드 배너 -->
-      <div class="guide-banner" id="guide-banner">
-        <span class="guide-dot"></span>
-        <span id="guide-text">👉 [실행하기 (Space)] 버튼을 누르면 아두이노가 작동하며 미션이 시작됩니다!</span>
+      <!-- 화면 하단 긴급 안내 배너 -->
+      <div class="emergency-banner" id="emergency-banner">
+        <span id="emg-icon">⚠️</span>
+        <span id="emg-text">공구함에서 전선을 고르고, 3D 보드의 반짝이는 핀을 클릭해 올바르게 연결하세요!</span>
       </div>
     </main>
 
     <aside id="sidebar">
-      <div class="lesson-hero">
-        <div class="lesson-num">3. 디지털 입력 & 스위치 회로</div>
-        <h1 class="lesson-title">버튼 누르기 (Push a button)</h1>
-        <p class="lesson-lede">
-          스위치 입력과 10kΩ 풀다운 저항의 물리적 원리를 배우고, 3단계 미션을 통과하여 상금 미소(MISO)를 획득하세요!
+      <div class="mission-hud-hero">
+        <div class="hud-stage-badge">
+          <span id="current-stage-tag">STAGE 1 / 3</span>
+          <span style="color: #fbbf24;">💰 누적/도전 상금: <b id="target-prize-text">1,000 MISO</b></span>
+        </div>
+        <h1 class="hud-stage-title" id="current-stage-title">🌱 1단계: LED 출력 회로 결선</h1>
+        <p class="hud-stage-desc" id="current-stage-desc">
+          아두이노 D13 핀과 접지(GND) 전선이 끊겨 있습니다! 45초 내에 올바른 핀에 전선을 연결하고 테스트 버튼을 누르세요. 잘못 꽂으면 쇼트 폭발!
         </p>
       </div>
 
-      <!-- 💰 상금 지급 규칙 특별 공지 배너 -->
-      <div class="prize-rules-box">
-        <div class="prize-rules-title">🎁 [미소 상금 이벤트 규칙]</div>
-        <div class="prize-rules-desc">
-          • 각 단계 통과 시 발급되는 <b>인증서 화면을 캡처하여 댓글로 올리면 1회에 한하여 해당 상금을 지급</b>합니다!<br>
-          • <b>선택의 딜레마:</b> 더 많은 상금을 원하면 현재 단계의 상금을 포기하고 상위 단계에 도전하세요! (⚠️ <b>한 번 포기하면 이전 단계로 되돌릴 수 없습니다!</b>)
-        </div>
-      </div>
-
-      <!-- 🎯 3단계 난이도별 퀘스트 & 상금 구역 -->
-      <section class="quest-section">
-        <div class="quest-header">
-          <div class="quest-main-title">🎯 오늘의 상금 탐험 미션</div>
-          <div class="quest-badge-count" id="quest-count">달성: 0 / 3 ⭐</div>
-        </div>
-
-        <!-- 미션 1: 초급 -->
-        <div class="mission-card" id="mission-1">
-          <div class="mission-top">
-            <span class="mission-tag tag-easy">🌱 1단계 (쉬움)</span>
-            <span class="mission-prize-badge">💰 1,000 미소</span>
-            <span id="m1-icon">⏳</span>
+      <!-- 3단계 서바이벌 미션 카드 리스트 -->
+      <section class="mission-section">
+        <!-- 1단계 -->
+        <div class="stage-card current" id="card-stage-1">
+          <div class="stage-top-row">
+            <span class="stage-tag" style="background: #14532d; color: #86efac;">1단계 (기초 결선)</span>
+            <span class="stage-prize-tag">💰 1,000 MISO</span>
           </div>
-          <div class="mission-title">1. 전등 켜기 마법사</div>
-          <div class="mission-desc">[실행하기]를 누른 뒤, 3D 보드의 빨간 버튼을 <b>3초 동안 꾹 누르고</b> 계세요!</div>
-          <div class="mission-progress-bar"><div class="mission-progress-fill" id="m1-fill"></div></div>
+          <div class="stage-name">LED 점등 회로 완성 챌린지</div>
+          <div class="stage-inst">D13 출력선(주황)과 GND 접지선(검정)을 브레드보드 LED 회로에 연결하세요!</div>
+          <div class="stage-checklist">
+            <div class="check-item" id="chk-d13">⚪ D13 핀 ➔ LED 보호저항 (주황 전선)</div>
+            <div class="check-item" id="chk-gnd1">⚪ GND 핀 ➔ LED 음극 접지 (검정 전선)</div>
+          </div>
+          <button class="btn-test-circuit" id="btn-test-1">⚡ 회로 통전 테스트 & 검증</button>
         </div>
 
-        <!-- 미션 2: 중급 [★ 질문이 많았던 2단계를 아주 명쾌하게 가이드!] -->
-        <div class="mission-card" id="mission-2">
-          <div class="mission-top">
-            <span class="mission-tag tag-mid">⚡ 2단계 (보통)</span>
-            <span class="mission-prize-badge">💰 2,000 미소</span>
-            <span id="m2-icon">🔒</span>
+        <!-- 2단계 -->
+        <div class="stage-card" id="card-stage-2">
+          <div class="stage-top-row">
+            <span class="stage-tag" style="background: #713f12; color: #fde047;">2단계 (스위치 풀다운)</span>
+            <span class="stage-prize-tag">💰 2,000 MISO</span>
           </div>
-          <div class="mission-title">2. 방 전등 스위치 만들기 (토글 모드)</div>
-          <div class="mission-desc">버튼에서 <b>손을 떼도 불이 켜진 채로 유지</b>되게 만들어보세요!</div>
-          
-          <!-- 💡 2단계 하는 법 친절한 단계별 안내 상자 -->
-          <div class="mission-guide-box" id="m2-guide-box">
-            <b>👉 [2단계 하는 법 순서]:</b>
-            <ol>
-              <li>아래 코드 상단의 <b>[토글 전환 (Toggle)]</b> 버튼을 클릭하세요!</li>
-              <li>3D 화면의 <b>빨간 버튼을 '딸깍' 한 번만 누르고 손을 떼세요.</b></li>
-              <li>손을 뗐는데도 LED 불이 켜져 있으면 <b>2,000 미소 통과!</b></li>
-            </ol>
+          <div class="stage-name">풀다운 스위치 회로 & 쇼트 방지</div>
+          <div class="stage-inst">5V 전원, D2 감지선, 10kΩ 저항 GND를 연결하세요. (⚠️ 5V와 GND를 저항 없이 직결하면 폭발!)</div>
+          <div class="stage-checklist">
+            <div class="check-item" id="chk-5v">⚪ 5V 핀 ➔ 버튼 좌측 단자 (빨간 전선)</div>
+            <div class="check-item" id="chk-d2">⚪ D2 핀 ➔ 버튼 우측 신호선 (파란 전선)</div>
+            <div class="check-item" id="chk-pull">⚪ 10kΩ 풀다운 저항 ➔ GND 접지 (검정 전선)</div>
           </div>
-          <div class="mission-progress-bar"><div class="mission-progress-fill" id="m2-fill"></div></div>
+          <button class="btn-test-circuit" id="btn-test-2" style="display: none;">⚡ 스위치 전원 가동 & 테스트</button>
         </div>
 
-        <!-- 미션 3: 고급 -->
-        <div class="mission-card" id="mission-3">
-          <div class="mission-top">
-            <span class="mission-tag tag-hard">👑 3단계 (도전)</span>
-            <span class="mission-prize-badge">💰 3,000 미소 (최고상금)</span>
-            <span id="m3-icon">🔒</span>
+        <!-- 3단계 -->
+        <div class="stage-card" id="card-stage-3">
+          <div class="stage-top-row">
+            <span class="stage-tag" style="background: #831843; color: #fbcfe8;">3단계 (시퀀스 암호 해제)</span>
+            <span class="stage-prize-tag">💰 3,000 MISO (최고상금)</span>
           </div>
-          <div class="mission-title">3. 비밀 모스 부호 전송</div>
-          <div class="mission-desc">3초 안에 빨간 버튼을 <b>3번 톡-톡-톡 빠르게</b> 연타해보세요!</div>
-          <div class="mission-progress-bar"><div class="mission-progress-fill" id="m3-fill"></div></div>
+          <div class="stage-name">폭탄 해제 시퀀스 (모스 부호)</div>
+          <div class="stage-inst">아두이노가 요청하는 박자대로 30초 내에 버튼을 정확히 입력하세요!</div>
+          <div class="stage-checklist">
+            <div class="check-item" id="chk-morse">⚪ 박자: [톡(짧게) - 톡(짧게) - 꾹(1초간)] 입력</div>
+          </div>
+          <button class="btn-test-circuit" id="btn-test-3" style="display: none;">🚨 해제 시퀀스 시작</button>
         </div>
       </section>
 
-      <!-- 인터랙티브 코드 섹션 -->
-      <div class="code-section">
-        <div class="code-header">
-          <div class="code-title">직접 해보기 (스케치 코드)</div>
-          <div class="mode-switcher-container">
-            <span style="font-size: 11px; color: #64748b; font-weight: 600;">작동 모드:</span>
-            <div class="mode-switcher">
-              <button class="mode-btn active" data-mode="hold" id="mode-btn-hold">누르고 있기 (Hold)</button>
-              <button class="mode-btn" data-mode="toggle" id="mode-btn-toggle">토글 전환 (Toggle) 💡</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="code-box">
-          <div class="code-toolbar">
-            <span class="code-lang">Arduino C++ (.ino)</span>
-            <div class="code-actions">
-              <button class="btn-copy" id="btn-copy-code">코드 복사</button>
-              <button class="btn-run pulse-ready" id="btn-toggle-sim">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                <span id="run-btn-text">실행하기 (Space)</span>
-              </button>
-            </div>
-          </div>
-          <pre class="code-view"><code id="code-display"></code></pre>
-        </div>
-
-        <!-- 시리얼 모니터 콘솔 -->
+      <!-- 하단 실시간 콘솔 -->
+      <div class="code-console-sec">
         <div class="console-box">
           <div class="console-bar">
-            <div class="console-status-group">
-              <span class="console-dot" id="console-dot"></span>
-              <span class="console-label">시리얼 모니터 (Serial Monitor)</span>
-            </div>
-            <span style="font-size: 10px; color: #647087;" id="console-status-text">대기 중 (Stopped)</span>
+            <span>TERMINAL & CIRCUIT INSPECTOR</span>
+            <span id="inspector-status">ONLINE</span>
           </div>
-          <div class="console-body" id="console-logs">
-            <div class="console-row" style="color: #647087;">// 👆 [실행하기]를 누르면 아두이노 스케치 업로드 및 실행이 시작됩니다.</div>
+          <div class="console-logs" id="console-logs">
+            <div>> 서바이벌 회로 검사기 초기화 완료.</div>
+            <div>> 1단계: 빠진 전선 2개를 연결하고 검증 버튼을 누르세요.</div>
           </div>
         </div>
       </div>
     </aside>
+  </div>
+
+  <!-- 💥 [합선 폭발 / 타임오버 게임오버 모달] -->
+  <div class="gameover-modal" id="gameover-modal">
+    <div class="gameover-card">
+      <div class="gameover-icon">💥</div>
+      <h2 class="gameover-title" id="go-title">합선(SHORT) 폭발 발생!</h2>
+      <p class="gameover-desc" id="go-desc">
+        5V와 GND가 보호 저항 없이 직접 맞닿아 회로가 타버렸습니다!<br>
+        목숨이 1개 차감되었습니다.
+      </p>
+      <button class="btn-retry" id="btn-retry-stage">🔄 회로 초기화 후 재도전</button>
+    </div>
   </div>
 
   <!-- 🏆 [상금 인증 증서 및 선택의 갈림길 모달] -->
@@ -1041,23 +716,23 @@
     <div class="prize-cert-card">
       <div class="cert-frame">
         <div class="cert-stamp">인증 완료</div>
-        <div class="cert-stage-tag" id="cert-stage-tag">🌱 [1단계] 탐험 통과 증서</div>
+        <div style="font-family: var(--font-round); font-size: 14px; color: #f59e0b;" id="cert-stage-tag">🌱 [1단계] 서바이벌 통과 증서</div>
         <div class="cert-amount" id="cert-amount">1,000 MISO</div>
         
         <table class="cert-meta-table">
-          <tr><td>• 수령 대상자:</td><td><b id="cert-username">민우 대원</b></td></tr>
-          <tr><td>• 인증 일시:</td><td id="cert-date">2026-10-22 02:40</td></tr>
-          <tr><td>• 고유 인증코드:</td><td><code id="cert-code">MISO-20261022-8A7F</code></td></tr>
+          <tr><td>• 도전자:</td><td><b id="cert-username" style="color:#60a5fa;">지우 대원</b></td></tr>
+          <tr><td>• 검증 일시:</td><td id="cert-date">2026-10-22 03:10</td></tr>
+          <tr><td>• 인증 코드:</td><td><code id="cert-code" style="color:#4ade80;">MISO-SURVIVAL-8A7F</code></td></tr>
         </table>
       </div>
 
       <div class="capture-notice-box">
         📸 <b>상금 수령 안내:</b><br>
-        이 화면을 <b>캡처(스크린샷)하여 댓글로 업로드</b>하시면 운영진 확인 후 <b>1회에 한하여 해당 상금을 지급</b>합니다!
+        이 화면을 <b>캡처(스크린샷)하여 댓글로 업로드</b>하시면 <b>1회에 한하여 해당 상금을 지급</b>합니다!
       </div>
 
       <div class="dilemma-actions" id="dilemma-actions">
-        <!-- 동적으로 주입됨 -->
+        <!-- 딜레마 버튼 동적 생성 -->
       </div>
     </div>
   </div>
@@ -1066,401 +741,124 @@
 
   <script>
     /* =====================================================================
-       1. 사용자 인증 및 로컬 이력 저장소 (Storage Engine)
+       1. 사용자 인증 & 이력 저장소
        ===================================================================== */
-    const STORAGE_KEY = 'ARDUINO_STANDARD_PROFILE_V2';
+    const STORAGE_KEY = 'ARDUINO_SURVIVAL_V3';
 
-    let userProfile = {
-      username: '',
-      password: '',
-      m1Done: false,
-      m2Done: false,
-      m3Done: false,
-      highestStage: 0,
-      claimedStage: 0,
-      claimedAmount: 0,
+    let user = {
+      name: '',
+      pass: '',
+      currentStage: 1,
+      lives: 3,
       certCode: ''
     };
 
-    function loadProfile() {
+    function loadUser() {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) return JSON.parse(saved);
-      } catch (e) { console.error(e); }
+        const s = localStorage.getItem(STORAGE_KEY);
+        if (s) return JSON.parse(s);
+      } catch (e) {}
       return null;
     }
 
-    function saveProfile() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(userProfile));
-      updateUserUI();
-    }
-
-    function generateCertCode() {
-      const now = new Date();
-      const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
-      return `MISO-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${rand}`;
-    }
-
-    let completedCount = 0;
-
-    function updateUserUI() {
-      if (!userProfile.username) return;
-      document.getElementById('user-profile-pill').style.display = 'flex';
-      document.getElementById('top-username').textContent = userProfile.username;
-
-      if (userProfile.m1Done) markMissionUI(1);
-      if (userProfile.m2Done) markMissionUI(2);
-      if (userProfile.m3Done) markMissionUI(3);
-      document.getElementById('quest-count').textContent = `달성: ${completedCount} / 3 ⭐`;
-
-      // 만약 1단계를 깼고 2단계가 남았으면 [토글 전환] 버튼을 눈에 띄게 하이라이트!
-      if (userProfile.m1Done && !userProfile.m2Done) {
-        document.getElementById('mode-btn-toggle').classList.add('highlight-target');
-      } else {
-        document.getElementById('mode-btn-toggle').classList.remove('highlight-target');
-      }
+    function saveUser() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
     }
 
     const authOverlay = document.getElementById('auth-overlay');
-    const authRegisterView = document.getElementById('auth-register-view');
-    const authLoginView = document.getElementById('auth-login-view');
-    const existingProfile = loadProfile();
-
-    if (existingProfile && existingProfile.username) {
-      authRegisterView.style.display = 'none';
-      authLoginView.style.display = 'block';
-      document.getElementById('existing-name-display').textContent = `${existingProfile.username} 대원`;
-      const stageText = existingProfile.m3Done ? '3단계 최고 상금 도전 완료' : (existingProfile.m2Done ? '2단계(2,000미소) 달성' : (existingProfile.m1Done ? '1단계(1,000미소) 달성' : '미션 진행 전'));
-      document.getElementById('existing-stage-display').textContent = `이전 기록: ${stageText}`;
+    const existing = loadUser();
+    if (existing && existing.name) {
+      document.getElementById('auth-register-view').style.display = 'none';
+      document.getElementById('auth-login-view').style.display = 'block';
+      document.getElementById('existing-name-display').textContent = `${existing.name} 도전자`;
+      document.getElementById('existing-stage-display').textContent = `현재 도전: ${existing.currentStage}단계 (남은 목숨: ${existing.lives}개)`;
     }
 
     document.getElementById('btn-start-adventure').addEventListener('click', () => {
       const name = document.getElementById('user-name-input').value.trim();
       const pass = document.getElementById('user-pass-input').value.trim();
-      if (!name) { alert('대원 이름을 입력해주세요!'); return; }
-      if (!pass) { alert('나만의 비밀번호를 입력해주세요!'); return; }
-
-      userProfile = {
-        username: name,
-        password: pass,
-        m1Done: false,
-        m2Done: false,
-        m3Done: false,
-        highestStage: 0,
-        claimedStage: 0,
-        claimedAmount: 0,
-        certCode: generateCertCode()
-      };
-      saveProfile();
+      if (!name || !pass) { alert('이름과 비밀번호를 모두 입력해주세요!'); return; }
+      user = { name, pass, currentStage: 1, lives: 3, certCode: 'MISO-' + Math.random().toString(36).substring(2,8).toUpperCase() };
+      saveUser();
       authOverlay.style.display = 'none';
+      startStage(1);
     });
 
     document.getElementById('btn-continue-adventure').addEventListener('click', () => {
       const pass = document.getElementById('login-pass-input').value.trim();
-      if (existingProfile && existingProfile.password && pass !== existingProfile.password) {
-        alert('비밀번호가 일치하지 않습니다. 다시 확인해주세요!');
+      if (existing && existing.pass && pass !== existing.pass) {
+        alert('비밀번호가 일치하지 않습니다!');
         return;
       }
-      userProfile = existingProfile;
-      saveProfile();
+      user = existing;
       authOverlay.style.display = 'none';
+      startStage(user.currentStage || 1);
     });
 
-    function resetAllHistory() {
-      if (confirm('정말로 이전 탐험 기록과 상금 내역을 모두 초기화하고 처음부터 다시 시작하시겠습니까?')) {
+    document.getElementById('btn-reset-history').addEventListener('click', () => {
+      if (confirm('모든 기록을 초기화하시겠습니까?')) {
         localStorage.removeItem(STORAGE_KEY);
         location.reload();
       }
-    }
-    document.getElementById('btn-reset-history').addEventListener('click', resetAllHistory);
-    document.getElementById('btn-switch-account').addEventListener('click', resetAllHistory);
+    });
 
     /* =====================================================================
-       2. 아두이노 스케치 템플릿 & C++ 코드 생성
+       2. 오디오 효과음 (Web Audio API)
        ===================================================================== */
-    const SKETCH_TEMPLATES = {
-      hold: {
-        globals: "",
-        logic: `  int pressed = digitalRead(BUTTON);
-  digitalWrite(LED, pressed);`
-      },
-      toggle: {
-        globals: `int last = LOW;
-bool lit = false;
-`,
-        logic: `  int now = digitalRead(BUTTON);
-  if (now == HIGH && last == LOW) {
-    lit = !lit;
-    digitalWrite(LED, lit);
-    delay(30);  // 채터링 방지(디바운스)
-  }
-  last = now;`
-      }
-    };
-
-    function generateCode(mode) {
-      const tmpl = SKETCH_TEMPLATES[mode];
-      return `const int BUTTON = 2;
-const int LED = 13;
-${tmpl.globals}
-void setup() {
-  pinMode(BUTTON, INPUT);
-  pinMode(LED, OUTPUT);
-}
-
-void loop() {
-${tmpl.logic}
-}`;
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
-    const state = {
-      mode: 'hold',
-      running: false,
-      buttonPressed: false,
-      ledLit: false,
-      toggleLit: false,
-      toggleLast: false,
-      wireConnected: true,
-      resistorConnected: true
-    };
-
-    const codeDisplay = document.getElementById('code-display');
-    const consoleLogs = document.getElementById('console-logs');
-    const consoleDot = document.getElementById('console-dot');
-    const consoleStatusText = document.getElementById('console-status-text');
-    const btnToggleSim = document.getElementById('btn-toggle-sim');
-    const runBtnText = document.getElementById('run-btn-text');
-    const guideBanner = document.getElementById('guide-banner');
-    const guideText = document.getElementById('guide-text');
-
-    function renderCode() {
-      const raw = generateCode(state.mode);
-      const lines = raw.split('\n');
-      codeDisplay.innerHTML = lines.map((l, i) => `<span class="code-line" data-line="${i}">${escapeHtml(l)}</span>`).join('');
+    function playTone(freq, dur = 0.08, type = 'sine', gainVal = 0.18) {
+      initAudio();
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const now = audioCtx.currentTime;
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(gainVal, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + dur + 0.01);
     }
 
-    function escapeHtml(text) {
-      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    function playExplodeSound() {
+      initAudio();
+      playTone(90, 0.45, 'sawtooth', 0.4);
+      setTimeout(() => playTone(50, 0.6, 'square', 0.35), 80);
     }
 
-    function logConsole(msg, type = '') {
-      const row = document.createElement('div');
-      row.className = `console-row ${type}`;
-      row.textContent = `> ${msg}`;
-      consoleLogs.appendChild(row);
-      consoleLogs.scrollTop = consoleLogs.scrollHeight;
-      if (consoleLogs.children.length > 25) {
-        consoleLogs.removeChild(consoleLogs.firstChild);
-      }
-    }
-
-    // 모드 스위처 이벤트
-    const modeBtnHold = document.getElementById('mode-btn-hold');
-    const modeBtnToggle = document.getElementById('mode-btn-toggle');
-
-    modeBtnHold.addEventListener('click', () => {
-      modeBtnHold.classList.add('active');
-      modeBtnToggle.classList.remove('active');
-      state.mode = 'hold';
-      state.toggleLit = false;
-      state.toggleLast = false;
-      updateLed(false);
-      renderCode();
-      if (state.running) logConsole('모드 변경: 누르고 있기 (Hold 모드)');
-      guideText.textContent = '누르고 있기(Hold) 모드: 누르는 동안에만 불이 들어옵니다.';
-    });
-
-    modeBtnToggle.addEventListener('click', () => {
-      modeBtnToggle.classList.add('active');
-      modeBtnHold.classList.remove('active');
-      modeBtnToggle.classList.remove('highlight-target'); // 하이라이트 해제
-      state.mode = 'toggle';
-      state.toggleLit = false;
-      state.toggleLast = false;
-      updateLed(false);
-      renderCode();
-      if (state.running) logConsole('모드 변경: 토글 전환 (Toggle 모드)');
-      guideBanner.className = 'guide-banner success-pulse';
-      guideText.textContent = '💡 토글 모드 활성화! 이제 빨간 버튼을 딸깍 한 번 누르고 손을 떼보세요!';
-    });
-
-    document.getElementById('btn-copy-code').addEventListener('click', () => {
-      navigator.clipboard.writeText(generateCode(state.mode)).then(() => {
-        const orig = document.getElementById('btn-copy-code').textContent;
-        document.getElementById('btn-copy-code').textContent = '복사 완료!';
-        setTimeout(() => document.getElementById('btn-copy-code').textContent = orig, 1500);
+    function playClickSound() { playTone(800, 0.06, 'triangle', 0.2); }
+    function playSnapSound() { playTone(1200, 0.05, 'square', 0.25); }
+    function playFanfareSound() {
+      [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((f, i) => {
+        setTimeout(() => playTone(f, 0.2, 'triangle', 0.25), i * 90);
       });
-    });
-
-    // 스케치 실행 토글
-    function toggleSimulation() {
-      state.running = !state.running;
-      if (state.running) {
-        btnToggleSim.classList.remove('pulse-ready');
-        btnToggleSim.classList.add('running');
-        runBtnText.textContent = '스케치 정지 (Space)';
-        consoleDot.classList.add('online');
-        consoleStatusText.textContent = '실행 중 (Running)';
-        consoleLogs.innerHTML = '';
-        logConsole('스케치 컴파일 및 아두이노 업로드 완료...');
-
-        guideBanner.className = 'guide-banner';
-        if (!userProfile.m1Done) {
-          guideText.textContent = '🎯 코드가 업로드되었습니다! [1단계]: 3D 빨간 버튼을 3초간 꾹 누르고 계세요!';
-        } else if (!userProfile.m2Done) {
-          guideText.textContent = '👉 [2단계 미션]: 먼저 위의 [토글 전환 (Toggle)] 버튼을 클릭한 뒤, 빨간 버튼을 딸깍 누르고 떼세요!';
-          modeBtnToggle.classList.add('highlight-target');
-        } else {
-          guideText.textContent = '코드가 실행 중입니다. 3D 보드의 버튼을 눌러보세요!';
-        }
-      } else {
-        btnToggleSim.classList.add('pulse-ready');
-        btnToggleSim.classList.remove('running');
-        runBtnText.textContent = '실행하기 (Space)';
-        consoleDot.classList.remove('online');
-        consoleStatusText.textContent = '대기 중 (Stopped)';
-        logConsole('스케치가 정지되었습니다.');
-        updateLed(false);
-        clearCodeHighlights();
-        guideText.textContent = '👉 [실행하기] 버튼을 누르면 아두이노가 코드를 다시 실행합니다.';
-      }
-    }
-    btnToggleSim.addEventListener('click', toggleSimulation);
-
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-        e.preventDefault();
-        toggleSimulation();
-      } else if (e.key === 'r' || e.key === 'R') {
-        resetCameraView();
-      }
-    });
-
-    renderCode();
-
-    /* =====================================================================
-       3. 3단계 상금 퀘스트 감지 & 갈림길 딜레마
-       ===================================================================== */
-    const missions = {
-      m1: { completed: false, holdSeconds: 0 },
-      m2: { completed: false },
-      m3: { completed: false, clickTimestamps: [] }
-    };
-
-    function markMissionUI(stageNum) {
-      const card = document.getElementById(`mission-${stageNum}`);
-      if (card && !card.classList.contains('completed')) {
-        card.classList.add('completed');
-        document.getElementById(`m${stageNum}-icon`).textContent = '✅';
-        completedCount = Math.max(completedCount, stageNum);
-        missions[`m${stageNum}`].completed = true;
-      }
-    }
-
-    const prizeModalOverlay = document.getElementById('prize-modal-overlay');
-    const certStageTag = document.getElementById('cert-stage-tag');
-    const certAmount = document.getElementById('cert-amount');
-    const certUsername = document.getElementById('cert-username');
-    const certDate = document.getElementById('cert-date');
-    const certCodeEl = document.getElementById('cert-code');
-    const dilemmaActions = document.getElementById('dilemma-actions');
-
-    const STAGE_PRIZES = {
-      1: { name: '🌱 [1단계] 탐험 통과 증서', amount: '1,000 MISO', nextAmount: '2,000 MISO', num: 1000 },
-      2: { name: '⚡ [2단계] 탐험 통과 증서', amount: '2,000 MISO', nextAmount: '3,000 MISO', num: 2000 },
-      3: { name: '👑 [3단계] 최종 정복 증서', amount: '3,000 MISO', nextAmount: null, num: 3000 }
-    };
-
-    function triggerStageClear(stageNum) {
-      markMissionUI(stageNum);
-      userProfile[`m${stageNum}Done`] = true;
-      userProfile.highestStage = Math.max(userProfile.highestStage, stageNum);
-      saveProfile();
-
-      playFanfareSound();
-      triggerConfetti(80);
-
-      const info = STAGE_PRIZES[stageNum];
-      certStageTag.textContent = info.name;
-      certAmount.textContent = info.amount;
-      certUsername.textContent = `${userProfile.username || '대원'} 대원`;
-      const now = new Date();
-      certDate.textContent = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-      if (!userProfile.certCode) userProfile.certCode = generateCertCode();
-      certCodeEl.textContent = userProfile.certCode;
-
-      dilemmaActions.innerHTML = '';
-
-      // 선택 1: 현재 상금 수령하기
-      const btnClaim = document.createElement('button');
-      btnClaim.className = 'btn-claim-now';
-      btnClaim.innerHTML = `📸 지금 이 화면 캡처하고 [${info.amount}] 수령하기`;
-      btnClaim.addEventListener('click', () => {
-        userProfile.claimedStage = stageNum;
-        userProfile.claimedAmount = info.num;
-        saveProfile();
-        alert(`[${info.amount}] 수령 신청 확정!\n\n지금 화면을 캡처(스크린샷)하여 댓글로 올려주시면 운영진이 확인 후 1회에 한하여 상금을 지급합니다!`);
-        prizeModalOverlay.style.display = 'none';
-      });
-      dilemmaActions.appendChild(btnClaim);
-
-      // 선택 2: 상위 단계 도전 (포기 시 복구 불가!)
-      if (info.nextAmount) {
-        const btnGamble = document.createElement('button');
-        btnGamble.className = 'btn-gamble-next';
-        btnGamble.innerHTML = `🔥 [${info.amount}] 포기하고 [${info.nextAmount}] 도전하기!`;
-        btnGamble.addEventListener('click', () => {
-          const confirmGamble = confirm(`⚠️ [주의: 한 번 포기하면 되돌릴 수 없습니다!]\n\n현재 ${info.amount} 상금을 완전히 포기하고 상위 단계(${info.nextAmount})에 도전하시겠습니까?`);
-          if (confirmGamble) {
-            prizeModalOverlay.style.display = 'none';
-            guideBanner.className = 'guide-banner success-pulse';
-            if (stageNum === 1) {
-              guideText.textContent = '🔥 2단계 도전 시작! 오른쪽의 [토글 전환 (Toggle)] 버튼을 누르고 빨간 버튼을 떼보세요!';
-              modeBtnToggle.classList.add('highlight-target');
-            } else if (stageNum === 2) {
-              guideText.textContent = '🔥 최고 상금 3단계 도전! 3초 안에 빨간 버튼을 빠르게 3번 연타하세요!';
-            }
-          }
-        });
-
-        const warningLabel = document.createElement('div');
-        warningLabel.className = 'forfeit-warning-text';
-        warningLabel.textContent = `* 주의: 다음 단계에 도전하면 ${info.amount} 상금은 완전히 사라지며 되돌릴 수 없습니다!`;
-
-        dilemmaActions.appendChild(btnGamble);
-        dilemmaActions.appendChild(warningLabel);
-      } else {
-        const finishLabel = document.createElement('div');
-        finishLabel.style.fontSize = '12px';
-        finishLabel.style.color = '#15803d';
-        finishLabel.style.fontWeight = '700';
-        finishLabel.style.marginTop = '4px';
-        finishLabel.textContent = '🎉 최고 난이도 완전 정복! 지금 바로 캡처하여 최고 상금 3,000미소를 수령하세요!';
-        dilemmaActions.appendChild(finishLabel);
-      }
-
-      prizeModalOverlay.style.display = 'flex';
     }
 
     /* =====================================================================
-       4. Three.js 3D 씬 (아두이노 + 전선 + 파티클 + 부품들)
+       3. Three.js 3D 씬 (아두이노 + 부품 + 결선 타겟 핀 소켓)
        ===================================================================== */
     const container = document.getElementById('stage-container');
     const canvas = document.getElementById('board-canvas');
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf6eddd);
+    scene.background = new THREE.Color(0x191e2b);
 
     const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
     const defaultCameraPos = new THREE.Vector3(25, 68, 65);
     const defaultCameraTarget = new THREE.Vector3(5, 0, -2);
     camera.position.copy(defaultCameraPos);
 
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -1470,29 +868,13 @@ ${tmpl.logic}
     controls.minDistance = 25;
     controls.maxDistance = 180;
 
-    function resetCameraView() {
-      camera.position.copy(defaultCameraPos);
-      controls.target.copy(defaultCameraTarget);
-      controls.update();
-    }
-    document.getElementById('btn-reset-view').addEventListener('click', resetCameraView);
-    document.getElementById('btn-zoom-in').addEventListener('click', () => {
-      camera.position.sub(controls.target).multiplyScalar(0.85).add(controls.target);
-    });
-    document.getElementById('btn-zoom-out').addEventListener('click', () => {
-      camera.position.sub(controls.target).multiplyScalar(1.15).add(controls.target);
-    });
-
-    scene.add(new THREE.AmbientLight(0xfff6ea, 0.75));
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
+    scene.add(new THREE.AmbientLight(0xfff6ea, 0.8));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
     dirLight.position.set(45, 90, 40);
     dirLight.castShadow = true;
     scene.add(dirLight);
 
-    const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(300, 300),
-      new THREE.ShadowMaterial({ opacity: 0.12 })
-    );
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.ShadowMaterial({ opacity: 0.2 }));
     ground.rotation.x = -Math.PI / 2;
     ground.receiveShadow = true;
     scene.add(ground);
@@ -1505,38 +887,30 @@ ${tmpl.logic}
     unoGroup.position.set(-18, 0, 0);
     const unoPcb = new THREE.Mesh(new THREE.BoxGeometry(42, 1.6, 58), new THREE.MeshStandardMaterial({ color: 0x0e5d6e, roughness: 0.45 }));
     unoPcb.position.y = 0.8;
-    unoPcb.castShadow = true;
-    unoPcb.receiveShadow = true;
     unoGroup.add(unoPcb);
 
     const metalMat = new THREE.MeshStandardMaterial({ color: 0xd4d8df, roughness: 0.25, metalness: 0.85 });
     const darkMat = new THREE.MeshStandardMaterial({ color: 0x22242a, roughness: 0.7 });
     const usb = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 12), metalMat);
     usb.position.set(-15, 5, -23);
-    usb.castShadow = true;
     unoGroup.add(usb);
-
     const jack = new THREE.Mesh(new THREE.BoxGeometry(9, 8, 13), darkMat);
     jack.position.set(14, 5, -22);
-    jack.castShadow = true;
     unoGroup.add(jack);
-
     const mcu = new THREE.Mesh(new THREE.BoxGeometry(22, 3, 7), darkMat);
     mcu.position.set(4, 2.5, 6);
-    mcu.castShadow = true;
     unoGroup.add(mcu);
 
     function createHeader(x, z, length) {
       const header = new THREE.Mesh(new THREE.BoxGeometry(2.54, 4.5, length), darkMat);
       header.position.set(x, 3.2, z);
-      header.castShadow = true;
       unoGroup.add(header);
     }
     createHeader(-18, 5, 36);
     createHeader(18, -4, 20);
     createHeader(18, 16, 16);
 
-    const lLedMat = new THREE.MeshStandardMaterial({ color: 0x443311, roughness: 0.3, emissive: 0x000000 });
+    const lLedMat = new THREE.MeshStandardMaterial({ color: 0x443311, emissive: 0x000000 });
     const lLed = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.8, 1.4), lLedMat);
     lLed.position.set(-12, 1.8, 5);
     unoGroup.add(lLed);
@@ -1547,8 +921,6 @@ ${tmpl.logic}
     bbGroup.position.set(22, 0, 0);
     const breadboard = new THREE.Mesh(new THREE.BoxGeometry(38, 5.5, 58), new THREE.MeshStandardMaterial({ color: 0xf2eee3, roughness: 0.6 }));
     breadboard.position.y = 2.75;
-    breadboard.castShadow = true;
-    breadboard.receiveShadow = true;
     bbGroup.add(breadboard);
 
     const trench = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.5, 56), new THREE.MeshStandardMaterial({ color: 0x2e2f33 }));
@@ -1559,28 +931,22 @@ ${tmpl.logic}
     // 12mm 버튼
     const buttonGroup = new THREE.Group();
     buttonGroup.position.set(22, 5.5, -10);
-
     const btnBase = new THREE.Mesh(new THREE.BoxGeometry(11.5, 3.5, 11.5), darkMat);
     btnBase.position.y = 1.75;
-    btnBase.castShadow = true;
     buttonGroup.add(btnBase);
-
     const btnPlate = new THREE.Mesh(new THREE.BoxGeometry(11.8, 0.4, 11.8), metalMat);
     btnPlate.position.y = 3.65;
-    btnPlate.castShadow = true;
     buttonGroup.add(btnPlate);
 
     const capGroup = new THREE.Group();
     capGroup.position.y = 3.8;
-    const capMesh = new THREE.Mesh(new THREE.CylinderGeometry(3.4, 3.8, 3.2, 32), new THREE.MeshStandardMaterial({ color: 0xe3604b, roughness: 0.35 }));
+    const capMesh = new THREE.Mesh(new THREE.CylinderGeometry(3.4, 3.8, 3.2, 32), new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.35 }));
     capMesh.position.y = 1.6;
-    capMesh.castShadow = true;
     capGroup.add(capMesh);
 
     const hitBox = new THREE.Mesh(new THREE.BoxGeometry(14, 10, 14), new THREE.MeshBasicMaterial({ visible: false }));
     hitBox.position.y = 4;
     capGroup.add(hitBox);
-
     buttonGroup.add(capGroup);
     rootGroup.add(buttonGroup);
 
@@ -1589,7 +955,6 @@ ${tmpl.logic}
       const rGroup = new THREE.Group();
       const body = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 6.2, 16), new THREE.MeshStandardMaterial({ color: 0xdec6a5, roughness: 0.6 }));
       body.rotation.z = Math.PI / 2;
-      body.castShadow = true;
       rGroup.add(body);
       colorBands.forEach((c, idx) => {
         const band = new THREE.Mesh(new THREE.CylinderGeometry(1.23, 1.23, 0.6, 16), new THREE.MeshBasicMaterial({ color: c }));
@@ -1599,11 +964,11 @@ ${tmpl.logic}
       });
       return rGroup;
     }
-    const pulldownResistor = createResistor([0x603813, 0x000000, 0xe67e22, 0xd4af37]); // 10k 풀다운 저항
+    const pulldownResistor = createResistor([0x603813, 0x000000, 0xe67e22, 0xd4af37]); // 10k
     pulldownResistor.position.set(22, 8.2, -1);
     rootGroup.add(pulldownResistor);
 
-    const ledResistor = createResistor([0xd93829, 0xd93829, 0x603813, 0xd4af37]); // 220 저항
+    const ledResistor = createResistor([0xd93829, 0xd93829, 0x603813, 0xd4af37]); // 220
     ledResistor.position.set(22, 8.2, 10);
     rootGroup.add(ledResistor);
 
@@ -1613,10 +978,8 @@ ${tmpl.logic}
     const ledMat = new THREE.MeshStandardMaterial({ color: 0x771111, roughness: 0.15, transparent: true, opacity: 0.88, emissive: 0x000000 });
     const ledDome = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.4, 5, 24), ledMat);
     ledDome.position.y = 3.5;
-    ledDome.castShadow = true;
     const ledCap = new THREE.Mesh(new THREE.SphereGeometry(2.4, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), ledMat);
     ledCap.position.y = 6;
-    ledCap.castShadow = true;
     ledGroup.add(ledDome, ledCap);
 
     const ledLight = new THREE.PointLight(0xff3322, 0, 25);
@@ -1624,195 +987,342 @@ ${tmpl.logic}
     ledGroup.add(ledLight);
     rootGroup.add(ledGroup);
 
-    // 점퍼 전선들
-    const wireCurves = {};
-    function createWire(id, points, hexColor) {
+    // ⚡ 전선 3D 메쉬들 (초기에는 빠져있음!)
+    const wires = {};
+    function buildWireMesh(id, points, hexColor) {
       const curve = new THREE.CatmullRomCurve3(points);
-      wireCurves[id] = curve;
       const wire = new THREE.Mesh(
-        new THREE.TubeGeometry(curve, 32, 0.55, 8, false),
+        new THREE.TubeGeometry(curve, 32, 0.6, 8, false),
         new THREE.MeshStandardMaterial({ color: hexColor, roughness: 0.5 })
       );
-      wire.castShadow = true;
+      wire.visible = false;
       rootGroup.add(wire);
+      wires[id] = wire;
       return wire;
     }
 
-    const wire5V = createWire('5v', [new THREE.Vector3(-0.5, 3.5, 4), new THREE.Vector3(5, 14, -2), new THREE.Vector3(14, 13, -12), new THREE.Vector3(17, 6, -12)], 0xd64a3a);
-    const wireD2 = createWire('d2', [new THREE.Vector3(-36, 3.5, 9), new THREE.Vector3(-20, 16, 2), new THREE.Vector3(12, 14, -8), new THREE.Vector3(26, 6, -8)], 0x3b74db);
-    const wireGnd = createWire('gnd', [new THREE.Vector3(-36, 3.5, 17), new THREE.Vector3(-15, 17, 12), new THREE.Vector3(15, 14, 3), new THREE.Vector3(26, 6, 3)], 0x222a3d);
-    const wireD13 = createWire('d13', [new THREE.Vector3(-36, 3.5, -9), new THREE.Vector3(-18, 15, -4), new THREE.Vector3(10, 14, 8), new THREE.Vector3(18, 6, 8)], 0xe89528);
+    buildWireMesh('d13', [new THREE.Vector3(-36, 3.5, -9), new THREE.Vector3(-18, 15, -4), new THREE.Vector3(10, 14, 8), new THREE.Vector3(18, 6, 8)], 0xf97316); // 주황 D13
+    buildWireMesh('gnd1', [new THREE.Vector3(-36, 3.5, 17), new THREE.Vector3(-15, 17, 12), new THREE.Vector3(18, 14, 20), new THREE.Vector3(28, 6, 20)], 0x334155); // 검정 GND
+    buildWireMesh('5v', [new THREE.Vector3(-0.5, 3.5, 4), new THREE.Vector3(5, 14, -2), new THREE.Vector3(14, 13, -12), new THREE.Vector3(17, 6, -12)], 0xef4444);  // 빨강 5V
+    buildWireMesh('d2', [new THREE.Vector3(-36, 3.5, 9), new THREE.Vector3(-20, 16, 2), new THREE.Vector3(12, 14, -8), new THREE.Vector3(26, 6, -8)], 0x3b82f6);    // 파랑 D2
+    buildWireMesh('pull', [new THREE.Vector3(22, 6, 3), new THREE.Vector3(15, 14, 3), new THREE.Vector3(-15, 17, 12), new THREE.Vector3(-36, 3.5, 17)], 0x334155); // 풀다운 GND
 
-    // 전기 요정 파티클
-    const particleCount = 24;
-    const pGeo = new THREE.SphereGeometry(0.5, 8, 8);
-    const pMat = new THREE.MeshBasicMaterial({ color: 0xffe600 });
-    const electricParticles = [];
-
-    for (let i = 0; i < particleCount; i++) {
-      const p = new THREE.Mesh(pGeo, pMat);
-      p.visible = false;
-      rootGroup.add(p);
-      electricParticles.push({
-        mesh: p,
-        wire: i < 12 ? '5v' : 'd2',
-        t: Math.random()
-      });
+    // 🎯 클릭 가능한 결선 소켓 타겟 핀들 (Pin Sockets)
+    const pinSockets = [];
+    function makePinSocket(id, pos, label) {
+      const geo = new THREE.CylinderGeometry(1.2, 1.2, 2.5, 16);
+      const mat = new THREE.MeshBasicMaterial({ color: 0xfacc15, wireframe: true });
+      const pin = new THREE.Mesh(geo, mat);
+      pin.position.copy(pos);
+      pin.userData = { id, label };
+      rootGroup.add(pin);
+      pinSockets.push(pin);
     }
 
-    function updateParticles(delta, isFlowing) {
-      if (!isFlowing || !state.wireConnected) {
-        electricParticles.forEach(p => p.mesh.visible = false);
-        return;
-      }
-      electricParticles.forEach(p => {
-        p.mesh.visible = true;
-        p.t += delta * 1.8;
-        if (p.t > 1) p.t = 0;
-        const curve = wireCurves[p.wire];
-        if (curve) {
-          p.mesh.position.copy(curve.getPointAt(p.t));
-          if (p.wire === 'd2') p.mesh.position.y += wireD2.position.y;
-        }
-      });
-    }
+    makePinSocket('soc-d13', new THREE.Vector3(-36, 5, -9), 'Arduino D13 핀');
+    makePinSocket('soc-led-in', new THREE.Vector3(18, 7, 8), 'LED 보호저항 입력');
+    makePinSocket('soc-gnd', new THREE.Vector3(-36, 5, 17), 'Arduino GND 접지');
+    makePinSocket('soc-led-gnd', new THREE.Vector3(28, 7, 20), 'LED 음극 접지');
 
-    // 전선 꽂기/뽑기 & 저항 뽑기 이벤트
-    const btnToggleWire = document.getElementById('btn-toggle-wire');
-    btnToggleWire.addEventListener('click', () => {
-      state.wireConnected = !state.wireConnected;
-      if (state.wireConnected) {
-        btnToggleWire.classList.remove('active-action');
-        btnToggleWire.textContent = '🔌 전선 쏙 뽑기';
-        wireD2.position.y = 0;
-        logConsole('D2 점퍼선 결선 완료! (신호 감지 정상)');
-        guideBanner.className = 'guide-banner';
-        guideText.textContent = '착! D2 전선이 다시 꽂혔습니다!';
-      } else {
-        btnToggleWire.classList.add('active-action');
-        btnToggleWire.textContent = '🔌 전선 콕 꽂기';
-        wireD2.position.y = 12;
-        logConsole('경고: D2 신호선 분리됨! (버튼을 눌러도 신호 전달 불가)', 'warn');
-        guideBanner.className = 'guide-banner alert-pulse';
-        guideText.textContent = '⚠️ D2 전선이 뽑혀있습니다! 버튼을 눌러도 아두이노가 신호를 읽지 못합니다.';
-        updateLed(false);
-      }
-    });
-
-    const btnToggleResistor = document.getElementById('btn-toggle-resistor');
-    btnToggleResistor.addEventListener('click', () => {
-      state.resistorConnected = !state.resistorConnected;
-      if (state.resistorConnected) {
-        btnToggleResistor.classList.remove('active-action');
-        btnToggleResistor.textContent = '👻 풀다운 저항 뽑기 (플로팅 실험)';
-        pulldownResistor.position.y = 8.2;
-        logConsole('10kΩ 풀다운 저항 복구: D2 핀 접지 전위(0V) 안정화.');
-        guideBanner.className = 'guide-banner';
-        guideText.textContent = '풀다운 저항이 다시 결선되어 0V로 안정화되었습니다.';
-        updateLed(false);
-      } else {
-        btnToggleResistor.classList.add('active-action');
-        btnToggleResistor.textContent = '🛡️ 저항 다시 꽂기';
-        pulldownResistor.position.y = 24;
-        logConsole('플로팅(Floating) 발생: 10kΩ 저항 부재로 주변 정전기 유입!', 'warn');
-        guideBanner.className = 'guide-banner alert-pulse';
-        guideText.textContent = '👻 플로팅 현상 발동! 저항이 없어 정전기로 인해 LED가 지지직 깜빡입니다!';
-      }
-    });
+    makePinSocket('soc-5v', new THREE.Vector3(-0.5, 5, 4), 'Arduino 5V 전원');
+    makePinSocket('soc-btn-l', new THREE.Vector3(17, 7, -12), '버튼 좌측 단자');
+    makePinSocket('soc-d2', new THREE.Vector3(-36, 5, 9), 'Arduino D2 입력');
+    makePinSocket('soc-btn-r', new THREE.Vector3(26, 7, -8), '버튼 우측 단자');
 
     /* =====================================================================
-       5. 버튼 인터랙션 & 미션 자동 통과 감지 루프
+       4. 서바이벌 게임 루프 & 미션 상태 엔진
        ===================================================================== */
+    let activeWireTool = null; // '5v' | 'd2' | 'd13' | 'gnd'
+    let currentStage = 1;
+    let timerValue = 45.0;
+    let timerRunning = false;
+    let timerInterval = null;
+    let selectedSocket = null;
+
+    const connectedCircuits = {
+      d13: false,
+      gnd1: false,
+      '5v': false,
+      d2: false,
+      pull: false
+    };
+
+    function logMsg(msg, type = '') {
+      const logs = document.getElementById('console-logs');
+      const d = document.createElement('div');
+      if (type === 'warn') d.className = 'log-warn';
+      if (type === 'succ') d.className = 'log-succ';
+      d.textContent = `> ${msg}`;
+      logs.appendChild(d);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    // 전선 공구함 선택
+    document.querySelectorAll('.wire-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.wire-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        activeWireTool = btn.dataset.wire;
+        document.getElementById('active-wire-label').textContent = `선택: ${btn.textContent.trim()}`;
+        document.getElementById('emergency-banner').className = 'emergency-banner';
+        document.getElementById('emg-text').textContent = `[${btn.textContent.trim()}]을(를) 집었습니다! 3D 화면의 반짝이는 핀 2곳을 차례로 클릭해 연결하세요!`;
+        playClickSound();
+      });
+    });
+
+    // 핀 소켓 클릭 & 배선 결선
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
-    let isPointerDownOnBtn = false;
-    let capStartY = 3.8;
-    let capTargetY = 3.8;
-    let capAnimProgress = 1;
-    let capFromY = 3.8;
-    let holdInterval = null;
 
-    function setButtonDepressed(isDown) {
-      if (state.buttonPressed === isDown) return;
-      state.buttonPressed = isDown;
-      capFromY = capGroup.position.y;
-      capTargetY = isDown ? (capStartY - 1.3) : capStartY;
-      capAnimProgress = 0;
-      onButtonStateChange(isDown);
-    }
+    function onCanvasClick(e) {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
-    function onButtonStateChange(isDown) {
-      if (!state.running) {
-        guideBanner.className = 'guide-banner alert-pulse';
-        guideText.textContent = '⚠️ 코드가 아직 실행되지 않았습니다! 오른쪽 [실행하기] 버튼을 먼저 눌러주세요!';
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects([...pinSockets, hitBox], true);
+      if (hits.length === 0) return;
+
+      const hitObj = hits[0].object;
+
+      // 만약 3단계 버튼 누르기 상태라면
+      if (hitObj === hitBox) {
+        onButtonPressInSurvival();
         return;
       }
 
-      if (!state.wireConnected) {
-        logConsole('신호 차단: D2 전선이 뽑혀있어 감지 불가!', 'warn');
+      if (!activeWireTool) {
+        alert('먼저 왼쪽 아래 공구함에서 꽂을 전선을 선택해주세요!');
         return;
       }
 
-      logConsole(`D2 신호 입력: ${isDown ? 'HIGH (버튼 눌림)' : 'LOW (버튼 놓임)'}`, isDown ? 'high' : 'low');
+      const socketId = hitObj.userData.id;
+      playClickSound();
 
-      if (state.mode === 'hold') {
-        updateLed(isDown);
-        highlightCodeLine(isDown ? 7 : 8);
+      if (!selectedSocket) {
+        selectedSocket = socketId;
+        hitObj.material.color.setHex(0x22c55e);
+        logMsg(`[결선 시작]: ${hitObj.userData.label} 선택됨. 연결할 반대편 핀을 클릭하세요.`);
+      } else {
+        const start = selectedSocket;
+        const end = socketId;
+        selectedSocket = null;
+        pinSockets.forEach(s => s.material.color.setHex(0xfacc15));
 
-        // 🎯 [1단계 미션 감지]: 3초 누르고 있기
-        if (isDown && !missions.m1.completed) {
-          missions.m1.holdSeconds = 0;
-          const fillBar = document.getElementById('m1-fill');
-          clearInterval(holdInterval);
-          holdInterval = setInterval(() => {
-            missions.m1.holdSeconds += 0.1;
-            fillBar.style.width = `${Math.min(100, (missions.m1.holdSeconds / 3.0) * 100)}%`;
-            if (missions.m1.holdSeconds >= 3.0) {
-              clearInterval(holdInterval);
-              triggerStageClear(1);
-            }
-          }, 100);
-        } else if (!isDown && !missions.m1.completed) {
-          clearInterval(holdInterval);
-          document.getElementById('m1-fill').style.width = '0%';
-        }
+        validateAndWire(start, end, activeWireTool);
+      }
+    }
+    canvas.addEventListener('pointerdown', onCanvasClick);
 
-      } else if (state.mode === 'toggle') {
-        if (isDown && !state.toggleLast) {
-          state.toggleLit = !state.toggleLit;
-          updateLed(state.toggleLit);
-          highlightCodeLine(9);
-          logConsole(`[토글 반전] LED 상태: ${state.toggleLit ? 'ON' : 'OFF'}`);
-        } else if (!isDown) {
-          // 🎯 [★ 2단계 미션 감지]: 손을 뗐는데도 LED가 켜져 있는 상태 달성!
-          if (state.toggleLit && !missions.m2.completed) {
-            triggerStageClear(2);
-          }
-        }
-        state.toggleLast = isDown;
+    // 배선 유효성 검사 & 합선 판별!
+    function validateAndWire(p1, p2, wireType) {
+      const pair = [p1, p2].sort().join('::');
+
+      // 💥 치명적 합선(쇼트) 판별: 5V와 GND를 보호저항 없이 직결하는 경우!
+      if ((p1 === 'soc-5v' && p2 === 'soc-gnd') || (p1 === 'soc-gnd' && p2 === 'soc-5v')) {
+        triggerExplosion('5V 전원과 GND 접지를 저항 없이 다이렉트로 쇼트시켰습니다! 메인보드가 파괴되었습니다!');
+        return;
       }
 
-      // 🎯 [3단계 미션 감지]: 3초 안 3회 연타
-      if (isDown && !missions.m3.completed) {
-        const nowTime = performance.now();
-        missions.m3.clickTimestamps.push(nowTime);
-        missions.m3.clickTimestamps = missions.m3.clickTimestamps.filter(t => nowTime - t <= 3000);
-        const cnt = missions.m3.clickTimestamps.length;
-        document.getElementById('m3-fill').style.width = `${Math.min(100, (cnt / 3) * 100)}%`;
-        if (cnt >= 3) {
-          triggerStageClear(3);
+      // 1단계 올바른 배선: D13 <-> LED 입력
+      if (pair === 'soc-d13::soc-led-in' && wireType === 'd13') {
+        connectedCircuits.d13 = true;
+        wires['d13'].visible = true;
+        document.getElementById('chk-d13').className = 'check-item done';
+        document.getElementById('chk-d13').textContent = '✅ D13 핀 ➔ LED 보호저항 (결선 완료)';
+        playSnapSound();
+        logMsg('D13 신호선 연결 성공!', 'succ');
+        return;
+      }
+
+      // 1단계 올바른 배선: GND <-> LED 접지
+      if (pair === 'soc-gnd::soc-led-gnd' && wireType === 'gnd') {
+        connectedCircuits.gnd1 = true;
+        wires['gnd1'].visible = true;
+        document.getElementById('chk-gnd1').className = 'check-item done';
+        document.getElementById('chk-gnd1').textContent = '✅ GND 핀 ➔ LED 음극 접지 (결선 완료)';
+        playSnapSound();
+        logMsg('LED 접지선 연결 성공!', 'succ');
+        return;
+      }
+
+      // 2단계 배선: 5V <-> 버튼 좌측
+      if (pair === 'soc-5v::soc-btn-l' && wireType === '5v') {
+        connectedCircuits['5v'] = true;
+        wires['5v'].visible = true;
+        document.getElementById('chk-5v').className = 'check-item done';
+        document.getElementById('chk-5v').textContent = '✅ 5V 핀 ➔ 버튼 좌측 (결선 완료)';
+        playSnapSound();
+        logMsg('5V 전원선 연결 성공!', 'succ');
+        return;
+      }
+
+      // 2단계 배선: D2 <-> 버튼 우측
+      if (pair === 'soc-btn-r::soc-d2' && wireType === 'd2') {
+        connectedCircuits.d2 = true;
+        wires['d2'].visible = true;
+        document.getElementById('chk-d2').className = 'check-item done';
+        document.getElementById('chk-d2').textContent = '✅ D2 핀 ➔ 버튼 우측 (결선 완료)';
+        playSnapSound();
+        logMsg('D2 입력선 연결 성공!', 'succ');
+        return;
+      }
+
+      // 잘못된 결선 시
+      playTone(200, 0.2, 'sawtooth', 0.2);
+      logMsg(`결선 실패: 해당 핀들 사이에는 [${wireType}] 전선이 맞지 않습니다!`, 'warn');
+    }
+
+    // 💥 합선 폭발 및 실패 처리
+    function triggerExplosion(reason) {
+      playExplodeSound();
+      clearInterval(timerInterval);
+      user.lives = Math.max(0, user.lives - 1);
+      updateLivesHUD();
+      saveUser();
+
+      document.getElementById('emergency-banner').className = 'emergency-banner alert-explosion';
+      document.getElementById('emg-text').textContent = '💥 폭발 발생! 잘못된 결선으로 회로가 타버렸습니다!';
+
+      document.getElementById('go-title').textContent = '💥 회로 폭발 발생!';
+      document.getElementById('go-desc').innerHTML = `${reason}<br><br>남은 목숨: <b>${user.lives}개</b>`;
+      document.getElementById('gameover-modal').style.display = 'flex';
+    }
+
+    function triggerTimeout() {
+      playExplodeSound();
+      clearInterval(timerInterval);
+      user.lives = Math.max(0, user.lives - 1);
+      updateLivesHUD();
+      saveUser();
+
+      document.getElementById('go-title').textContent = '⏱️ 시간 초과 (TIME OVER)';
+      document.getElementById('go-desc').innerHTML = `제한시간 내에 회로를 완성하지 못했습니다!<br><br>남은 목숨: <b>${user.lives}개</b>`;
+      document.getElementById('gameover-modal').style.display = 'flex';
+    }
+
+    document.getElementById('btn-retry-stage').addEventListener('click', () => {
+      document.getElementById('gameover-modal').style.display = 'none';
+      if (user.lives <= 0) {
+        alert('목숨을 모두 소진했습니다! 1단계부터 처음으로 리셋됩니다.');
+        user.lives = 3;
+        user.currentStage = 1;
+        saveUser();
+        location.reload();
+      } else {
+        startStage(currentStage);
+      }
+    });
+
+    function updateLivesHUD() {
+      const hearts = ['🖤🖤🖤', '❤️🖤🖤', '❤️❤️🖤', '❤️❤️❤️'];
+      document.getElementById('lives-pill').textContent = hearts[user.lives] || '🖤🖤🖤';
+    }
+
+    /* =====================================================================
+       5. 단계별 서바이벌 실행 및 검증
+       ===================================================================== */
+    function startStage(stage) {
+      currentStage = stage;
+      user.currentStage = stage;
+      saveUser();
+      updateLivesHUD();
+
+      // UI 갱신
+      document.getElementById('current-stage-tag').textContent = `STAGE ${stage} / 3`;
+      for (let s = 1; s <= 3; s++) {
+        const card = document.getElementById(`card-stage-${s}`);
+        card.className = 'stage-card' + (s === stage ? ' current' : (s < stage ? ' completed' : ''));
+        const btn = document.getElementById(`btn-test-${s}`);
+        if (btn) btn.style.display = s === stage ? 'flex' : 'none';
+      }
+
+      // 타이머 시작 (45초)
+      timerValue = stage === 3 ? 30.0 : 45.0;
+      clearInterval(timerInterval);
+      document.getElementById('timer-pill').classList.remove('urgent');
+
+      timerInterval = setInterval(() => {
+        timerValue -= 0.1;
+        if (timerValue <= 10.0) {
+          document.getElementById('timer-pill').classList.add('urgent');
+          playTone(400, 0.03, 'sine', 0.1);
+        }
+        if (timerValue <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById('timer-text').textContent = '0.0s';
+          triggerTimeout();
+          return;
+        }
+        document.getElementById('timer-text').textContent = `${timerValue.toFixed(1)}s`;
+      }, 100);
+
+      logMsg(`--- [STAGE ${stage} 서바이벌 시작 (제한시간 ${timerValue}초)] ---`);
+    }
+
+    // 1단계 테스트 검증
+    document.getElementById('btn-test-1').addEventListener('click', () => {
+      if (connectedCircuits.d13 && connectedCircuits.gnd1) {
+        clearInterval(timerInterval);
+        lightUpLED(true);
+        playFanfareSound();
+        logMsg('🎉 1단계 완벽 성공! LED 회로 정상 작동 확인!', 'succ');
+        triggerPrizeModal(1, '1,000 MISO', '2,000 MISO', 1000);
+      } else {
+        playTone(180, 0.3, 'sawtooth', 0.25);
+        logMsg('테스트 실패: D13 전선이나 GND 전선이 빠져있습니다!', 'warn');
+        document.getElementById('emg-text').textContent = '회로가 미완성입니다! D13과 GND 전선을 둘 다 연결하세요!';
+      }
+    });
+
+    // 2단계 테스트 검증
+    document.getElementById('btn-test-2').addEventListener('click', () => {
+      if (connectedCircuits['5v'] && connectedCircuits.d2) {
+        clearInterval(timerInterval);
+        wires['pull'].visible = true; // 풀다운 자동 안착
+        playFanfareSound();
+        logMsg('🎉 2단계 스위치 풀다운 회로 완성 성공! 쇼트 없음!', 'succ');
+        triggerPrizeModal(2, '2,000 MISO', '3,000 MISO', 2000);
+      } else {
+        playTone(180, 0.3, 'sawtooth', 0.25);
+        logMsg('테스트 실패: 5V 전원 또는 D2 입력선이 결선되지 않았습니다!', 'warn');
+      }
+    });
+
+    // 3단계 모스부호 입력 처리
+    let morseInputs = [];
+    let lastPressTime = 0;
+    document.getElementById('btn-test-3').addEventListener('click', () => {
+      morseInputs = [];
+      logMsg('시퀀스 입력 대기 중: 3D 빨간 버튼을 [톡(짧게) - 톡(짧게) - 꾹(1초간)] 누르세요!');
+      document.getElementById('emg-text').textContent = '버튼을 [톡 - 톡 - 꾹(1초)] 순서대로 입력하세요!';
+    });
+
+    function onButtonPressInSurvival() {
+      playClickSound();
+      lightUpLED(true);
+      setTimeout(() => lightUpLED(false), 200);
+
+      if (currentStage === 3) {
+        const now = performance.now();
+        morseInputs.push(now);
+        logMsg(`버튼 신호 감지 (${morseInputs.length}회차)`);
+        if (morseInputs.length >= 3) {
+          clearInterval(timerInterval);
+          playFanfareSound();
+          logMsg('🏆 3단계 폭탄 해제 및 최고 상금 3,000미소 완전 정복!', 'succ');
+          triggerPrizeModal(3, '3,000 MISO', null, 3000);
         }
       }
     }
 
-    function updateLed(on) {
-      state.ledLit = on;
+    function lightUpLED(on) {
       if (on) {
         ledMat.emissive.setHex(0xff2211);
-        ledMat.emissiveIntensity = 1.2;
-        ledLight.intensity = 1.6;
-        lLedMat.emissive.setHex(0xe89528);
-        lLedMat.emissiveIntensity = 1.0;
+        ledMat.emissiveIntensity = 1.3;
+        ledLight.intensity = 2.0;
+        lLedMat.emissive.setHex(0xffa040);
+        lLedMat.emissiveIntensity = 1.2;
       } else {
         ledMat.emissive.setHex(0x000000);
         ledMat.emissiveIntensity = 0;
@@ -1822,154 +1332,69 @@ ${tmpl.logic}
       }
     }
 
-    function highlightCodeLine(lineIdx) {
-      document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
-      const target = document.querySelector(`.code-line[data-line="${lineIdx}"]`);
-      if (target) target.classList.add('active');
-    }
+    /* =====================================================================
+       6. 상금 수령 증서 및 피 말리는 선택의 딜레마
+       ===================================================================== */
+    const prizeModal = document.getElementById('prize-modal-overlay');
 
-    function clearCodeHighlights() {
-      document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
-    }
+    function triggerPrizeModal(stageNum, amountStr, nextAmountStr, numVal) {
+      triggerConfetti(80);
+      document.getElementById('cert-stage-tag').textContent = `⚡ [STAGE ${stageNum}] 서바이벌 통과 증서`;
+      document.getElementById('cert-amount').textContent = amountStr;
+      document.getElementById('cert-username').textContent = `${user.name} 도전자`;
+      document.getElementById('cert-code').textContent = user.certCode || 'MISO-SURVIVAL-8A7F';
 
-    function onPointerDown(e) {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      const actions = document.getElementById('dilemma-actions');
+      actions.innerHTML = '';
 
-      raycaster.setFromCamera(mouse, camera);
-      const hits = raycaster.intersectObjects([hitBox, capMesh, btnPlate, wireD2], true);
-      if (hits.length > 0) {
-        if (hits[0].object === wireD2) {
-          btnToggleWire.click();
-          return;
-        }
-        isPointerDownOnBtn = true;
-        controls.enabled = false;
-        setButtonDepressed(true);
-      }
-    }
-
-    function onPointerUp() {
-      if (isPointerDownOnBtn) {
-        isPointerDownOnBtn = false;
-        controls.enabled = true;
-        setButtonDepressed(false);
-      }
-    }
-
-    canvas.addEventListener('pointerdown', onPointerDown);
-    window.addEventListener('pointerup', onPointerUp);
-    window.addEventListener('pointercancel', onPointerUp);
-
-    // 3D 앵커 콜아웃
-    const callouts = [
-      { id: 'btn', pos: new THREE.Vector3(22, 11, -10), title: '택트 버튼 (입력)', desc: '누르면 5V HIGH 공급' },
-      { id: 'r_pull', pos: new THREE.Vector3(22, 11, -1), title: '10kΩ 풀다운 저항', desc: '평상시 0V LOW 유지' },
-      { id: 'led', pos: new THREE.Vector3(30, 13, 18), title: 'LED 및 220Ω 저항', desc: 'D13 출력으로 점등' }
-    ];
-
-    const overlay = document.getElementById('callout-overlay');
-    callouts.forEach(c => {
-      const el = document.createElement('div');
-      el.className = 'callout-card';
-      el.id = `callout-${c.id}`;
-      el.innerHTML = `<div class="callout-title">${c.title}</div><div class="callout-desc">${c.desc}</div>`;
-      overlay.appendChild(el);
-    });
-
-    function updateCallouts() {
-      const w = container.clientWidth;
-      const h = container.clientHeight;
-      const p = new THREE.Vector3();
-      callouts.forEach(c => {
-        p.copy(c.pos);
-        if (c.id === 'r_pull') p.y += (state.resistorConnected ? 0 : 16);
-        p.project(camera);
-        const el = document.getElementById(`callout-${c.id}`);
-        if (p.z > 1) {
-          el.style.opacity = '0';
-          return;
-        }
-        el.style.opacity = '1';
-        el.style.left = `${Math.round((p.x * 0.5 + 0.5) * w)}px`;
-        el.style.top = `${Math.round((-(p.y * 0.5) + 0.5) * h - 10)}px`;
+      // 선택 1: 안전하게 수령하기
+      const btnClaim = document.createElement('button');
+      btnClaim.className = 'btn-claim-now';
+      btnClaim.innerHTML = `📸 지금 이 화면 캡처하고 [${amountStr}] 안전하게 수령하기`;
+      btnClaim.addEventListener('click', () => {
+        alert(`[${amountStr}] 수령 확정!\n\n화면을 캡처하여 댓글로 올리시면 1회에 한하여 상금을 지급합니다!`);
+        prizeModal.style.display = 'none';
       });
+      actions.appendChild(btnClaim);
+
+      // 선택 2: 목숨 걸고 상위 단계 도전하기!
+      if (nextAmountStr) {
+        const btnNext = document.createElement('button');
+        btnNext.className = 'btn-gamble-next';
+        btnNext.innerHTML = `🔥 [${amountStr}] 포기하고 [${nextAmountStr}] 서바이벌 도전!`;
+        btnNext.addEventListener('click', () => {
+          if (confirm(`⚠️ [주의: 한 번 포기하면 되돌릴 수 없습니다!]\n\n현재의 ${amountStr}를 완전히 포기하고 상위 단계(${nextAmountStr})에 도전하시겠습니까?\n실패 시 상금은 0원이 됩니다!`)) {
+            prizeModal.style.display = 'none';
+            startStage(stageNum + 1);
+          }
+        });
+        const warn = document.createElement('div');
+        warn.className = 'forfeit-warning-text';
+        warn.textContent = `* 경고: 다음 단계에서 실패하면 이전 상금(${amountStr})은 완전히 소멸됩니다!`;
+        actions.appendChild(btnNext);
+        actions.appendChild(warn);
+      } else {
+        const win3 = document.createElement('div');
+        win3.style.color = '#4ade80';
+        win3.style.fontFamily = 'var(--font-round)';
+        win3.style.fontSize = '14px';
+        win3.style.marginTop = '6px';
+        win3.textContent = '👑 서바이벌 최종 정복! 지금 즉시 캡처하여 3,000 미소를 쟁취하세요!';
+        actions.appendChild(win3);
+      }
+
+      prizeModal.style.display = 'flex';
     }
 
     /* =====================================================================
-       6. 오디오 및 팡파르 사운드 (Web Audio API)
+       7. 렌더링 루프 & 폭죽
        ===================================================================== */
-    let audioCtx = null;
-    function initAudio() {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-    }
-
-    function playTone(freq, duration = 0.08, type = 'sine', gainVal = 0.18) {
-      initAudio();
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      const now = audioCtx.currentTime;
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, now);
-      gain.gain.setValueAtTime(gainVal, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + duration + 0.01);
-    }
-
-    function playFanfareSound() {
-      initAudio();
-      const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
-      notes.forEach((f, idx) => {
-        setTimeout(() => playTone(f, 0.22, 'triangle', 0.25), idx * 100);
-      });
-    }
-
-    /* =====================================================================
-       7. 메인 렌더링 루프
-       ===================================================================== */
-    let lastTime = performance.now();
-    let floatingNoiseTimer = 0;
-
-    function animate(now) {
+    function animate() {
       requestAnimationFrame(animate);
-      const delta = (now - lastTime) / 1000;
-      lastTime = now;
-
-      if (capAnimProgress < 1) {
-        capAnimProgress += delta / 0.09;
-        if (capAnimProgress >= 1) {
-          capAnimProgress = 1;
-          capGroup.position.y = capTargetY;
-        } else {
-          const t = 1 - Math.pow(1 - capAnimProgress, 3);
-          capGroup.position.y = capFromY + (capTargetY - capFromY) * t;
-        }
-      }
-
-      // 플로팅 현상
-      if (!state.resistorConnected && state.running && !state.buttonPressed) {
-        floatingNoiseTimer += delta;
-        if (floatingNoiseTimer > 0.07) {
-          floatingNoiseTimer = 0;
-          const randomGlitch = Math.random() > 0.5;
-          updateLed(randomGlitch);
-        }
-      }
-
-      const isFlowing = state.running && ((state.buttonPressed && state.mode === 'hold') || (state.ledLit && state.mode === 'toggle'));
-      updateParticles(delta, isFlowing);
-
       controls.update();
       renderer.render(scene, camera);
-      updateCallouts();
     }
-    requestAnimationFrame(animate);
+    animate();
 
     window.addEventListener('resize', () => {
       camera.aspect = container.clientWidth / container.clientHeight;
@@ -1977,12 +1402,9 @@ ${tmpl.logic}
       renderer.setSize(container.clientWidth, container.clientHeight);
     });
 
-    /* =====================================================================
-       8. 폭죽 파티클 (Canvas Confetti)
-       ===================================================================== */
     const confCanvas = document.getElementById('confetti-canvas');
     const confCtx = confCanvas.getContext('2d');
-    let confettiParticles = [];
+    let confetti = [];
 
     function resizeConfetti() {
       confCanvas.width = window.innerWidth;
@@ -1991,18 +1413,18 @@ ${tmpl.logic}
     window.addEventListener('resize', resizeConfetti);
     resizeConfetti();
 
-    function triggerConfetti(count = 80) {
-      const colors = ['#ff5757', '#ffde59', '#5271ff', '#7ed957', '#ff914d', '#a855f7', '#f59e0b'];
-      for (let i = 0; i < count; i++) {
-        confettiParticles.push({
+    function triggerConfetti(cnt = 70) {
+      const cols = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#f43f5e'];
+      for (let i = 0; i < cnt; i++) {
+        confetti.push({
           x: window.innerWidth * 0.5 + (Math.random() - 0.5) * 200,
-          y: window.innerHeight * 0.35 + (Math.random() - 0.5) * 80,
+          y: window.innerHeight * 0.4,
           vx: (Math.random() - 0.5) * 14,
-          vy: -Math.random() * 11 - 5,
-          size: Math.random() * 8 + 6,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          rotation: Math.random() * 360,
-          vr: (Math.random() - 0.5) * 10,
+          vy: -Math.random() * 10 - 4,
+          size: Math.random() * 8 + 5,
+          color: cols[Math.floor(Math.random() * cols.length)],
+          rot: Math.random() * 360,
+          vrot: (Math.random() - 0.5) * 10,
           alpha: 1
         });
       }
@@ -2011,27 +1433,20 @@ ${tmpl.logic}
     function renderConfetti() {
       requestAnimationFrame(renderConfetti);
       confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
-      if (confettiParticles.length === 0) return;
-
-      confettiParticles.forEach((p) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.25;
-        p.rotation += p.vr;
-        p.alpha -= 0.008;
-
+      if (confetti.length === 0) return;
+      confetti.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.vy += 0.25; p.rot += p.vrot; p.alpha -= 0.008;
         confCtx.save();
         confCtx.globalAlpha = Math.max(0, p.alpha);
         confCtx.fillStyle = p.color;
         confCtx.translate(p.x, p.y);
-        confCtx.rotate((p.rotation * Math.PI) / 180);
+        confCtx.rotate((p.rot * Math.PI) / 180);
         confCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
         confCtx.restore();
       });
-
-      confettiParticles = confettiParticles.filter(p => p.alpha > 0 && p.y < window.innerHeight + 50);
+      confetti = confetti.filter(p => p.alpha > 0 && p.y < window.innerHeight + 50);
     }
-    requestAnimationFrame(renderConfetti);
+    renderConfetti();
   </script>
 </body>
 </html>
