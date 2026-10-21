@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>아두이노 서바이벌 배선 챌린지 — 1,000 ~ 3,000 미소 상금 쟁탈전</title>
+  <title>아두이노 서바이벌 배선 챌린지 — 1,000 ~ 5,000 미소 상금 쟁탈전</title>
   <meta name="description" content="제한시간 내에 직접 전선을 올바르게 연결하세요! 잘못 연결하면 합선 폭발! 성공하면 진짜 상금 미소 획득!" />
   
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
@@ -644,61 +644,75 @@
 
       .btn-mobile-toggle {
         display: inline-flex;
+        font-size: 10px !important;
+        padding: 3px 6px !important;
+        white-space: nowrap;
       }
 
       .hud-bar {
         top: 8px;
         left: 8px;
         right: 8px;
-        padding: 5px 10px;
-        gap: 6px;
+        padding: 4px 8px;
+        gap: 5px;
         justify-content: space-between;
         border-radius: 14px;
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: none;
       }
+      .hud-bar::-webkit-scrollbar { display: none; }
       .hud-title {
-        font-size: 12.5px;
-        gap: 4px;
+        display: none; /* 모바일에서 필수 상태창 공간 확보를 위해 타이틀 생략 */
+      }
+      #hud-hours-pill, #hud-attempts-pill {
+        font-size: 10px !important;
+        padding: 2px 6px !important;
+        white-space: nowrap;
       }
       .timer-pill {
-        padding: 3px 8px;
-        font-size: 11.5px;
+        padding: 2px 7px;
+        font-size: 11px;
         border-width: 1.5px;
+        white-space: nowrap;
       }
       .lives-pill {
         font-size: 11px;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
       }
 
       .wire-toolkit {
         bottom: 8px;
         left: 8px;
         right: 8px;
-        padding: 7px 10px;
+        padding: 6px 8px;
         border-radius: 14px;
       }
       .toolkit-title {
         font-size: 11px;
-        margin-bottom: 5px;
+        margin-bottom: 4px;
       }
       .wire-selector-grid {
         display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        gap: 2.5px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
       }
       .wire-btn {
-        padding: 4px 1px;
-        font-size: 8.5px;
+        padding: 6px 3px;
+        font-size: 10px;
+        font-weight: 700;
         justify-content: center;
-        border-radius: 6px;
-        min-height: 34px;
+        border-radius: 7px;
+        min-height: 32px;
       }
       .wire-btn .wire-dot {
-        width: 7px;
-        height: 7px;
+        width: 8px;
+        height: 8px;
       }
 
       .emergency-banner {
-        top: 48px;
+        top: 46px;
         bottom: auto;
         left: 8px;
         right: 8px;
@@ -754,8 +768,9 @@
       .prize-cert-card, .gameover-card, .auth-card {
         width: 92vw !important;
         max-width: 380px !important;
-        max-height: 85dvh !important;
+        max-height: 88dvh !important;
         overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
         padding: 18px 14px !important;
         margin: auto;
       }
@@ -883,9 +898,6 @@
           <button class="wire-btn" data-wire="bypass" id="btn-w-bypass">
             <span class="wire-dot" style="background: #a855f7;"></span>🟣 보라선(비상리셋)
           </button>
-          <button class="wire-btn" data-wire="gold" id="btn-w-gold">
-            <span class="wire-dot" style="background: #eab308;"></span>🟡 골드선(도깨비퇴치)
-          </button>
         </div>
       </div>
 
@@ -899,7 +911,7 @@
     <aside id="sidebar">
       <div class="mission-hud-hero">
         <div class="hud-stage-badge">
-          <span id="current-stage-tag">STAGE 1 / 5</span>
+          <span id="current-stage-tag">STAGE 1 / 4</span>
           <span style="color: #fbbf24;">💰 현재 상금: <b id="target-prize-text">1,000 MISO</b></span>
         </div>
         <h1 class="hud-stage-title" id="current-stage-title">🌱 1단계: 마법의 빨간 불(LED) 켜기</h1>
@@ -908,7 +920,7 @@
         </p>
       </div>
 
-      <!-- 5단계 서바이벌 미션 카드 리스트 -->
+      <!-- 4단계 서바이벌 미션 카드 리스트 -->
       <section class="mission-section">
         <!-- 1단계 -->
         <div class="stage-card current" id="card-stage-1">
@@ -955,14 +967,14 @@
           <button class="btn-test-circuit" id="btn-test-3" style="display: none;">🚨 3회 연속 누르기 도전 시작!</button>
         </div>
 
-        <!-- 4단계 (궁극의 최고 난이도 익스트림 미션) -->
+        <!-- 4단계 (최종 관문: 궁극의 최고 난이도 익스트림 미션) -->
         <div class="stage-card" id="card-stage-4" style="border-color: #8b5cf6;">
           <div class="stage-top-row">
-            <span class="stage-tag" style="background: #4c1d95; color: #e9d5ff;">☠️ 4단계 (궁극의 익스트림)</span>
-            <span class="stage-prize-tag" style="background: #eab308; color: #451a03; font-weight: 800;">👑 특별 상금 5,000 MISO</span>
+            <span class="stage-tag" style="background: #4c1d95; color: #e9d5ff;">☠️ 4단계 (최종 관문 익스트림)</span>
+            <span class="stage-prize-tag" style="background: #eab308; color: #451a03; font-weight: 800;">👑 최고 특별 상금 5,000 MISO</span>
           </div>
           <div class="stage-name" style="color: #f0abfc;">타임어택 폭탄 해제 & 과부하 긴급 방출</div>
-          <div class="stage-inst">25초 긴급 상황! [보라선]으로 비상 리셋을 꽂고, 🔴 빨간 단추를 4회 연속 초고속 탭하여 과부하 폭발을 막으세요!</div>
+          <div class="stage-inst">25초 긴급 상황! [보라선]으로 비상 리셋을 꽂고, 🔴 빨간 단추를 4회 연속 초고속 탭하여 과부하 폭발을 막으세요! 성공 시 최고 상금 5,000 미소 획득!</div>
           <div class="stage-checklist">
             <div class="check-item" id="chk-bypass">⚪ 1. [보라선] 비상 리셋선 ➔ 번쩍이는 보라 구멍 2곳 콕콕!</div>
             <div class="check-item" id="chk-rhythm">⚪ 2. [긴급 해제] 버튼 누른 후 3D 빨간 단추 4회 연타!</div>
@@ -971,47 +983,7 @@
             ☠️ 긴급 해제 시퀀스 시작 (5,000 미소 도전!)
           </button>
         </div>
-
-        <!-- 5단계 (고등학생 수준 과학 융합: 10만 미소 초극강 마스터 챌린지 - 어린이 눈높이 쉬운 용어) -->
-        <div class="stage-card" id="card-stage-5" style="border: 2px solid #ec4899; background: #1f142b;">
-          <div class="stage-top-row">
-            <span class="stage-tag" style="background: #831843; color: #fbcfe8;">🌌 5단계 (형·누나 과학 융합 마스터)</span>
-            <span class="stage-prize-tag" style="background: linear-gradient(135deg, #ec4899, #f59e0b); color: #fff; font-weight: 800;">💎 특별 상금 100,000 MISO</span>
-          </div>
-          <div class="stage-name" style="color: #f472b6;">불빛 지킴이 댐 저항 & 도깨비 전기(노이즈) 퇴치 작전</div>
-          <div class="stage-inst">
-            <b>[고등학교 물리 & 정보 융합을 어린이 눈높이로!]</b><br>
-            전기가 너무 세면 전구가 펑 터져요! <b>'옴의 법칙(전기 힘 나누기 퀴즈)'</b>으로 알맞은 댐 저항을 찾고, <b>'도깨비 전기를 쫓아내는 🟡 골드선'</b>을 이은 뒤, 단추를 심장박동처럼 <b>'똑... 똑... 똑... 0.5초 박자'</b>로 3번 탭하세요!
-          </div>
-
-          <!-- 1) 옴의 법칙 4지선다 퀴즈 영역 -->
-          <div id="physics-quiz-box" style="background: #120e1a; border: 1px solid #db2777; border-radius: 10px; padding: 10px; margin-top: 8px;">
-            <div style="font-size: 11.5px; font-weight: 700; color: #fbcfe8; margin-bottom: 5px;">
-              📐 Q1. 전구를 지키는 [댐 저항 크기]와 [무지개 색띠]는?
-            </div>
-            <div style="font-size: 10.5px; color: #cbd5e1; margin-bottom: 8px; line-height: 1.4;">
-              💡 <b>초등학생도 바로 푸는 계산 힌트:</b><br>
-              들어오는 전기 힘(5V) - 전구가 먹는 힘(2V) = 남는 힘 3V!<br>
-              남는 힘 3V ÷ 흐르는 전기(0.02A) = <b>몇 옴(Ω)일까요?</b><br>
-              (색띠 비밀: 갈색=1, 초록=5, 갈색=0 한 개 더 붙이기!)
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;" id="quiz-options-grid">
-              <button class="quiz-btn" data-ans="wrong">A) 100Ω [갈-검-갈]<br><span style="font-size: 9.5px; opacity: 0.8;">(힘을 덜 막아 전구가 위험해요)</span></button>
-              <button class="quiz-btn" data-ans="correct">B) 150Ω [갈-초-갈]<br><span style="font-size: 9.5px; opacity: 0.8;">(정답! 전구가 딱 안전해요)</span></button>
-              <button class="quiz-btn" data-ans="wrong">C) 330Ω [주-주-갈]<br><span style="font-size: 9.5px; opacity: 0.8;">(너무 많이 막아 너무 어두워요)</span></button>
-              <button class="quiz-btn" data-ans="wrong">D) 1kΩ [갈-검-빨]<br><span style="font-size: 9.5px; opacity: 0.8;">(불이 아예 안 켜져요)</span></button>
-            </div>
-          </div>
-
-          <div class="stage-checklist" style="margin-top: 8px;">
-            <div class="check-item" id="chk-ohm">⚪ 1. [퀴즈] 전구 보호 댐 저항 풀기 (150Ω 갈-초-갈)</div>
-            <div class="check-item" id="chk-gold">⚪ 2. [골드선] 도깨비 전기(플로팅) 쫓아내는 D3 황금선 잇기</div>
-            <div class="check-item" id="chk-debounce">⚪ 3. [박자] 단추 떨림(채터링) 막기! 0.5초 심장박동으로 3회 탭</div>
-          </div>
-          <button class="btn-test-circuit" id="btn-test-5" style="display: none; background: linear-gradient(135deg, #db2777, #9333ea); border-color: #be185d; color: #fff;">
-            🌌 10만 미소 초극강 마스터 검증 시작!
-          </button>
-        </div>
+      </section>
       </section>
 
       <!-- 하단 실시간 콘솔 -->
@@ -1452,7 +1424,6 @@
     buildWireMesh('d2', [new THREE.Vector3(-36, 3.5, 9), new THREE.Vector3(-20, 16, 2), new THREE.Vector3(12, 14, -8), new THREE.Vector3(26, 6, -8)], 0x3b82f6);    // 파랑 D2
     buildWireMesh('pull', [new THREE.Vector3(22, 6, 3), new THREE.Vector3(15, 14, 3), new THREE.Vector3(-15, 17, 12), new THREE.Vector3(-36, 3.5, 17)], 0x334155); // 풀다운 GND
     buildWireMesh('bypass', [new THREE.Vector3(-0.5, 3.5, 9.5), new THREE.Vector3(7, 15, 4.5), new THREE.Vector3(-0.5, 3.5, -0.5)], 0xa855f7); // 보라 바이패스 리셋선
-    buildWireMesh('gold', [new THREE.Vector3(-36, 3.5, 6), new THREE.Vector3(-18, 16, 0), new THREE.Vector3(12, 15, -4), new THREE.Vector3(26, 6, -4)], 0xfacc15); // 골드 마스터 D3 인터럽트 결선
 
     // 🎯 클릭 가능한 결선 소켓 타겟 핀들 (Pin Sockets & Mobile Touch Targets)
     const pinSockets = [];
@@ -1466,9 +1437,9 @@
       rootGroup.add(pin);
       pinSockets.push(pin);
 
-      // 모바일 손가락 터치용 투명 충돌 구체 (반경 3.8로 대폭 확대하여 터치 편의 극대화)
+      // 모바일 손가락 터치용 투명 충돌 구체 (반경 4.5로 확대하여 터치 편의 극대화)
       const hitTarget = new THREE.Mesh(
-        new THREE.SphereGeometry(3.8, 8, 8),
+        new THREE.SphereGeometry(4.5, 8, 8),
         new THREE.MeshBasicMaterial({ visible: false })
       );
       hitTarget.position.copy(pos);
@@ -1488,8 +1459,6 @@
     makePinSocket('soc-btn-r', new THREE.Vector3(26, 7, -8), '버튼 우측 단자');
     makePinSocket('soc-rst', new THREE.Vector3(-0.5, 5, 9.5), 'Arduino RESET 핀');
     makePinSocket('soc-gnd2', new THREE.Vector3(-0.5, 5, -0.5), 'Arduino GND 접지2');
-    makePinSocket('soc-d3', new THREE.Vector3(-36, 5, 6), 'Arduino D3 인터럽트 핀');
-    makePinSocket('soc-btn-branch', new THREE.Vector3(26, 7, -4), '버튼 인터럽트 분기 단자');
 
     // 🌟 초등학생을 위한 번쩍이는 3D 유도 빔 & 힌트 발자국 시스템 (Pulsing Beacons)
     const beaconGroup = new THREE.Group();
@@ -1530,13 +1499,6 @@
         color: 0xa855f7,
         label: '🟣 보라선(비상리셋)',
         tip: '보드에서 번쩍이는 보라색 리셋 구멍 2개를 콕콕 연결하세요!'
-      },
-      gold: {
-        p1: 'soc-d3',
-        p2: 'soc-btn-branch',
-        color: 0xfacc15,
-        label: '🟡 골드선(도깨비 전기 퇴치)',
-        tip: '보드에서 번쩍이는 황금빛 도깨비 퇴치 구멍 2개를 차례로 콕콕 연결하세요!'
       }
     };
 
@@ -1589,7 +1551,7 @@
     /* =====================================================================
        4. 서바이벌 게임 루프 & 미션 상태 엔진
        ===================================================================== */
-    let activeWireTool = null; // '5v' | 'd2' | 'd13' | 'gnd'
+    let activeWireTool = null; // '5v' | 'd2' | 'd13' | 'gnd' | 'bypass'
     let currentStage = 1;
     let timerValue = 45.0;
     let timerRunning = false;
@@ -1602,10 +1564,8 @@
       '5v': false,
       d2: false,
       pull: false,
-      bypass: false,
-      gold: false
+      bypass: false
     };
-    let ohmQuizSolved = false;
 
     function logMsg(msg, type = '') {
       const logs = document.getElementById('console-logs');
@@ -1692,8 +1652,8 @@
     canvas.addEventListener('pointerup', (e) => {
       const dist = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
       const elapsed = performance.now() - pointerDownTime;
-      // 화면 드래그 이동이 10px 미만이고 400ms 이하일 때만 의도된 '탭/클릭'으로 판정!
-      if (dist < 10 && elapsed < 400) {
+      // 화면 드래그 이동이 18px 미만이고 500ms 이하일 때만 의도된 '탭/클릭'으로 판정! (모바일 터치 최적화)
+      if (dist < 18 && elapsed < 500) {
         onCanvasClick(e);
       }
     });
@@ -1785,23 +1745,6 @@
         return;
       }
 
-      // 5단계 올바른 배선: D3 <-> 버튼 인터럽트 분기 (골드선)
-      if ((pair === 'soc-btn-branch::soc-d3' || pair === 'soc-d3::soc-btn-branch') && wireType === 'gold') {
-        connectedCircuits.gold = true;
-        wires['gold'].visible = true;
-        const chkGold = document.getElementById('chk-gold');
-        if (chkGold) {
-          chkGold.className = 'check-item done';
-          chkGold.textContent = '✅ 2. [골드선] 도깨비 전기(플로팅) 쫓아내기 완료!';
-        }
-        playSnapSound();
-        document.getElementById('emg-text').innerHTML = '<b>로봇 삐뽀:</b> 와! 도깨비 전기가 도망쳤어요! 1번 퀴즈를 풀고 검증을 시작하세요!';
-        logMsg('골드선(도깨비 전기 퇴치 D3선) 연결 성공!', 'succ');
-        clearBeacons();
-        checkStage5Ready();
-        return;
-      }
-
       // 잘못된 결선 시
       playTone(200, 0.2, 'sawtooth', 0.2);
       document.getElementById('emg-text').innerHTML = `<b>로봇 삐뽀:</b> 앗! 해당 구멍들에는 [${wireType}] 전선이 맞지 않아요! 반짝이는 구멍을 다시 찾아봐요!`;
@@ -1864,7 +1807,7 @@
       updateLivesHUD();
 
       // UI 갱신
-      document.getElementById('current-stage-tag').textContent = `STAGE ${stage} / 5`;
+      document.getElementById('current-stage-tag').textContent = `STAGE ${stage} / 4`;
       if (stage === 1) {
         document.getElementById('current-stage-title').textContent = '🌱 1단계: 마법의 빨간 불(LED) 켜기';
         document.getElementById('current-stage-desc').textContent = '전구에 전기가 흐르도록 [주황선]과 [검정선]을 이어봐요! 전선을 고르면 보드 구멍이 번쩍번쩍 빛나요!';
@@ -1884,29 +1827,22 @@
         document.getElementById('emergency-banner').className = 'emergency-banner';
         document.getElementById('emg-text').innerHTML = '<b>로봇 삐뽀:</b> 3단계 미션! 3D 화면의 빨간 단추를 3번 연속 톡! 톡! 톡! 탭하세요!';
       } else if (stage === 4) {
-        document.getElementById('current-stage-title').textContent = '☠️ 4단계: 궁극의 타임어택 폭탄 해제 (특별 상금 5,000 MISO)';
-        document.getElementById('current-stage-desc').textContent = '🚨 긴급 상황! 25초 내에 [보라선]으로 비상 리셋을 꽂고, 🔴 빨간 단추를 4회 연속 신속 연타해 과부하 폭발을 막으세요!';
-        document.getElementById('target-prize-text').textContent = '👑 5,000 MISO (특별 상금)';
+        document.getElementById('current-stage-title').textContent = '☠️ 4단계 FINAL: 궁극의 타임어택 폭탄 해제 (최고 특별 상금 5,000 MISO)';
+        document.getElementById('current-stage-desc').textContent = '🚨 긴급 상황! 25초 내에 [보라선]으로 비상 리셋을 꽂고, 🔴 빨간 단추를 4회 연속 신속 연타해 과부하 폭발을 막으세요! 성공 시 최고 상금 5,000 미소 획득!';
+        document.getElementById('target-prize-text').textContent = '👑 5,000 MISO (최고 상금)';
         document.getElementById('emergency-banner').className = 'emergency-banner alert-explosion';
         document.getElementById('emg-text').innerHTML = '<b>🚨 삐뽀 비상경보:</b> 25초 카운트다운! [보라선]을 집어 번쩍이는 리셋 구멍 2개를 신속히 탭하세요!';
-      } else if (stage === 5) {
-        document.getElementById('current-stage-title').textContent = '🌌 5단계: 불빛 지킴이 댐 저항 & 도깨비 전기 퇴치 (특별 상금 100,000 MISO)';
-        document.getElementById('current-stage-desc').textContent = '💡 [어린이 과학 마스터] 전구가 안 터지게 150옴 댐 저항을 찾고, 🟡 골드선으로 도깨비 전기를 쫓아낸 뒤, 심장박동 0.5초 박자로 침착하게 3회 탭하세요!';
-        document.getElementById('target-prize-text').textContent = '💎 100,000 MISO';
-        document.getElementById('emergency-banner').className = 'emergency-banner';
-        document.getElementById('emg-text').innerHTML = '<b>🌌 로봇 삐뽀:</b> 10만 미소 최종 관문! 1번 퀴즈를 풀고, [골드선]을 골라 번쩍이는 구멍 2개를 이어봐요!';
       }
 
-      for (let s = 1; s <= 5; s++) {
+      for (let s = 1; s <= 4; s++) {
         const card = document.getElementById(`card-stage-${s}`);
         if (card) card.className = 'stage-card' + (s === stage ? ' current' : (s < stage ? ' completed' : ''));
         const btn = document.getElementById(`btn-test-${s}`);
-        if (btn) btn.style.display = (s === stage && s !== 5) ? 'flex' : 'none';
+        if (btn) btn.style.display = s === stage ? 'flex' : 'none';
       }
-      if (stage === 5) checkStage5Ready();
 
-      // 타이머 시작 (5단계 60초, 4단계 25초, 3단계 30초, 1~2단계 45초)
-      timerValue = stage === 5 ? 60.0 : (stage === 4 ? 25.0 : (stage === 3 ? 30.0 : 45.0));
+      // 타이머 시작 (4단계 25초, 3단계 30초, 1~2단계 45초)
+      timerValue = stage === 4 ? 25.0 : (stage === 3 ? 30.0 : 45.0);
       clearInterval(timerInterval);
       document.getElementById('timer-pill').classList.remove('urgent');
 
@@ -1984,62 +1920,6 @@
       });
     }
 
-    function checkStage5Ready() {
-      const testBtn = document.getElementById('btn-test-5');
-      if (testBtn && ohmQuizSolved && connectedCircuits.gold) {
-        testBtn.style.display = 'flex';
-      }
-    }
-
-    // 5단계 옴의 법칙 퀴즈 이벤트 리스너
-    document.querySelectorAll('.quiz-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const isCorrect = btn.dataset.ans === 'correct';
-        document.querySelectorAll('.quiz-btn').forEach(b => {
-          b.classList.remove('selected-correct', 'selected-wrong');
-        });
-        if (isCorrect) {
-          btn.classList.add('selected-correct');
-          ohmQuizSolved = true;
-          const chkOhm = document.getElementById('chk-ohm');
-          if (chkOhm) {
-            chkOhm.className = 'check-item done';
-            chkOhm.textContent = '✅ 1. [퀴즈] 전구 보호 댐 저항 풀기 성공! (150Ω 갈-초-갈)';
-          }
-          playSnapSound();
-          logMsg('옴의 법칙 퀴즈 정답! 3V ÷ 0.02A = 150Ω (갈-초-갈)! 전구가 안전합니다!', 'succ');
-          document.getElementById('emg-text').innerHTML = '<b>로봇 삐뽀:</b> 150옴 정답! 전구가 안 터져요! 이제 [골드선]을 연결하거나 아래 검증 시작을 누르세요!';
-          checkStage5Ready();
-        } else {
-          btn.classList.add('selected-wrong');
-          ohmQuizSolved = false;
-          playTone(180, 0.25, 'sawtooth', 0.2);
-          logMsg('오답: 💡 힌트: 전기 힘 5에서 전구 힘 2를 뺀 3에서 0.02를 나눠보세요!', 'warn');
-        }
-      });
-    });
-
-    // 5단계 초극강 마스터 검증 시퀀스 시작 버튼
-    let stage5Active = false;
-    let debounceCadenceCount = 0;
-    let lastDebouncePressTime = 0;
-    const btnTest5 = document.getElementById('btn-test-5');
-    if (btnTest5) {
-      btnTest5.addEventListener('click', () => {
-        if (!ohmQuizSolved || !connectedCircuits.gold) {
-          playTone(180, 0.3, 'sawtooth', 0.25);
-          alert('1번 댐 저항 퀴즈와 2번 골드선 도깨비 퇴치가 모두 완료되어야 합니다!');
-          return;
-        }
-        stage5Active = true;
-        debounceCadenceCount = 0;
-        lastDebouncePressTime = 0;
-        playTone(700, 0.2, 'triangle', 0.3);
-        document.getElementById('emg-text').innerHTML = '<b>🌌 10만 미소 마스터 동기화 가동!</b><br>단추 스프링이 바들바들 떠는 떨림(채터링)을 막기 위해 <b>\'똑... 똑... 똑...\' 심장박동(0.5초 간격)</b>으로 침착하게 3회 탭하세요!';
-        logMsg('STAGE 5 초극강 동기화 가동: 심장박동 0.5초 간격으로 침착하게 3회 탭하세요 (파바박 연타하면 떨림 에러 발생)!');
-      });
-    }
-
     function onButtonPressInSurvival() {
       playClickSound();
       lightUpLED(true);
@@ -2074,54 +1954,8 @@
           playFanfareSound();
           document.getElementById('chk-rhythm').className = 'check-item done';
           document.getElementById('chk-rhythm').textContent = '✅ 2. 과부하 완전 방출 & 해제 성공!';
-          logMsg('👑 [궁극의 마스터 정복] 폭탄 해제 성공! 특별 상금 5,000 MISO 달성!', 'succ');
-          triggerPrizeModal(4, '👑 특별 상금 5,000 MISO', '💎 초극강 100,000 MISO', 5000);
-        }
-      } else if (currentStage === 5) {
-        if (!stage5Active) {
-          logMsg('안내: 먼저 [10만 미소 초극강 마스터 검증 시작] 버튼을 누른 후 단추를 누르세요!', 'warn');
-          return;
-        }
-        const now = performance.now();
-        if (lastDebouncePressTime === 0) {
-          lastDebouncePressTime = now;
-          debounceCadenceCount = 1;
-          playTone(520, 0.1, 'triangle', 0.25);
-          document.getElementById('chk-debounce').textContent = '⚪ 3. 심장박동 박자: 1 / 3회 (다음 탭은 0.5초 뒤 똑!)';
-          logMsg('첫 번째 탭 감지! 다음 탭은 약 0.5초 뒤에 \'똑\' 누르세요.');
-        } else {
-          const delta = now - lastDebouncePressTime;
-          lastDebouncePressTime = now;
-          if (delta < 320) {
-            // 하드웨어 접점 바운싱 (단추 떨림 채터링 노이즈)
-            debounceCadenceCount = 0;
-            lastDebouncePressTime = 0;
-            playTone(180, 0.3, 'sawtooth', 0.3);
-            document.getElementById('chk-debounce').textContent = '⚠️ 단추 떨림 감지! (파바박 연타 금지: 0회 리셋)';
-            document.getElementById('emg-text').innerHTML = '<b>⚠️ 단추 떨림(채터링) 감지!</b> 너무 빠르게 파바박 누르면 단추 스프링이 바들바들 떨어 컴퓨터가 헷갈려요! <b>\'똑... 똑... 똑...\' 0.5초 심장박동</b>으로 침착하게 누르세요!';
-            logMsg(`[단추 떨림 에러] 간격 ${Math.round(delta)}ms: 너무 빨라 단추 내부 쇠붙이가 바들바들 떨렸습니다. (0회 리셋)`, 'warn');
-          } else if (delta > 1200) {
-            // 시간 초과
-            debounceCadenceCount = 1;
-            playTone(300, 0.1, 'triangle', 0.2);
-            document.getElementById('chk-debounce').textContent = '⚪ 3. 심장박동 박자: 1 / 3회 (박자가 늦어 1회차부터 다시 시작)';
-            logMsg(`[박자 늦음] 간격 ${Math.round(delta)}ms: 너무 늦어 1회차부터 다시 시작합니다.`);
-          } else {
-            // 정상 통과 (320ms ~ 1200ms)
-            debounceCadenceCount++;
-            playTone(520 + debounceCadenceCount * 140, 0.1, 'triangle', 0.3);
-            document.getElementById('chk-debounce').textContent = `⚪ 3. 심장박동 박자: ${debounceCadenceCount} / 3회 (완벽한 박자!)`;
-            logMsg(`심장박동 펄스 ${debounceCadenceCount}/3회 정상 통과 (간격: ${Math.round(delta)}ms)`);
-
-            if (debounceCadenceCount >= 3) {
-              clearInterval(timerInterval);
-              playFanfareSound();
-              document.getElementById('chk-debounce').className = 'check-item done';
-              document.getElementById('chk-debounce').textContent = '✅ 3. 단추 떨림 완벽 제거 & 0.5초 심장박동 통과!';
-              logMsg('🌌 [전설의 초극강 마스터 정복] 100,000 MISO 달성! 형·누나 과학 융합 미션 완벽 정복!', 'succ');
-              triggerPrizeModal(5, '💎 100,000 MISO (초극강 마스터)', null, 100000);
-            }
-          }
+          logMsg('👑 [궁극의 마스터 정복] 폭탄 해제 성공! 최고 특별 상금 5,000 MISO 달성!', 'succ');
+          triggerPrizeModal(4, '👑 최고 특별 상금 5,000 MISO', null, 5000);
         }
       }
     }
@@ -2151,15 +1985,10 @@
       const cardEl = document.querySelector('.prize-cert-card');
       cardEl.classList.remove('legendary-gold', 'cosmic-diamond');
 
-      if (stageNum === 5) {
-        cardEl.classList.add('cosmic-diamond');
-        triggerConfetti(220);
-        document.getElementById('cert-stage-tag').textContent = '🌌 [STAGE 5 FINAL] 초극강 마스터 10만 미소 최고 존엄 증서';
-        document.getElementById('cert-code').textContent = 'MISO-COSMIC-DIAMOND-100000';
-      } else if (stageNum === 4) {
+      if (stageNum === 4) {
         cardEl.classList.add('legendary-gold');
-        triggerConfetti(140);
-        document.getElementById('cert-stage-tag').textContent = `☠️ [STAGE 4] 궁극의 익스트림 마스터 특별 증서`;
+        triggerConfetti(160);
+        document.getElementById('cert-stage-tag').textContent = `👑 [STAGE 4 FINAL] 궁극의 익스트림 마스터 특별 증서`;
         document.getElementById('cert-code').textContent = 'MISO-LEGENDARY-GOLD-777';
       } else {
         triggerConfetti(80);
@@ -2205,9 +2034,7 @@
         winNotice.style.fontFamily = 'var(--font-round)';
         winNotice.style.fontSize = '14px';
         winNotice.style.marginTop = '8px';
-        winNotice.textContent = stageNum === 5
-          ? '💎 [신화적 마스터 정복!] 지금 즉시 이 화면을 캡처하여 특별 상금 100,000 MISO를 쟁취하세요! (1인 1회 한정)'
-          : '👑 [궁극의 마스터 정복!] 지금 즉시 이 화면을 캡처하여 특별 상금 5,000 MISO를 쟁취하세요! (1인 1회 한정)';
+        winNotice.textContent = '👑 [궁극의 마스터 정복!] 지금 즉시 이 화면을 캡처하여 최고 특별 상금 5,000 MISO를 쟁취하세요! (1인 1회 한정)';
         actions.appendChild(winNotice);
       }
 
