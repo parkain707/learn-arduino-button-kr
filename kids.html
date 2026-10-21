@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>아두이노 마법 과학실 — 눈으로 보는 신기한 전기 실험 (어린이 눈높이 3D)</title>
+  <title>아두이노 마법 과학실 — 미소 상금 챌린지 (어린이 눈높이 3D)</title>
   
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Round&display=swap" rel="stylesheet">
@@ -30,6 +30,7 @@
       --kids-blue: #5271ff;
       --kids-green: #7ed957;
       --kids-purple: #9d4edd;
+      --kids-gold: #f59e0b;
       --kids-dark: #2d3142;
       --font-round: "Jua", "Pretendard", sans-serif;
       --font-body: "Pretendard", -apple-system, sans-serif;
@@ -78,6 +79,7 @@
       cursor: grabbing;
     }
 
+    /* 상단 배너 & 대원 프로필 바 */
     .top-banner {
       position: absolute;
       top: 18px;
@@ -87,7 +89,7 @@
       gap: 12px;
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(8px);
-      padding: 9px 18px;
+      padding: 8px 18px;
       border-radius: 40px;
       box-shadow: var(--shadow-pop);
       border: 3px solid #ffde59;
@@ -103,13 +105,35 @@
     }
     .banner-title {
       font-family: var(--font-round);
-      font-size: 18px;
+      font-size: 17px;
       color: #ff5757;
     }
     .banner-sub {
-      font-size: 11.5px;
+      font-size: 11px;
       color: #7a8299;
       font-weight: 600;
+    }
+
+    .user-pill {
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #166534;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 6px;
+    }
+    .btn-user-reset {
+      background: transparent;
+      border: none;
+      color: #dc2626;
+      cursor: pointer;
+      font-size: 11px;
+      text-decoration: underline;
     }
 
     .view-control {
@@ -139,7 +163,6 @@
       border-bottom: 2px solid #ccd2e0;
     }
 
-    /* 화면 하단 안내 말풍선 */
     .action-bubble {
       position: absolute;
       bottom: 26px;
@@ -178,7 +201,6 @@
       75% { transform: translateX(-48%) rotate(2deg); }
     }
 
-    /* 3D 앵커 말풍선 */
     .bubble-tag {
       position: absolute;
       background: rgba(255, 255, 255, 0.95);
@@ -235,7 +257,7 @@
       font-size: 32px;
     }
     .robot-speech {
-      font-size: 13px;
+      font-size: 12.5px;
       line-height: 1.45;
       color: #3b4256;
     }
@@ -244,38 +266,62 @@
       font-family: var(--font-round);
     }
 
-    /* 🧪 신기한 4대 과학 마법 실험실 구역 */
+    /* 💰 상금 안내 특별 공지 배너 */
+    .prize-banner-box {
+      margin: 12px 20px 4px;
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border: 2px solid #f59e0b;
+      border-radius: 14px;
+      padding: 10px 14px;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.15);
+    }
+    .prize-banner-title {
+      font-family: var(--font-round);
+      font-size: 14px;
+      color: #92400e;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 3px;
+    }
+    .prize-banner-desc {
+      font-size: 11.5px;
+      color: #78350f;
+      line-height: 1.4;
+    }
+
+    /* 🧪 신기한 4대 과학 실험실 구역 */
     .lab-section {
-      padding: 16px 20px;
+      padding: 14px 20px;
       background: #fdfaff;
       border-bottom: 2px solid #f0e6ff;
     }
     .lab-title {
       font-family: var(--font-round);
-      font-size: 16.5px;
+      font-size: 15.5px;
       color: #6b21a8;
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     .lab-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
     }
     .lab-btn {
       background: #ffffff;
       border: 2px solid #e9d5ff;
       border-bottom: 4px solid #c084fc;
-      border-radius: 14px;
-      padding: 10px;
+      border-radius: 12px;
+      padding: 8px;
       text-align: center;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       transition: all 0.15s ease;
     }
     .lab-btn:active {
@@ -285,18 +331,18 @@
     .lab-btn.active-lab {
       border-color: #9333ea;
       background: #faf5ff;
-      box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
     }
     .lab-btn-icon {
-      font-size: 24px;
+      font-size: 20px;
     }
     .lab-btn-text {
       font-family: var(--font-round);
-      font-size: 13px;
+      font-size: 12.5px;
       color: #3b0764;
     }
     .lab-btn-sub {
-      font-size: 10.5px;
+      font-size: 10px;
       color: #7e22ce;
     }
 
@@ -336,6 +382,7 @@
       padding: 9px 12px;
       margin-bottom: 8px;
       transition: all 0.2s ease;
+      position: relative;
     }
     .mission-card.completed {
       border-color: #86efac;
@@ -356,6 +403,16 @@
     .tag-easy { background: #dcfce7; color: #166534; }
     .tag-mid { background: #fef3c7; color: #92400e; }
     .tag-hard { background: #fee2e2; color: #991b1b; }
+
+    .mission-prize-badge {
+      font-family: var(--font-round);
+      font-size: 11px;
+      background: #fef08a;
+      color: #854d0e;
+      padding: 2px 7px;
+      border-radius: 12px;
+      border: 1px solid #facc15;
+    }
 
     .mission-title {
       font-family: var(--font-round);
@@ -390,7 +447,6 @@
       width: 100% !important;
     }
 
-    /* 하단 모드 스위처 */
     .cards-container {
       padding: 12px 20px;
       display: flex;
@@ -428,63 +484,263 @@
       border-bottom-width: 2px;
     }
 
-    /* 축하 모달 팝업 */
-    .celebrate-modal {
+    /* =====================================================================
+       🔑 로그인 & 등록 모달
+       ===================================================================== */
+    .auth-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(5px);
+      background: rgba(30, 35, 48, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    .auth-card {
+      background: #ffffff;
+      border: 4px solid #ffde59;
+      border-radius: 28px;
+      padding: 30px;
+      width: 90%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .auth-robot {
+      font-size: 48px;
+      margin-bottom: 8px;
+      animation: bounceMascot 2s infinite ease-in-out;
+    }
+    .auth-title {
+      font-family: var(--font-round);
+      font-size: 22px;
+      color: #1f2937;
+      margin-bottom: 6px;
+    }
+    .auth-desc {
+      font-size: 12.5px;
+      color: #64748b;
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+    .auth-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 18px;
+      text-align: left;
+    }
+    .auth-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #374151;
+      margin-left: 4px;
+    }
+    .auth-input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .auth-input:focus {
+      border-color: #5271ff;
+    }
+    .btn-auth-primary {
+      width: 100%;
+      background: #ff5757;
+      color: #fff;
+      border: none;
+      border-bottom: 4px solid #d43b3b;
+      padding: 12px;
+      border-radius: 14px;
+      font-family: var(--font-round);
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-auth-primary:active {
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+    }
+    .auth-existing-box {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .auth-choice-btns {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-auth-sub {
+      flex: 1;
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      padding: 9px;
+      border-radius: 10px;
+      font-family: var(--font-round);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    /* =====================================================================
+       🏆 상금 인증서 & 선택의 갈림길 모달
+       ===================================================================== */
+    .prize-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(17, 24, 39, 0.88);
+      backdrop-filter: blur(8px);
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 999;
+      z-index: 10001;
     }
-    .celebrate-card {
-      background: #fff;
-      border: 4px solid #ffde59;
+    .prize-cert-card {
+      background: #ffffff;
+      border: 4px solid #f59e0b;
       border-radius: 28px;
-      padding: 26px;
-      max-width: 380px;
+      padding: 24px;
+      width: 92%;
+      max-width: 440px;
       text-align: center;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+      position: relative;
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     @keyframes popIn { from { transform: scale(0.7); } to { transform: scale(1); } }
-    .badge-medal {
-      font-size: 60px;
-      margin-bottom: 8px;
-      animation: medalWiggle 1.5s infinite;
+
+    /* 영수증/증서 양식 */
+    .cert-frame {
+      background: #fffdf5;
+      border: 2px dashed #f59e0b;
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 16px;
+      position: relative;
     }
-    @keyframes medalWiggle {
-      0%, 100% { transform: rotate(0deg); }
-      25% { transform: rotate(-8deg); }
-      75% { transform: rotate(8deg); }
-    }
-    .celebrate-title {
+    .cert-stamp {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 68px;
+      height: 68px;
+      border: 3px solid #dc2626;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #dc2626;
       font-family: var(--font-round);
-      font-size: 22px;
-      color: #ff5757;
+      font-size: 13px;
+      font-weight: 700;
+      transform: rotate(-12deg);
+      opacity: 0.9;
+    }
+    .cert-stage-tag {
+      font-family: var(--font-round);
+      font-size: 14px;
+      color: #d97706;
+      margin-bottom: 4px;
+    }
+    .cert-amount {
+      font-family: var(--font-round);
+      font-size: 34px;
+      color: #b45309;
       margin-bottom: 6px;
+      text-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
     }
-    .celebrate-sub {
-      font-size: 13.5px;
-      color: #4b5563;
-      line-height: 1.5;
-      margin-bottom: 18px;
+    .cert-meta-table {
+      width: 100%;
+      font-size: 11.5px;
+      text-align: left;
+      color: #64748b;
+      margin-top: 8px;
+      border-top: 1px solid #fed7aa;
+      padding-top: 8px;
     }
-    .btn-close-modal {
-      background: #5271ff;
+    .cert-meta-table td {
+      padding: 2px 4px;
+    }
+
+    /* 📸 캡처 댓글 인증 필수 안내문 */
+    .capture-notice-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-left: 4px solid #3b82f6;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #1e40af;
+      text-align: left;
+      margin-bottom: 14px;
+    }
+    .capture-notice-box b {
+      color: #1d4ed8;
+    }
+
+    /* 딜레마 갈림길 버튼 */
+    .dilemma-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .btn-claim-now {
+      background: #10b981;
       color: #fff;
       border: none;
-      border-bottom: 4px solid #324fc7;
-      padding: 9px 22px;
-      border-radius: 20px;
+      border-bottom: 4px solid #059669;
+      padding: 12px;
+      border-radius: 14px;
       font-family: var(--font-round);
       font-size: 15px;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .btn-gamble-next {
+      background: #f59e0b;
+      color: #fff;
+      border: none;
+      border-bottom: 4px solid #d97706;
+      padding: 12px;
+      border-radius: 14px;
+      font-family: var(--font-round);
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+    .btn-claim-now:active, .btn-gamble-next:active {
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+    }
+    .forfeit-warning-text {
+      font-size: 10.5px;
+      color: #dc2626;
+      font-weight: 700;
+      margin-top: 2px;
     }
 
     #confetti-canvas {
@@ -494,7 +750,7 @@
       width: 100vw;
       height: 100vh;
       pointer-events: none;
-      z-index: 1000;
+      z-index: 10002;
     }
 
     @media (max-width: 960px) {
@@ -510,16 +766,62 @@
   </style>
 </head>
 <body>
+  <!-- 🔑 [로그인 / 프로필 모달] -->
+  <div class="auth-overlay" id="auth-overlay">
+    <div class="auth-card" id="auth-register-view">
+      <div class="auth-robot">🤖</div>
+      <h2 class="auth-title">아두이노 마법 과학실 탐험대</h2>
+      <p class="auth-desc">이름과 비밀번호를 등록하면 <b>상금 획득 내역과 진행 상황</b>이 자동으로 안전하게 저장됩니다!</p>
+      
+      <div class="auth-input-group">
+        <label class="auth-label" for="user-name-input">대원 이름 (닉네임)</label>
+        <input type="text" id="user-name-input" class="auth-input" placeholder="예: 번개탐험가 민우" maxlength="12" />
+        
+        <label class="auth-label" for="user-pass-input">나만의 비밀번호 (간단한 4자리 등)</label>
+        <input type="password" id="user-pass-input" class="auth-input" placeholder="나중에 이어서 할 때 필요해요" maxlength="16" />
+      </div>
+
+      <button class="btn-auth-primary" id="btn-start-adventure">🚀 탐험 시작하고 상금 도전하기!</button>
+    </div>
+
+    <!-- 기존 저장된 계정 재방문 뷰 -->
+    <div class="auth-card" id="auth-login-view" style="display: none;">
+      <div class="auth-robot">👋</div>
+      <h2 class="auth-title">다시 돌아온 것을 환영해요!</h2>
+      <div class="auth-existing-box">
+        <div style="font-size: 14px; font-weight: 700; color: #1e3a8a;" id="existing-name-display">민우 대원</div>
+        <div style="font-size: 12px; color: #475569; margin-top: 4px;" id="existing-stage-display">이전 달성: 1단계 (1,000미소)</div>
+      </div>
+
+      <div class="auth-input-group">
+        <label class="auth-label" for="login-pass-input">비밀번호 확인</label>
+        <input type="password" id="login-pass-input" class="auth-input" placeholder="등록했던 비밀번호 입력" />
+      </div>
+
+      <div class="auth-choice-btns">
+        <button class="btn-auth-primary" style="flex: 1.5;" id="btn-continue-adventure">▶ 이어서 하기</button>
+        <button class="btn-auth-sub" id="btn-reset-history">🔄 초기화 후 새로하기</button>
+      </div>
+    </div>
+  </div>
+
   <div id="kids-app">
     <main id="canvas-container">
       <div class="top-banner">
         <span class="mascot-icon">🤖</span>
         <div>
           <div class="banner-title">3D 아두이노 마법 과학실</div>
-          <div class="banner-sub">전선 직접 꽂기! 유령 도깨비 실험! 눈으로 보는 전기 흐름!</div>
+          <div class="banner-sub">상금 도전! 1,000 ~ 3,000 미소 챌린지</div>
         </div>
-        <a href="index.html" style="margin-left: 12px; font-size: 11.5px; font-weight: 700; text-decoration: none; background: #eef2f9; color: #3b5998; padding: 5px 11px; border-radius: 20px; border: 1px solid #d0d9e8; white-space: nowrap;">
-          🎓 표준 엔지니어 모드
+
+        <!-- 로그인된 대원 뱃지 -->
+        <div class="user-pill" id="user-pill" style="display: none;">
+          <span>👤 <b id="top-username">탐험대원</b></span>
+          <button class="btn-user-reset" id="btn-switch-account" title="기록 관리 및 계정 변경">초기화/변경</button>
+        </div>
+
+        <a href="index.html" style="margin-left: 8px; font-size: 11px; font-weight: 700; text-decoration: none; background: #eef2f9; color: #3b5998; padding: 4px 10px; border-radius: 20px; border: 1px solid #d0d9e8; white-space: nowrap;">
+          🎓 표준 모드
         </a>
       </div>
 
@@ -536,7 +838,7 @@
 
       <div class="action-bubble" id="action-bubble">
         <span id="bubble-emoji">⚡</span>
-        <span id="bubble-text">오른쪽 [신기한 4대 과학 실험]을 눌러 마법을 부려보세요!</span>
+        <span id="bubble-text">오른쪽 3가지 탐험 미션을 통과하고 상금 미소를 획득하세요!</span>
       </div>
     </main>
 
@@ -545,38 +847,41 @@
         <div class="robot-card">
           <div class="robot-face">🤖</div>
           <div class="robot-speech">
-            안녕! 팅커봇이야! 전선도 꽂아보고, <b>저항을 쏙 뽑아서 도깨비 유령</b>도 불러내보자!<br>
-            아래 <b>4대 실험실 버튼</b>을 눌러봐! 진짜 신기한 일이 벌어져!
+            안녕! <b><span id="hero-username">대원</span></b>아!<br>
+            각 단계를 깰 때마다 <b>1,000 ~ 3,000 미소 상금</b>이 걸려있어!<br>
+            캡처해서 댓글로 올리면 <b>진짜 상금</b>을 지급하니까 집중해봐!
           </div>
+        </div>
+      </div>
+
+      <!-- 💰 상금 지급 규칙 특별 공지 배너 -->
+      <div class="prize-banner-box">
+        <div class="prize-banner-title">🎁 [미소 상금 이벤트 규칙]</div>
+        <div class="prize-banner-desc">
+          • 각 단계 통과 시 발급되는 <b>인증서 화면을 캡처하여 댓글로 올리면 1회에 한하여 해당 상금을 지급</b>합니다!<br>
+          • <b>선택의 딜레마:</b> 더 많은 상금을 원하면 현재 단계의 상금을 포기하고 상위 단계에 도전하세요! (⚠️ <b>한 번 포기하면 이전 단계로 되돌릴 수 없습니다!</b>)
         </div>
       </div>
 
       <!-- 🧪 신기한 4대 과학 실험실 구역 -->
       <section class="lab-section">
-        <div class="lab-title">🧪 신기한 4대 인터랙티브 실험실</div>
+        <div class="lab-title">🧪 4대 인터랙티브 실험실</div>
         <div class="lab-grid">
-          <!-- 실험 1: 직접 전선 꽂기 -->
           <button class="lab-btn" id="btn-lab-wire">
             <span class="lab-btn-icon">🔌</span>
             <span class="lab-btn-text" id="wire-status-text">전선 쏙 뽑기!</span>
             <span class="lab-btn-sub">직접 꽂아 회로 완성</span>
           </button>
-
-          <!-- 실험 2: 도깨비 유령 실험 (풀다운 저항 뽑기) -->
           <button class="lab-btn" id="btn-lab-ghost">
             <span class="lab-btn-icon">👻</span>
-            <span class="lab-btn-text" id="ghost-status-text">저항 뽑기 (유령 소환!)</span>
-            <span class="lab-btn-sub">플로팅 정전기 폭주!</span>
+            <span class="lab-btn-text" id="ghost-status-text">저항 뽑기 (유령!)</span>
+            <span class="lab-btn-sub">플로팅 정전기 폭주</span>
           </button>
-
-          <!-- 실험 3: 무지개 디스코 & 도레미 피아노 -->
           <button class="lab-btn" id="btn-lab-rainbow">
             <span class="lab-btn-icon">🌈</span>
-            <span class="lab-btn-text" id="rainbow-status-text">무지개 피아노 켜기</span>
+            <span class="lab-btn-text" id="rainbow-status-text">무지개 피아노</span>
             <span class="lab-btn-sub">도-레-미 음계 연주</span>
           </button>
-
-          <!-- 실험 4: 눈으로 보는 전기 요정 -->
           <button class="lab-btn active-lab" id="btn-lab-particles">
             <span class="lab-btn-icon">⚡</span>
             <span class="lab-btn-text" id="particle-status-text">전기 요정: 켜짐</span>
@@ -585,16 +890,17 @@
         </div>
       </section>
 
-      <!-- 🎯 3단계 난이도별 퀘스트 -->
+      <!-- 🎯 3단계 난이도별 퀘스트 & 상금 -->
       <section class="quest-section">
         <div class="quest-header">
-          <div class="quest-main-title">🎯 오늘의 탐험 미션</div>
+          <div class="quest-main-title">🎯 오늘의 상금 탐험 미션</div>
           <div class="quest-badge-count" id="quest-count">달성: 0 / 3 ⭐</div>
         </div>
 
         <div class="mission-card" id="mission-1">
           <div class="mission-top">
             <span class="mission-tag tag-easy">🌱 1단계 (쉬움)</span>
+            <span class="mission-prize-badge">💰 1,000 미소</span>
             <span id="m1-icon">⏳</span>
           </div>
           <div class="mission-title">1. 전등 켜기 마법사</div>
@@ -605,6 +911,7 @@
         <div class="mission-card" id="mission-2">
           <div class="mission-top">
             <span class="mission-tag tag-mid">⚡ 2단계 (보통)</span>
+            <span class="mission-prize-badge">💰 2,000 미소</span>
             <span id="m2-icon">🔒</span>
           </div>
           <div class="mission-title">2. 방 전등 스위치 만들기</div>
@@ -615,6 +922,7 @@
         <div class="mission-card" id="mission-3">
           <div class="mission-top">
             <span class="mission-tag tag-hard">👑 3단계 (도전)</span>
+            <span class="mission-prize-badge">💰 3,000 미소 (최고상금)</span>
             <span id="m3-icon">🔒</span>
           </div>
           <div class="mission-title">3. 비밀 모스 부호 전송</div>
@@ -640,15 +948,31 @@
     </aside>
   </div>
 
-  <div class="celebrate-modal" id="celebrate-modal">
-    <div class="celebrate-card">
-      <div class="badge-medal">🏆</div>
-      <h2 class="celebrate-title">대단해요! 올클리어!</h2>
-      <p class="celebrate-sub">
-        모든 과학 실험과 3대 탐험 미션을 완수한 당신은<br>
-        <b>'아두이노 탐험 대장'</b>입니다! 훌륭해요!
-      </p>
-      <button class="btn-close-modal" id="btn-close-modal">계속 자유롭게 놀기 🚀</button>
+  <!-- 🏆 [상금 인증 증서 및 선택의 갈림길 모달] -->
+  <div class="prize-modal-overlay" id="prize-modal-overlay">
+    <div class="prize-cert-card">
+      <div class="cert-frame">
+        <div class="cert-stamp">인증 완료</div>
+        <div class="cert-stage-tag" id="cert-stage-tag">🌱 [1단계] 탐험 통과 증서</div>
+        <div class="cert-amount" id="cert-amount">1,000 MISO</div>
+        
+        <table class="cert-meta-table">
+          <tr><td>• 수령 대상자:</td><td><b id="cert-username">민우 대원</b></td></tr>
+          <tr><td>• 인증 일시:</td><td id="cert-date">2026-10-22 02:40</td></tr>
+          <tr><td>• 고유 인증코드:</td><td><code id="cert-code">MISO-20261022-8A7F</code></td></tr>
+        </table>
+      </div>
+
+      <!-- 📢 캡처 댓글 인증 필수 공지 -->
+      <div class="capture-notice-box">
+        📸 <b>상금 수령 안내:</b><br>
+        이 화면을 <b>캡처(스크린샷)하여 댓글로 업로드</b>하시면 운영진 확인 후 <b>1회에 한하여 해당 상금을 지급</b>합니다!
+      </div>
+
+      <!-- 딜레마 갈림길 버튼 그룹 -->
+      <div class="dilemma-actions" id="dilemma-actions">
+        <!-- 동적으로 주입됨 (수령하기 vs 포기하고 상위 단계 도전) -->
+      </div>
     </div>
   </div>
 
@@ -656,7 +980,126 @@
 
   <script>
     /* =====================================================================
-       1. 효과음 및 피아노 음계 신디사이저 (Web Audio API)
+       1. 사용자 인증 및 로컬 이력 저장소 (Storage Engine)
+       ===================================================================== */
+    const STORAGE_KEY = 'ARDUINO_KIDS_USER_PROFILE_V1';
+
+    let userProfile = {
+      username: '',
+      password: '',
+      m1Done: false,
+      m2Done: false,
+      m3Done: false,
+      highestStage: 0,
+      claimedStage: 0,
+      claimedAmount: 0,
+      certCode: ''
+    };
+
+    function loadProfile() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      return null;
+    }
+
+    function saveProfile() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(userProfile));
+      updateUserUI();
+    }
+
+    function generateCertCode() {
+      const now = new Date();
+      const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+      return `MISO-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${rand}`;
+    }
+
+    function updateUserUI() {
+      if (!userProfile.username) return;
+      document.getElementById('user-pill').style.display = 'flex';
+      document.getElementById('top-username').textContent = userProfile.username;
+      document.getElementById('hero-username').textContent = userProfile.username;
+
+      // 미션 상태 반영
+      if (userProfile.m1Done) markMissionUI(1);
+      if (userProfile.m2Done) markMissionUI(2);
+      if (userProfile.m3Done) markMissionUI(3);
+      document.getElementById('quest-count').textContent = `달성: ${completedCount} / 3 ⭐`;
+    }
+
+    // 초기 로그인 / 등록 모달 제어
+    const authOverlay = document.getElementById('auth-overlay');
+    const authRegisterView = document.getElementById('auth-register-view');
+    const authLoginView = document.getElementById('auth-login-view');
+    const existingProfile = loadProfile();
+
+    if (existingProfile && existingProfile.username) {
+      authRegisterView.style.display = 'none';
+      authLoginView.style.display = 'block';
+      document.getElementById('existing-name-display').textContent = `${existingProfile.username} 대원`;
+      const stageText = existingProfile.m3Done ? '3단계 최고 상금 도전 완료' : (existingProfile.m2Done ? '2단계(2,000미소) 달성' : (existingProfile.m1Done ? '1단계(1,000미소) 달성' : '미션 진행 전'));
+      document.getElementById('existing-stage-display').textContent = `이전 기록: ${stageText}`;
+    }
+
+    // 신규 등록 시작
+    document.getElementById('btn-start-adventure').addEventListener('click', () => {
+      const name = document.getElementById('user-name-input').value.trim();
+      const pass = document.getElementById('user-pass-input').value.trim();
+      if (!name) {
+        alert('대원 이름을 입력해주세요!');
+        return;
+      }
+      if (!pass) {
+        alert('나만의 비밀번호를 입력해주세요!');
+        return;
+      }
+
+      userProfile = {
+        username: name,
+        password: pass,
+        m1Done: false,
+        m2Done: false,
+        m3Done: false,
+        highestStage: 0,
+        claimedStage: 0,
+        claimedAmount: 0,
+        certCode: generateCertCode()
+      };
+      saveProfile();
+      authOverlay.style.display = 'none';
+      playTone(523.25, 0.15, 'triangle', 0.2);
+    });
+
+    // 기존 계정 이어서 하기
+    document.getElementById('btn-continue-adventure').addEventListener('click', () => {
+      const pass = document.getElementById('login-pass-input').value.trim();
+      if (existingProfile && existingProfile.password && pass !== existingProfile.password) {
+        alert('비밀번호가 일치하지 않습니다. 다시 확인해주세요!');
+        return;
+      }
+      userProfile = existingProfile;
+      saveProfile();
+      authOverlay.style.display = 'none';
+      playTone(523.25, 0.15, 'triangle', 0.2);
+    });
+
+    // 기록 초기화
+    function resetAllHistory() {
+      if (confirm('정말로 이전 탐험 기록과 상금 내역을 모두 초기화하고 처음부터 다시 시작하시겠습니까?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      }
+    }
+    document.getElementById('btn-reset-history').addEventListener('click', resetAllHistory);
+    document.getElementById('btn-switch-account').addEventListener('click', resetAllHistory);
+
+    /* =====================================================================
+       2. 오디오 사운드 신디사이저 (Web Audio API)
        ===================================================================== */
     let audioCtx = null;
     let soundEnabled = true;
@@ -670,7 +1113,7 @@
       }
     }
 
-    const PIANO_NOTES = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25]; // 도레미파솔라시도
+    const PIANO_NOTES = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25];
     let noteIndex = 0;
 
     function playTone(freq, duration = 0.08, type = 'sine', gainVal = 0.18) {
@@ -692,7 +1135,6 @@
 
     function playClickSound(isDown) {
       if (experiments.rainbowMode && isDown) {
-        // 도레미 실로폰 음계 연주!
         const freq = PIANO_NOTES[noteIndex % PIANO_NOTES.length];
         noteIndex++;
         playTone(freq, 0.2, 'triangle', 0.25);
@@ -714,9 +1156,9 @@
     function playFanfareSound() {
       if (!soundEnabled) return;
       initAudio();
-      const notes = [523.25, 659.25, 783.99, 1046.50];
+      const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
       notes.forEach((f, idx) => {
-        setTimeout(() => playTone(f, 0.18, 'triangle', 0.22), idx * 110);
+        setTimeout(() => playTone(f, 0.22, 'triangle', 0.25), idx * 100);
       });
     }
 
@@ -726,13 +1168,13 @@
     });
 
     /* =====================================================================
-       2. 🧪 4대 인터랙티브 실험실 상태 관리
+       3. 4대 인터랙티브 실험실 상태
        ===================================================================== */
     const experiments = {
-      wireConnected: true,    // 전선 연결 여부
-      ghostMode: false,        // 풀다운 저항 뽑기 (도깨비 플로팅 현상)
-      rainbowMode: false,      // 무지개 디스코 피아노
-      particlesEnabled: true   // 눈으로 보는 전기 요정
+      wireConnected: true,
+      ghostMode: false,
+      rainbowMode: false,
+      particlesEnabled: true
     };
 
     const RAINBOW_COLORS = [0xff3333, 0xff9922, 0xffff22, 0x33dd55, 0x2288ff, 0x9933ff, 0xff22aa];
@@ -742,7 +1184,6 @@
     const bubbleEmoji = document.getElementById('bubble-emoji');
     const bubbleText = document.getElementById('bubble-text');
 
-    // 1) 전선 꽂기/뽑기 토글
     const btnLabWire = document.getElementById('btn-lab-wire');
     const wireStatusText = document.getElementById('wire-status-text');
     btnLabWire.addEventListener('click', () => {
@@ -751,15 +1192,14 @@
       if (experiments.wireConnected) {
         btnLabWire.classList.remove('active-lab');
         wireStatusText.textContent = '전선 쏙 뽑기!';
-        blueWireMesh.position.y = 0; // 원위치 결선
-        blueWireMesh.material.opacity = 1.0;
+        blueWireMesh.position.y = 0;
         actionBubble.className = 'action-bubble active-state';
         bubbleEmoji.textContent = '🔌';
         bubbleText.textContent = '착! D2 전선이 연결되었어요! 이제 신호가 통해요!';
       } else {
         btnLabWire.classList.add('active-lab');
         wireStatusText.textContent = '전선 콕 꽂기!';
-        blueWireMesh.position.y = 12; // 공중에 붕 뜸 (분리됨)
+        blueWireMesh.position.y = 12;
         setLedGlow(false);
         actionBubble.className = 'action-bubble';
         bubbleEmoji.textContent = '⚠️';
@@ -767,7 +1207,6 @@
       }
     });
 
-    // 2) 도깨비 유령 실험 (풀다운 저항 뽑기)
     const btnLabGhost = document.getElementById('btn-lab-ghost');
     const ghostStatusText = document.getElementById('ghost-status-text');
     btnLabGhost.addEventListener('click', () => {
@@ -776,14 +1215,14 @@
       if (experiments.ghostMode) {
         btnLabGhost.classList.add('active-lab');
         ghostStatusText.textContent = '저항 다시 꽂기! 🛡️';
-        pullDownRes.position.y = 25; // 저항이 공중으로 쑥 빠짐!
+        pullDownRes.position.y = 25;
         actionBubble.className = 'action-bubble ghost-alert';
         bubbleEmoji.textContent = '👻';
         bubbleText.textContent = '으악! 저항이 없어져서 공기 중 정전기 귀신 때문에 LED가 미쳤어요!';
       } else {
         btnLabGhost.classList.remove('active-lab');
-        ghostStatusText.textContent = '저항 뽑기 (유령 소환!)';
-        pullDownRes.position.y = 8.2; // 원위치 복귀!
+        ghostStatusText.textContent = '저항 뽑기 (유령!)';
+        pullDownRes.position.y = 8.2;
         actionBubble.className = 'action-bubble';
         bubbleEmoji.textContent = '🛡️';
         bubbleText.textContent = '휴~! 10kΩ 안전 저항이 정전기를 모두 미끄럼틀로 내려보냈어요!';
@@ -791,13 +1230,12 @@
       }
     });
 
-    // 3) 무지개 디스코 & 도레미 피아노
     const btnLabRainbow = document.getElementById('btn-lab-rainbow');
     const rainbowStatusText = document.getElementById('rainbow-status-text');
     btnLabRainbow.addEventListener('click', () => {
       experiments.rainbowMode = !experiments.rainbowMode;
       btnLabRainbow.classList.toggle('active-lab', experiments.rainbowMode);
-      rainbowStatusText.textContent = experiments.rainbowMode ? '무지개 모드: 켜짐 🌈' : '무지개 피아노 켜기';
+      rainbowStatusText.textContent = experiments.rainbowMode ? '무지개 모드: 켜짐 🌈' : '무지개 피아노';
       if (experiments.rainbowMode) {
         actionBubble.className = 'action-bubble active-state';
         bubbleEmoji.textContent = '🎶';
@@ -805,7 +1243,6 @@
       }
     });
 
-    // 4) 눈으로 보는 전기 요정 파티클
     const btnLabParticles = document.getElementById('btn-lab-particles');
     const particleStatusText = document.getElementById('particle-status-text');
     btnLabParticles.addEventListener('click', () => {
@@ -815,46 +1252,110 @@
     });
 
     /* =====================================================================
-       3. 3단계 퀘스트 미션 감지기
+       4. 3단계 퀘스트 달성 & 상금 갈림길 딜레마 시스템
        ===================================================================== */
+    let completedCount = 0;
     const missions = {
       m1: { completed: false, holdSeconds: 0 },
       m2: { completed: false },
       m3: { completed: false, clickTimestamps: [] }
     };
-    let completedCount = 0;
 
-    function completeMission(mKey, title) {
-      if (missions[mKey].completed) return;
-      missions[mKey].completed = true;
-      completedCount++;
-
-      playFanfareSound();
-      triggerConfetti(60);
-
-      const card = document.getElementById(`mission-${mKey.slice(1)}`);
-      card.classList.add('completed');
-      document.getElementById(`${mKey}-icon`).textContent = '✅';
-      document.getElementById('quest-count').textContent = `달성: ${completedCount} / 3 ⭐`;
-
-      actionBubble.className = 'action-bubble active-state';
-      bubbleEmoji.textContent = '🎉';
-      bubbleText.textContent = `축하해요! [${title}] 미션 달성! ⭐`;
-
-      if (completedCount === 3) {
-        setTimeout(() => {
-          document.getElementById('celebrate-modal').style.display = 'flex';
-          triggerConfetti(150);
-        }, 600);
+    function markMissionUI(stageNum) {
+      const card = document.getElementById(`mission-${stageNum}`);
+      if (card && !card.classList.contains('completed')) {
+        card.classList.add('completed');
+        document.getElementById(`m${stageNum}-icon`).textContent = '✅';
+        completedCount = Math.max(completedCount, stageNum);
+        missions[`m${stageNum}`].completed = true;
       }
     }
 
-    document.getElementById('btn-close-modal').addEventListener('click', () => {
-      document.getElementById('celebrate-modal').style.display = 'none';
-    });
+    const prizeModalOverlay = document.getElementById('prize-modal-overlay');
+    const certStageTag = document.getElementById('cert-stage-tag');
+    const certAmount = document.getElementById('cert-amount');
+    const certUsername = document.getElementById('cert-username');
+    const certDate = document.getElementById('cert-date');
+    const certCodeEl = document.getElementById('cert-code');
+    const dilemmaActions = document.getElementById('dilemma-actions');
+
+    const STAGE_PRIZES = {
+      1: { name: '🌱 [1단계] 탐험 통과 증서', amount: '1,000 MISO', nextAmount: '2,000 MISO', num: 1000 },
+      2: { name: '⚡ [2단계] 탐험 통과 증서', amount: '2,000 MISO', nextAmount: '3,000 MISO', num: 2000 },
+      3: { name: '👑 [3단계] 최종 정복 증서', amount: '3,000 MISO', nextAmount: null, num: 3000 }
+    };
+
+    function triggerStageClear(stageNum) {
+      markMissionUI(stageNum);
+      userProfile[`m${stageNum}Done`] = true;
+      userProfile.highestStage = Math.max(userProfile.highestStage, stageNum);
+      saveProfile();
+
+      playFanfareSound();
+      triggerConfetti(80);
+
+      const info = STAGE_PRIZES[stageNum];
+      certStageTag.textContent = info.name;
+      certAmount.textContent = info.amount;
+      certUsername.textContent = `${userProfile.username || '대원'} 대원`;
+      const now = new Date();
+      certDate.textContent = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      if (!userProfile.certCode) userProfile.certCode = generateCertCode();
+      certCodeEl.textContent = userProfile.certCode;
+
+      // 딜레마 갈림길 버튼 생성
+      dilemmaActions.innerHTML = '';
+
+      // 선택 1: 현재 상금 수령하기
+      const btnClaim = document.createElement('button');
+      btnClaim.className = 'btn-claim-now';
+      btnClaim.innerHTML = `📸 지금 이 화면 캡처하고 [${info.amount}] 수령하기`;
+      btnClaim.addEventListener('click', () => {
+        userProfile.claimedStage = stageNum;
+        userProfile.claimedAmount = info.num;
+        saveProfile();
+        alert(`[${info.amount}] 수령 신청 완료!\n\n지금 이 화면을 캡처(스크린샷)하여 댓글로 올려주시면 운영진이 확인 후 1회에 한하여 상금을 지급합니다!`);
+        prizeModalOverlay.style.display = 'none';
+      });
+      dilemmaActions.appendChild(btnClaim);
+
+      // 선택 2: 상위 단계 도전 (포기 시 되돌릴 수 없음!)
+      if (info.nextAmount) {
+        const btnGamble = document.createElement('button');
+        btnGamble.className = 'btn-gamble-next';
+        btnGamble.innerHTML = `🔥 [${info.amount}] 포기하고 [${info.nextAmount}] 도전하기!`;
+        btnGamble.addEventListener('click', () => {
+          const confirmGamble = confirm(`⚠️ [주의: 한 번 포기하면 되돌릴 수 없습니다!]\n\n현재 ${info.amount} 상금을 완전히 포기하고 상위 단계(${info.nextAmount})에 도전하시겠습니까?`);
+          if (confirmGamble) {
+            prizeModalOverlay.style.display = 'none';
+            actionBubble.className = 'action-bubble active-state';
+            bubbleEmoji.textContent = '🔥';
+            bubbleText.textContent = `용기 있는 선택! ${info.nextAmount} 상금을 향해 다음 미션에 도전하세요!`;
+          }
+        });
+
+        const warningLabel = document.createElement('div');
+        warningLabel.className = 'forfeit-warning-text';
+        warningLabel.textContent = `* 주의: 다음 단계에 도전하면 ${info.amount} 상금은 완전히 사라지며 되돌릴 수 없습니다!`;
+
+        dilemmaActions.appendChild(btnGamble);
+        dilemmaActions.appendChild(warningLabel);
+      } else {
+        // 3단계 최종 단계
+        const finishLabel = document.createElement('div');
+        finishLabel.style.fontSize = '12px';
+        finishLabel.style.color = '#15803d';
+        finishLabel.style.fontWeight = '700';
+        finishLabel.style.marginTop = '4px';
+        finishLabel.textContent = '🎉 최고 난이도 완전 정복! 지금 바로 캡처하여 최고 상금 3,000미소를 수령하세요!';
+        dilemmaActions.appendChild(finishLabel);
+      }
+
+      prizeModalOverlay.style.display = 'flex';
+    }
 
     /* =====================================================================
-       4. Three.js 3D 씬 (아두이노 + 부품들 + 전기 파티클 흐름)
+       5. Three.js 3D 씬 (아두이노 + 전선 + 파티클 + 부품들)
        ===================================================================== */
     const container = document.getElementById('canvas-container');
     const canvas = document.getElementById('three-canvas');
@@ -1015,12 +1516,11 @@
       mainGroup.add(g);
       return g;
     }
-    const pullDownRes = makeResistor(new THREE.Vector3(22, 8.2, -1), [0x603813, 0x000000, 0xe67e22, 0xd4af37]); // 10k 풀다운 저항
-    const ledRes = makeResistor(new THREE.Vector3(22, 8.2, 10), [0xd93829, 0xd93829, 0x603813, 0xd4af37]);      // 220 LED 저항
+    const pullDownRes = makeResistor(new THREE.Vector3(22, 8.2, -1), [0x603813, 0x000000, 0xe67e22, 0xd4af37]);
+    const ledRes = makeResistor(new THREE.Vector3(22, 8.2, 10), [0xd93829, 0xd93829, 0x603813, 0xd4af37]);
 
-    // ⚡ 전선들 및 곡선 경로 (전기 파티클 이동 경로)
+    // 전선들
     const wireCurves = {};
-
     function makeWire(id, pts, color) {
       const curve = new THREE.CatmullRomCurve3(pts);
       wireCurves[id] = curve;
@@ -1038,9 +1538,7 @@
     const gndWireMesh = makeWire('gnd', [new THREE.Vector3(-36, 3.5, 17), new THREE.Vector3(-15, 18, 12), new THREE.Vector3(15, 15, 3), new THREE.Vector3(26, 6, 3)], 0x222a3d);
     const d13WireMesh = makeWire('d13', [new THREE.Vector3(-36, 3.5, -9), new THREE.Vector3(-18, 16, -4), new THREE.Vector3(10, 15, 8), new THREE.Vector3(18, 6, 8)], 0xffa040);
 
-    /* =====================================================================
-       ⚡ [마법 1] 눈으로 보는 전기 요정 파티클 시스템
-       ===================================================================== */
+    // 전기 요정 파티클
     const particleCount = 28;
     const particleGeo = new THREE.SphereGeometry(0.55, 8, 8);
     const particleMat = new THREE.MeshBasicMaterial({ color: 0xffea00 });
@@ -1062,7 +1560,6 @@
         electricParticles.forEach(p => p.mesh.visible = false);
         return;
       }
-
       electricParticles.forEach(p => {
         p.mesh.visible = true;
         p.t += delta * 1.8;
@@ -1079,7 +1576,7 @@
     }
 
     /* =====================================================================
-       5. 물리 트윈 및 복합 인터랙션
+       6. 물리 트윈 및 퀘스트 인터랙션
        ===================================================================== */
     const state = {
       mode: 'hold',
@@ -1121,7 +1618,6 @@
         rainbowIdx++;
       }
 
-      // 만약 전선이 뽑혀있으면 신호 전달 안 됨!
       if (!experiments.wireConnected) {
         actionBubble.className = 'action-bubble';
         bubbleEmoji.textContent = '🔌';
@@ -1129,7 +1625,6 @@
         return;
       }
 
-      // 만약 유령 모드(저항 뽑힘)면 버튼 누르면 정전기가 아니라 정상 HIGH
       if (experiments.ghostMode) {
         setLedGlow(isDown);
         return;
@@ -1139,7 +1634,7 @@
         setLedGlow(isDown);
         updateActionBubble(isDown);
 
-        // [미션 1 감지]: 3초 누르기
+        // 🎯 [미션 1 감지]: 3초 꾹 누르기
         if (isDown && !missions.m1.completed) {
           missions.m1.holdSeconds = 0;
           const fillBar = document.getElementById('m1-fill');
@@ -1149,7 +1644,7 @@
             fillBar.style.width = `${Math.min(100, (missions.m1.holdSeconds / 3.0) * 100)}%`;
             if (missions.m1.holdSeconds >= 3.0) {
               clearInterval(holdInterval);
-              completeMission('m1', '전등 켜기 마법사');
+              triggerStageClear(1);
             }
           }, 100);
         } else if (!isDown && !missions.m1.completed) {
@@ -1163,14 +1658,14 @@
           setLedGlow(state.toggleState);
           updateActionBubble(state.toggleState);
         } else {
-          // [미션 2 감지]: 손 떼도 켜져 있음
+          // 🎯 [미션 2 감지]: 손 뗐는데도 켜져 있음
           if (state.toggleState && !missions.m2.completed) {
-            completeMission('m2', '방 전등 스위치 만들기');
+            triggerStageClear(2);
           }
         }
       }
 
-      // [미션 3 감지]: 3초 안 3회 연타
+      // 🎯 [미션 3 감지]: 3초 안 3회 연타
       if (isDown && !missions.m3.completed) {
         const nowTime = performance.now();
         missions.m3.clickTimestamps.push(nowTime);
@@ -1178,7 +1673,7 @@
         const cnt = missions.m3.clickTimestamps.length;
         document.getElementById('m3-fill').style.width = `${Math.min(100, (cnt / 3) * 100)}%`;
         if (cnt >= 3) {
-          completeMission('m3', '비밀 모스 부호 전송');
+          triggerStageClear(3);
         }
       }
     }
@@ -1199,7 +1694,7 @@
       }
     }
 
-    // 마우스 레이캐스터
+    // 마우스 이벤트
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let isPressedOnScreen = false;
@@ -1212,7 +1707,6 @@
       raycaster.setFromCamera(mouse, camera);
       const hits = raycaster.intersectObjects([hitBox, capMesh, btnPlate, blueWireMesh], true);
       if (hits.length > 0) {
-        // 전선 클릭 시 전선 꽂기/뽑기 반응
         if (hits[0].object === blueWireMesh) {
           btnLabWire.click();
           return;
@@ -1235,7 +1729,6 @@
     window.addEventListener('pointerup', handlePointerUp);
     window.addEventListener('pointercancel', handlePointerUp);
 
-    // 모드 버튼
     document.querySelectorAll('.kid-mode-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.kid-mode-btn').forEach(b => b.classList.remove('active'));
@@ -1247,7 +1740,6 @@
       });
     });
 
-    // 말풍선 위치 투영
     const tagButton = document.getElementById('tag-button');
     const tagLed = document.getElementById('tag-led');
     const tagResistor = document.getElementById('tag-resistor');
@@ -1274,7 +1766,7 @@
     }
 
     /* =====================================================================
-       6. 메인 애니메이션 루프 (도깨비 유령 플로팅 시뮬레이션 포함)
+       7. 메인 렌더링 루프
        ===================================================================== */
     let lastTime = performance.now();
     let ghostTimer = 0;
@@ -1284,11 +1776,9 @@
       const delta = (now - lastTime) / 1000;
       lastTime = now;
 
-      // 캡 하강 보간
       capCurrentY += (capTargetY - capCurrentY) * 0.35;
       capGroup.position.y = capCurrentY;
 
-      // 👻 도깨비 유령 모드 (풀다운 저항 빠짐 -> 정전기 노이즈 깜빡임)
       if (experiments.ghostMode && !state.isDown) {
         ghostTimer += delta;
         if (ghostTimer > 0.08) {
@@ -1299,7 +1789,6 @@
         }
       }
 
-      // ⚡ 눈으로 보는 전기 요정 파티클
       const isElectricityFlowing = (state.isDown && state.mode === 'hold') || (state.ledLit && state.mode === 'toggle');
       updateElectricityParticles(delta, isElectricityFlowing);
 
@@ -1316,7 +1805,7 @@
     });
 
     /* =====================================================================
-       7. 축하 폭죽 파티클 (Canvas Confetti)
+       8. 폭죽 파티클 (Canvas Confetti)
        ===================================================================== */
     const confCanvas = document.getElementById('confetti-canvas');
     const confCtx = confCanvas.getContext('2d');
@@ -1330,11 +1819,11 @@
     resizeConfetti();
 
     function triggerConfetti(count = 80) {
-      const colors = ['#ff5757', '#ffde59', '#5271ff', '#7ed957', '#ff914d', '#a855f7'];
+      const colors = ['#ff5757', '#ffde59', '#5271ff', '#7ed957', '#ff914d', '#a855f7', '#f59e0b'];
       for (let i = 0; i < count; i++) {
         confettiParticles.push({
           x: window.innerWidth * 0.5 + (Math.random() - 0.5) * 200,
-          y: window.innerHeight * 0.4 + (Math.random() - 0.5) * 100,
+          y: window.innerHeight * 0.35 + (Math.random() - 0.5) * 80,
           vx: (Math.random() - 0.5) * 14,
           vy: -Math.random() * 11 - 5,
           size: Math.random() * 8 + 6,
